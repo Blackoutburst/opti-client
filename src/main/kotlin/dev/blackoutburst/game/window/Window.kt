@@ -23,6 +23,7 @@ import org.lwjgl.system.MemoryUtil.NULL
 import org.lwjgl.system.Platform
 import java.nio.ByteBuffer
 import java.security.Key
+import kotlin.random.Random
 import kotlin.system.exitProcess
 
 object Window {
@@ -53,11 +54,11 @@ object Window {
         createCapabilities()
 
         glfwSwapInterval(if (Platform.get() == Platform.MACOSX) GLFW_TRUE else GLFW_FALSE)
-        //glfwSetInputMode(id, GLFW_CURSOR, GLFW_CURSOR_DISABLED)
+        glfwSetInputMode(id, GLFW_CURSOR, GLFW_CURSOR_DISABLED)
 
         NK.init(id)
 
-        glClearColor(0.1f, 0.1f, 0.1f, 1f)
+        glClearColor(Random.nextFloat(), Random.nextFloat(), Random.nextFloat(), 1f)
 
         setCallbacks()
         setIcons()
@@ -136,7 +137,7 @@ object Window {
         val image = GLFWImage.malloc()
         val buffer = GLFWImage.malloc(1)
         try {
-            image[128, 128] = loadIcon()
+            image[64, 64] = loadIcon()
             buffer.put(0, image)
             glfwSetWindowIcon(id, buffer)
         } catch (e: Exception) {

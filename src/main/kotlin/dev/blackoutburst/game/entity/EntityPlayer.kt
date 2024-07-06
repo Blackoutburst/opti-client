@@ -1,12 +1,19 @@
 package dev.blackoutburst.game.entity
 
-import dev.blackoutburst.game.Camera
+import dev.blackoutburst.game.Main
+import dev.blackoutburst.game.camera.Camera
 import dev.blackoutburst.game.input.Keyboard
 import dev.blackoutburst.game.input.Mouse
 import dev.blackoutburst.game.maths.Vector2f
 import dev.blackoutburst.game.maths.Vector3f
+import dev.blackoutburst.game.network.Connection
+import dev.blackoutburst.game.network.packets.client.C00UpdateEntity
+import dev.blackoutburst.game.network.packets.client.C01UpdateBlock
 import dev.blackoutburst.game.utils.Time
+import dev.blackoutburst.game.world.BlockType
+import dev.blackoutburst.game.world.World
 import org.lwjgl.glfw.GLFW
+import org.lwjgl.openal.AL10.alSourcePlay
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -24,6 +31,8 @@ class EntityPlayer(
     private val runSpeed = 50f
     private val walkSpeed = 10f
 
+    private var blockType = BlockType.GRASS
+
     private var velocity = Vector3f()
 
     override fun update() {
@@ -31,6 +40,13 @@ class EntityPlayer(
         rotate()
         move()
         updateCamera()
+        networkUpdate()
+    }
+
+    private fun networkUpdate() {
+        if (Time.doUpdate()) {
+            Connection.write(C00UpdateEntity(id, position, rotation))
+        }
     }
 
     override fun render() {
@@ -122,12 +138,26 @@ class EntityPlayer(
 
     private fun mouseAction() {
         if (Mouse.isButtonPressed(Mouse.RIGHT_BUTTON)) {
+            val result = World.dda(Camera.position, Camera.direction, 100)
+            result.block?.let { b ->
+                result.face?.let { f ->
+                    Connection.write(C01UpdateBlock(blockType.id, b.position + f))
+                }
+            }
         }
 
         if (Mouse.isButtonPressed(Mouse.LEFT_BUTTON)) {
+            World.dda(Camera.position, Camera.direction, 100)
+                .block?.let {
+                    alSourcePlay(Main.source)
+                    Connection.write(C01UpdateBlock(BlockType.AIR.id, it.position))
+                }
         }
 
         if (Mouse.isButtonPressed(Mouse.MIDDLE_BUTTON)) {
+            World.dda(Camera.position, Camera.direction, 100).block?.let {
+                blockType = it.type
+            }
         }
     }
 }

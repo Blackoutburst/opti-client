@@ -1,8 +1,6 @@
 package dev.blackoutburst.game.ui
 
 import dev.blackoutburst.game.Main
-import dev.blackoutburst.game.utils.FBN
-import dev.blackoutburst.game.utils.SystemMonitor
 import dev.blackoutburst.game.utils.stack
 import dev.blackoutburst.game.window.nuklear.NK.ctx
 import org.lwjgl.nuklear.NkRect
@@ -21,12 +19,6 @@ object SystemUsage {
             ) {
                 nk_layout_row_dynamic(ctx, 20f, 1)
                 nk_label(ctx, "FPS: ${Main.fps}", NK_TEXT_LEFT)
-                nk_layout_row_dynamic(ctx, 20f, 1)
-                nk_label(ctx, "CPU: ${SystemMonitor.cPUProcessUsage}%", NK_TEXT_LEFT)
-                nk_layout_row_dynamic(ctx, 20f, 1)
-                nk_label(ctx, "Threads: ${FBN(SystemMonitor.threadCount)}", NK_TEXT_LEFT)
-                nk_layout_row_dynamic(ctx, 20f, 1)
-                nk_label(ctx, "RAM: ${FBN(SystemMonitor.memoryUsage)}Mo", NK_TEXT_LEFT)
             }
             nk_end(ctx)
         }

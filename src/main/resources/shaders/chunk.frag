@@ -18,9 +18,6 @@ uniform vec4 color;
 out vec4 FragColor;
 
 void main() {
-    FragColor = vec4(1.0, 0.0, 0.0, 1.0);
-    return;
-
     if (texture(text, vec3(uv, layer)).a <= 0.5) {
         discard;
     }

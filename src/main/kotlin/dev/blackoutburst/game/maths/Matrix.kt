@@ -25,9 +25,81 @@ class Matrix {
     var m32: Float = 0f
     var m33: Float = 0f
 
-    init {
-        setIdentity()
+    constructor() {
+        this.setIdentity()
     }
+
+    constructor(matrix: Matrix) {
+        this.m00 = matrix.m00
+        this.m01 = matrix.m01
+        this.m02 = matrix.m02
+        this.m03 = matrix.m03
+        this.m10 = matrix.m10
+        this.m11 = matrix.m11
+        this.m12 = matrix.m12
+        this.m13 = matrix.m13
+        this.m20 = matrix.m20
+        this.m21 = matrix.m21
+        this.m22 = matrix.m22
+        this.m23 = matrix.m23
+        this.m30 = matrix.m30
+        this.m31 = matrix.m31
+        this.m32 = matrix.m32
+        this.m33 = matrix.m33
+    }
+
+    fun get(index: Int): Float {
+        val elements = floatArrayOf(
+            this.m00, this.m01, this.m02, this.m03,
+            this.m10, this.m11, this.m12, this.m13,
+            this.m20, this.m21, this.m22, this.m23,
+            this.m30, this.m31, this.m32, this.m33
+        )
+
+        return elements[index]
+    }
+
+    fun mul(right: Matrix): Matrix {
+        val src = Matrix()
+        load(this, src)
+
+        val m00 = this.m00 * right.m00 + this.m10 * right.m01 + this.m20 * right.m02 + this.m30 * right.m03
+        val m01 = this.m01 * right.m00 + this.m11 * right.m01 + this.m21 * right.m02 + this.m31 * right.m03
+        val m02 = this.m02 * right.m00 + this.m12 * right.m01 + this.m22 * right.m02 + this.m32 * right.m03
+        val m03 = this.m03 * right.m00 + this.m13 * right.m01 + this.m23 * right.m02 + this.m33 * right.m03
+        val m10 = this.m00 * right.m10 + this.m10 * right.m11 + this.m20 * right.m12 + this.m30 * right.m13
+        val m11 = this.m01 * right.m10 + this.m11 * right.m11 + this.m21 * right.m12 + this.m31 * right.m13
+        val m12 = this.m02 * right.m10 + this.m12 * right.m11 + this.m22 * right.m12 + this.m32 * right.m13
+        val m13 = this.m03 * right.m10 + this.m13 * right.m11 + this.m23 * right.m12 + this.m33 * right.m13
+        val m20 = this.m00 * right.m20 + this.m10 * right.m21 + this.m20 * right.m22 + this.m30 * right.m23
+        val m21 = this.m01 * right.m20 + this.m11 * right.m21 + this.m21 * right.m22 + this.m31 * right.m23
+        val m22 = this.m02 * right.m20 + this.m12 * right.m21 + this.m22 * right.m22 + this.m32 * right.m23
+        val m23 = this.m03 * right.m20 + this.m13 * right.m21 + this.m23 * right.m22 + this.m33 * right.m23
+        val m30 = this.m00 * right.m30 + this.m10 * right.m31 + this.m20 * right.m32 + this.m30 * right.m33
+        val m31 = this.m01 * right.m30 + this.m11 * right.m31 + this.m21 * right.m32 + this.m31 * right.m33
+        val m32 = this.m02 * right.m30 + this.m12 * right.m31 + this.m22 * right.m32 + this.m32 * right.m33
+        val m33 = this.m03 * right.m30 + this.m13 * right.m31 + this.m23 * right.m32 + this.m33 * right.m33
+
+        this.m00 = m00
+        this.m01 = m01
+        this.m02 = m02
+        this.m03 = m03
+        this.m10 = m10
+        this.m11 = m11
+        this.m12 = m12
+        this.m13 = m13
+        this.m20 = m20
+        this.m21 = m21
+        this.m22 = m22
+        this.m23 = m23
+        this.m30 = m30
+        this.m31 = m31
+        this.m32 = m32
+        this.m33 = m33
+
+        return this
+    }
+
 
     fun lookAt(eye: Vector3f, center: Vector3f, up: Vector3f): Matrix {
         val f = (center - eye).normalize()
@@ -507,7 +579,7 @@ class Matrix {
     }
 
 
-    fun translate(vec: Vector2f) {
+    fun translate(vec: Vector2f): Matrix {
         val src = Matrix()
         load(this, src)
 
@@ -515,6 +587,8 @@ class Matrix {
         this.m31 += src.m01 * vec.x + src.m11 * vec.y
         this.m32 += src.m02 * vec.x + src.m12 * vec.y
         this.m33 += src.m03 * vec.x + src.m13 * vec.y
+
+        return this
     }
 
     fun translate(vec: Vector3f): Matrix {

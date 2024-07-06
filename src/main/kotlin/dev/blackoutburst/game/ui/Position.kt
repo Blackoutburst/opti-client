@@ -1,9 +1,8 @@
 package dev.blackoutburst.game.ui
 
-import dev.blackoutburst.game.Camera
+import dev.blackoutburst.game.camera.Camera
 import dev.blackoutburst.game.utils.stack
 import dev.blackoutburst.game.window.nuklear.NK.ctx
-import dev.blackoutburst.game.world.World
 import org.lwjgl.nuklear.NkRect
 import org.lwjgl.nuklear.Nuklear.*
 

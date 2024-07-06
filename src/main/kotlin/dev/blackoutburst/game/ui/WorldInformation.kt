@@ -21,6 +21,8 @@ object WorldInformation {
                 nk_label(ctx, "Chunks: ${World.chunks.size}", NK_TEXT_LEFT)
                 nk_layout_row_dynamic(ctx, 20f, 1)
                 nk_label(ctx, "Rendered: ${World.chunkRendered}", NK_TEXT_LEFT)
+                nk_layout_row_dynamic(ctx, 20f, 1)
+                nk_label(ctx, "Update: ${World.chunkUpdate}", NK_TEXT_LEFT)
             }
             nk_end(ctx)
         }

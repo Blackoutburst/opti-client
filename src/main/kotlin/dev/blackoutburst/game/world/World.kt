@@ -15,6 +15,7 @@ import org.lwjgl.opengl.GL20.GL_FRAGMENT_SHADER
 import org.lwjgl.opengl.GL20.GL_VERTEX_SHADER
 import org.lwjgl.opengl.GL30.*
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicInteger
 import kotlin.math.abs
 import kotlin.math.floor
 import kotlin.math.sign
@@ -30,6 +31,7 @@ object World {
 
     val chunks: ConcurrentHashMap<String, Chunk> = ConcurrentHashMap()
     var chunkRendered = 0
+    var chunkUpdate = AtomicInteger(0)
 
     fun addChunk(position: Vector3i, blockData: Array<Byte>) {
         chunks[position.toString()]?.let {

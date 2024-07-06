@@ -141,6 +141,7 @@ class EntityPlayer(
             val result = World.dda(Camera.position, Camera.direction, 100)
             result.block?.let { b ->
                 result.face?.let { f ->
+                    alSourcePlay(Main.source2)
                     Connection.write(C01UpdateBlock(blockType.id, b.position + f))
                 }
             }

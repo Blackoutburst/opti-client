@@ -2,6 +2,7 @@ package dev.blackoutburst.game
 
 import dev.blackoutburst.game.Main.queue
 import dev.blackoutburst.game.Main.source
+import dev.blackoutburst.game.Main.source2
 import dev.blackoutburst.game.entity.EntityManager
 import dev.blackoutburst.game.network.Connection
 import dev.blackoutburst.game.ui.*
@@ -14,7 +15,6 @@ import org.lwjgl.openal.AL
 import org.lwjgl.openal.AL10.*
 import org.lwjgl.openal.ALC10.*
 import org.lwjgl.system.MemoryUtil
-import java.io.FileInputStream
 import java.nio.ByteBuffer
 import java.nio.IntBuffer
 import java.util.concurrent.ConcurrentLinkedQueue
@@ -24,6 +24,7 @@ object Main {
     val queue: ConcurrentLinkedQueue<() -> Unit> = ConcurrentLinkedQueue()
     var fps = 0
     var source = 0
+    var source2 = 0
 }
 
 fun main() {
@@ -51,6 +52,18 @@ fun main() {
 
     source = alGenSources()
     alSourcei(source, AL_BUFFER, buffer)
+
+    val buffer2 = alGenBuffers()
+    val waveFile2 = Main::class.java.getResourceAsStream("/bomb.wav")
+    val audioInputStream2 = AudioSystem.getAudioInputStream(waveFile2)
+    val format2 = if (audioInputStream2.format.channels == 1) AL_FORMAT_MONO16 else AL_FORMAT_STEREO16
+    val audioBytes2 = audioInputStream2.readAllBytes()
+    val audioBuffer2 = BufferUtils.createByteBuffer(audioBytes2.size)
+    audioBuffer2.put(audioBytes2).flip()
+    alBufferData(buffer2, format2, audioBuffer2, audioInputStream2.format.sampleRate.toInt())
+
+    source2 = alGenSources()
+    alSourcei(source2, AL_BUFFER, buffer2)
 
     //AL SHITPOST END
 

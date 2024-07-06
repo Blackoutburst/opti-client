@@ -3,6 +3,9 @@ package dev.blackoutburst.game.world
 import dev.blackoutburst.game.maths.Vector3i
 import dev.blackoutburst.game.utils.main
 import dev.blackoutburst.game.utils.stack
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import org.lwjgl.opengl.ARBInstancedArrays
 import org.lwjgl.opengl.GL30.*
 import org.lwjgl.opengl.GL33.glDrawElementsInstanced
@@ -56,6 +59,8 @@ class Chunk(
             ((texture and 31) shl 18)
 
     fun update() {
+        World.chunkUpdate.incrementAndGet()
+
         main {
             if (vaoID == 0) {
                 vaoID = glGenVertexArrays()
@@ -84,8 +89,9 @@ class Chunk(
 
                 //SSBO
                 glBindBuffer(GL_ARRAY_BUFFER, ssboId)
-                val instanceBuffer = getOffsets(stack)
-                instanceBuffer.flip()
+                val offsets = getOffsets()
+                val instanceBuffer = stack.mallocInt(offsets.size)
+                instanceBuffer.put(offsets).flip()
                 glBufferData(GL_ARRAY_BUFFER, instanceBuffer, GL_STATIC_DRAW)
                 glEnableVertexAttribArray(1)
                 glVertexAttribIPointer(1, 1, GL_INT, 0, 0)
@@ -93,12 +99,14 @@ class Chunk(
                 glBindBuffer(GL_ARRAY_BUFFER, 0)
 
                 glBindVertexArray(0)
+
+                World.chunkUpdate.decrementAndGet()
             }
         }
     }
 
-    private fun getOffsets(stack: MemoryStack): IntBuffer {
-        val buffer = stack.mallocInt(4096 * 6)
+    private fun getOffsets(): IntArray {
+        val offsets = mutableListOf<Int>()
         instanceCount = 0
 
         block@for (i in blocks.indices) {
@@ -113,12 +121,12 @@ class Chunk(
                 val face = faces[j]
                 if (!face) continue@face
 
-                buffer.put(packData(position, j, blockType.textures[j]))
+                offsets.add(packData(position, j, blockType.textures[j]))
                 instanceCount++
             }
         }
 
-        return buffer
+        return offsets.toIntArray()
     }
 
     fun render() {

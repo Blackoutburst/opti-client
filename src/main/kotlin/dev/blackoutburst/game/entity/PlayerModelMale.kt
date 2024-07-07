@@ -5,6 +5,8 @@ import org.lwjgl.opengl.GL30.*
 
 object PlayerModelMale {
 
+    private const val LAYER = 0.05f
+
     val vaos = mutableMapOf(
         "head" to 0,
         "body" to 0,
@@ -40,30 +42,6 @@ object PlayerModelMale {
         //BOTTOM
         21, 22, 20,
         22, 23, 20,
-
-        //TOP
-        0 + 24, 2 + 24, 1 + 24,
-        0 + 24, 3 + 24, 2 + 24,
-
-        //FRONT
-        4 + 24, 6 + 24, 5 + 24,
-        4 + 24, 7 + 24, 6 + 24,
-
-        //BACK
-        9 + 24, 10 + 24, 8 + 24,
-        10 + 24, 11 + 24, 8 + 24,
-
-        //LEFT
-        12 + 24, 14 + 24, 13 + 24,
-        12 + 24, 15 + 24, 14 + 24,
-
-        //RIGHT
-        17 + 24, 18 + 24, 16 + 24,
-        18 + 24, 19 + 24, 16 + 24,
-
-        //BOTTOM
-        21 + 24, 22 + 24, 20 + 24,
-        22 + 24, 23 + 24, 20 + 24,
     )
 
     private val headVertices = floatArrayOf(
@@ -106,40 +84,40 @@ object PlayerModelMale {
 
     private val headLayerVertices = floatArrayOf(
         //TOP
-        0f - 0.03f, 1f + 0.03f, 0f - 0.03f, uv(1f,40f,48f), uv(1f,0f,8f), 0f,
-        1f + 0.03f, 1f + 0.03f, 0f - 0.03f, uv(0f,40f,48f), uv(1f,0f,8f), 0f,
-        1f + 0.03f, 1f + 0.03f, 1f + 0.03f, uv(0f,40f,48f), uv(0f,0f,8f), 0f,
-        0f - 0.03f, 1f + 0.03f, 1f + 0.03f, uv(1f,40f,48f), uv(0f,0f,8f), 0f,
+        0f - LAYER, 1f + LAYER, 0f - LAYER, uv(1f,40f,48f), uv(1f,0f,8f), 0f,
+        1f + LAYER, 1f + LAYER, 0f - LAYER, uv(0f,40f,48f), uv(1f,0f,8f), 0f,
+        1f + LAYER, 1f + LAYER, 1f + LAYER, uv(0f,40f,48f), uv(0f,0f,8f), 0f,
+        0f - LAYER, 1f + LAYER, 1f + LAYER, uv(1f,40f,48f), uv(0f,0f,8f), 0f,
 
         //FRONT
-        0f - 0.03f, 0f - 0.03f, 0f - 0.03f, uv(1f,40f,48f), uv(1f,8f,16f), 1f,
-        1f + 0.03f, 0f - 0.03f, 0f - 0.03f, uv(0f,40f,48f), uv(1f,8f,16f), 1f,
-        1f + 0.03f, 1f + 0.03f, 0f - 0.03f, uv(0f,40f,48f), uv(0f,8f,16f), 1f,
-        0f - 0.03f, 1f + 0.03f, 0f - 0.03f, uv(1f,40f,48f), uv(0f,8f,16f), 1f,
+        0f - LAYER, 0f - LAYER, 0f - LAYER, uv(1f,40f,48f), uv(1f,8f,16f), 1f,
+        1f + LAYER, 0f - LAYER, 0f - LAYER, uv(0f,40f,48f), uv(1f,8f,16f), 1f,
+        1f + LAYER, 1f + LAYER, 0f - LAYER, uv(0f,40f,48f), uv(0f,8f,16f), 1f,
+        0f - LAYER, 1f + LAYER, 0f - LAYER, uv(1f,40f,48f), uv(0f,8f,16f), 1f,
 
         //BACK
-        0f - 0.03f, 0f - 0.03f, 1f + 0.03f, uv(0f,56f,64f), uv(1f,8f,16f), 2f,
-        1f + 0.03f, 0f - 0.03f, 1f + 0.03f, uv(1f,56f,64f), uv(1f,8f,16f), 2f,
-        1f + 0.03f, 1f + 0.03f, 1f + 0.03f, uv(1f,56f,64f), uv(0f,8f,16f), 2f,
-        0f - 0.03f, 1f + 0.03f, 1f + 0.03f, uv(0f,56f,64f), uv(0f,8f,16f), 2f,
+        0f - LAYER, 0f - LAYER, 1f + LAYER, uv(0f,56f,64f), uv(1f,8f,16f), 2f,
+        1f + LAYER, 0f - LAYER, 1f + LAYER, uv(1f,56f,64f), uv(1f,8f,16f), 2f,
+        1f + LAYER, 1f + LAYER, 1f + LAYER, uv(1f,56f,64f), uv(0f,8f,16f), 2f,
+        0f - LAYER, 1f + LAYER, 1f + LAYER, uv(0f,56f,64f), uv(0f,8f,16f), 2f,
 
         //LEFT
-        0f - 0.03f, 0f - 0.03f, 0f - 0.03f, uv(0f,48f,56f), uv(1f,8f,16f), 3f,
-        0f - 0.03f, 1f + 0.03f, 0f - 0.03f, uv(0f,48f,56f), uv(0f,8f,16f), 3f,
-        0f - 0.03f, 1f + 0.03f, 1f + 0.03f, uv(1f,48f,56f), uv(0f,8f,16f), 3f,
-        0f - 0.03f, 0f - 0.03f, 1f + 0.03f, uv(1f,48f,56f), uv(1f,8f,16f), 3f,
+        0f - LAYER, 0f - LAYER, 0f - LAYER, uv(0f,48f,56f), uv(1f,8f,16f), 3f,
+        0f - LAYER, 1f + LAYER, 0f - LAYER, uv(0f,48f,56f), uv(0f,8f,16f), 3f,
+        0f - LAYER, 1f + LAYER, 1f + LAYER, uv(1f,48f,56f), uv(0f,8f,16f), 3f,
+        0f - LAYER, 0f - LAYER, 1f + LAYER, uv(1f,48f,56f), uv(1f,8f,16f), 3f,
 
         //RIGHT
-        1f + 0.03f, 0f - 0.03f, 0f - 0.03f, uv(1f,32f,40f), uv(1f,8f,16f), 4f,
-        1f + 0.03f, 1f + 0.03f, 0f - 0.03f, uv(1f,32f,40f), uv(0f,8f,16f), 4f,
-        1f + 0.03f, 1f + 0.03f, 1f + 0.03f, uv(0f,32f,40f), uv(0f,8f,16f), 4f,
-        1f + 0.03f, 0f - 0.03f, 1f + 0.03f, uv(0f,32f,40f), uv(1f,8f,16f), 4f,
+        1f + LAYER, 0f - LAYER, 0f - LAYER, uv(1f,32f,40f), uv(1f,8f,16f), 4f,
+        1f + LAYER, 1f + LAYER, 0f - LAYER, uv(1f,32f,40f), uv(0f,8f,16f), 4f,
+        1f + LAYER, 1f + LAYER, 1f + LAYER, uv(0f,32f,40f), uv(0f,8f,16f), 4f,
+        1f + LAYER, 0f - LAYER, 1f + LAYER, uv(0f,32f,40f), uv(1f,8f,16f), 4f,
 
         //BOTTOM
-        0f - 0.03f, 0f - 0.03f, 0f - 0.03f, uv(0f,48f,56f), uv(1f,0f,8f), 5f,
-        1f + 0.03f, 0f - 0.03f, 0f - 0.03f, uv(1f,48f,56f), uv(1f,0f,8f), 5f,
-        1f + 0.03f, 0f - 0.03f, 1f + 0.03f, uv(1f,48f,56f), uv(0f,0f,8f), 5f,
-        0f - 0.03f, 0f - 0.03f, 1f + 0.03f, uv(0f,48f,56f), uv(0f,0f,8f), 5f,
+        0f - LAYER, 0f - LAYER, 0f - LAYER, uv(0f,48f,56f), uv(1f,0f,8f), 5f,
+        1f + LAYER, 0f - LAYER, 0f - LAYER, uv(1f,48f,56f), uv(1f,0f,8f), 5f,
+        1f + LAYER, 0f - LAYER, 1f + LAYER, uv(1f,48f,56f), uv(0f,0f,8f), 5f,
+        0f - LAYER, 0f - LAYER, 1f + LAYER, uv(0f,48f,56f), uv(0f,0f,8f), 5f,
     )
 
     private val bodyVertices = floatArrayOf(
@@ -182,40 +160,40 @@ object PlayerModelMale {
 
     private val bodyLayerVertices = floatArrayOf(
         //TOP
-        (0f - 0.031f), (1f - 1f + 0.031f), (0f + 0.25f - 0.031f),                uv(1f,20f,28f), uv(1f,32f,36f), 0f,
-        (1f + 0.031f), (1f - 1f + 0.031f), (0f + 0.25f - 0.031f),                uv(0f,20f,28f), uv(1f,32f,36f), 0f,
-        (1f + 0.031f), (1f - 1f + 0.031f), (1f - 0.25f + 0.031f),                uv(0f,20f,28f), uv(0f,32f,36f), 0f,
-        (0f - 0.031f), (1f - 1f + 0.031f), (1f - 0.25f + 0.031f),                uv(1f,20f,28f), uv(0f,32f,36f), 0f,
+        (0f - (LAYER + 0.001F)), (1f - 1f + (LAYER + 0.001F)), (0f + 0.25f - (LAYER + 0.001F)),                uv(1f,20f,28f), uv(1f,32f,36f), 0f,
+        (1f + (LAYER + 0.001F)), (1f - 1f + (LAYER + 0.001F)), (0f + 0.25f - (LAYER + 0.001F)),                uv(0f,20f,28f), uv(1f,32f,36f), 0f,
+        (1f + (LAYER + 0.001F)), (1f - 1f + (LAYER + 0.001F)), (1f - 0.25f + (LAYER + 0.001F)),                uv(0f,20f,28f), uv(0f,32f,36f), 0f,
+        (0f - (LAYER + 0.001F)), (1f - 1f + (LAYER + 0.001F)), (1f - 0.25f + (LAYER + 0.001F)),                uv(1f,20f,28f), uv(0f,32f,36f), 0f,
 
         //FRONT
-        (0f - 0.031f), (0f - 1f - 0.5f - 0.031f), (0f + 0.25f - 0.031f),         uv(1f,20f,28f), uv(1f,36f,48f), 1f,
-        (1f + 0.031f), (0f - 1f - 0.5f - 0.031f), (0f + 0.25f - 0.031f),         uv(0f,20f,28f), uv(1f,36f,48f), 1f,
-        (1f + 0.031f), (1f - 1f + 0.031f), (0f + 0.25f - 0.031f),                uv(0f,20f,28f), uv(0f,36f,48f), 1f,
-        (0f - 0.031f), (1f - 1f + 0.031f), (0f + 0.25f - 0.031f),                uv(1f,20f,28f), uv(0f,36f,48f), 1f,
+        (0f - (LAYER + 0.001F)), (0f - 1f - 0.5f - (LAYER + 0.001F)), (0f + 0.25f - (LAYER + 0.001F)),         uv(1f,20f,28f), uv(1f,36f,48f), 1f,
+        (1f + (LAYER + 0.001F)), (0f - 1f - 0.5f - (LAYER + 0.001F)), (0f + 0.25f - (LAYER + 0.001F)),         uv(0f,20f,28f), uv(1f,36f,48f), 1f,
+        (1f + (LAYER + 0.001F)), (1f - 1f + (LAYER + 0.001F)), (0f + 0.25f - (LAYER + 0.001F)),                uv(0f,20f,28f), uv(0f,36f,48f), 1f,
+        (0f - (LAYER + 0.001F)), (1f - 1f + (LAYER + 0.001F)), (0f + 0.25f - (LAYER + 0.001F)),                uv(1f,20f,28f), uv(0f,36f,48f), 1f,
 
         //BACK
-        (0f - 0.031f), (0f - 1f - 0.5f - 0.031f), (1f - 0.25f + 0.031f),         uv(0f,32f,40f), uv(1f,36f,48f), 2f,
-        (1f + 0.031f), (0f - 1f - 0.5f - 0.031f), (1f - 0.25f + 0.031f),         uv(1f,32f,40f), uv(1f,36f,48f), 2f,
-        (1f + 0.031f), (1f - 1f + 0.031f), (1f - 0.25f + 0.031f),                uv(1f,32f,40f), uv(0f,36f,48f), 2f,
-        (0f - 0.031f), (1f - 1f + 0.031f), (1f - 0.25f + 0.031f),                uv(0f,32f,40f), uv(0f,36f,48f), 2f,
+        (0f - (LAYER + 0.001F)), (0f - 1f - 0.5f - (LAYER + 0.001F)), (1f - 0.25f + (LAYER + 0.001F)),         uv(0f,32f,40f), uv(1f,36f,48f), 2f,
+        (1f + (LAYER + 0.001F)), (0f - 1f - 0.5f - (LAYER + 0.001F)), (1f - 0.25f + (LAYER + 0.001F)),         uv(1f,32f,40f), uv(1f,36f,48f), 2f,
+        (1f + (LAYER + 0.001F)), (1f - 1f + (LAYER + 0.001F)), (1f - 0.25f + (LAYER + 0.001F)),                uv(1f,32f,40f), uv(0f,36f,48f), 2f,
+        (0f - (LAYER + 0.001F)), (1f - 1f + (LAYER + 0.001F)), (1f - 0.25f + (LAYER + 0.001F)),                uv(0f,32f,40f), uv(0f,36f,48f), 2f,
 
         //LEFT
-        (0f - 0.031f), (0f - 1f - 0.5f - 0.031f), (0f + 0.25f - 0.031f),         uv(0f,28f,32f), uv(1f,36f,48f), 3f,
-        (0f - 0.031f), (1f - 1f + 0.031f), (0f + 0.25f - 0.031f),                uv(0f,28f,32f), uv(0f,36f,48f), 3f,
-        (0f - 0.031f), (1f - 1f + 0.031f), (1f - 0.25f + 0.031f),                uv(1f,28f,32f), uv(0f,36f,48f), 3f,
-        (0f - 0.031f), (0f - 1f - 0.5f - 0.031f), (1f - 0.25f + 0.031f),         uv(1f,28f,32f), uv(1f,36f,48f), 3f,
+        (0f - (LAYER + 0.001F)), (0f - 1f - 0.5f - (LAYER + 0.001F)), (0f + 0.25f - (LAYER + 0.001F)),         uv(0f,28f,32f), uv(1f,36f,48f), 3f,
+        (0f - (LAYER + 0.001F)), (1f - 1f + (LAYER + 0.001F)), (0f + 0.25f - (LAYER + 0.001F)),                uv(0f,28f,32f), uv(0f,36f,48f), 3f,
+        (0f - (LAYER + 0.001F)), (1f - 1f + (LAYER + 0.001F)), (1f - 0.25f + (LAYER + 0.001F)),                uv(1f,28f,32f), uv(0f,36f,48f), 3f,
+        (0f - (LAYER + 0.001F)), (0f - 1f - 0.5f - (LAYER + 0.001F)), (1f - 0.25f + (LAYER + 0.001F)),         uv(1f,28f,32f), uv(1f,36f,48f), 3f,
 
         //RIGHT
-        (1f + 0.031f), (0f - 1f - 0.5f - 0.031f), (0f + 0.25f - 0.031f),         uv(1f,16f,20f), uv(1f,36f,48f), 4f,
-        (1f + 0.031f), (1f - 1f + 0.031f), (0f + 0.25f - 0.031f),                uv(1f,16f,20f), uv(0f,36f,48f), 4f,
-        (1f + 0.031f), (1f - 1f + 0.031f), (1f - 0.25f + 0.031f),                uv(0f,16f,20f), uv(0f,36f,48f), 4f,
-        (1f + 0.031f), (0f - 1f - 0.5f - 0.031f), (1f - 0.25f + 0.031f),         uv(0f,16f,20f), uv(1f,36f,48f), 4f,
+        (1f + (LAYER + 0.001F)), (0f - 1f - 0.5f - (LAYER + 0.001F)), (0f + 0.25f - (LAYER + 0.001F)),         uv(1f,16f,20f), uv(1f,36f,48f), 4f,
+        (1f + (LAYER + 0.001F)), (1f - 1f + (LAYER + 0.001F)), (0f + 0.25f - (LAYER + 0.001F)),                uv(1f,16f,20f), uv(0f,36f,48f), 4f,
+        (1f + (LAYER + 0.001F)), (1f - 1f + (LAYER + 0.001F)), (1f - 0.25f + (LAYER + 0.001F)),                uv(0f,16f,20f), uv(0f,36f,48f), 4f,
+        (1f + (LAYER + 0.001F)), (0f - 1f - 0.5f - (LAYER + 0.001F)), (1f - 0.25f + (LAYER + 0.001F)),         uv(0f,16f,20f), uv(1f,36f,48f), 4f,
 
         //BOTTOM
-        (0f - 0.031f), (0f - 1f - 0.5f - 0.031f), (0f + 0.25f - 0.031f),         uv(0f,28f,36f), uv(1f,32f,36f), 5f,
-        (1f + 0.031f), (0f - 1f - 0.5f - 0.031f), (0f + 0.25f - 0.031f),         uv(1f,28f,36f), uv(1f,32f,36f), 5f,
-        (1f + 0.031f), (0f - 1f - 0.5f - 0.031f), (1f - 0.25f + 0.031f),         uv(1f,28f,36f), uv(0f,32f,36f), 5f,
-        (0f - 0.031f), (0f - 1f - 0.5f - 0.031f), (1f - 0.25f + 0.03f),         uv(0f,28f,36f), uv(0f,32f,36f), 5f,
+        (0f - (LAYER + 0.001F)), (0f - 1f - 0.5f - (LAYER + 0.001F)), (0f + 0.25f - (LAYER + 0.001F)),         uv(0f,28f,36f), uv(1f,32f,36f), 5f,
+        (1f + (LAYER + 0.001F)), (0f - 1f - 0.5f - (LAYER + 0.001F)), (0f + 0.25f - (LAYER + 0.001F)),         uv(1f,28f,36f), uv(1f,32f,36f), 5f,
+        (1f + (LAYER + 0.001F)), (0f - 1f - 0.5f - (LAYER + 0.001F)), (1f - 0.25f + (LAYER + 0.001F)),         uv(1f,28f,36f), uv(0f,32f,36f), 5f,
+        (0f - (LAYER + 0.001F)), (0f - 1f - 0.5f - (LAYER + 0.001F)), (1f - 0.25f + LAYER),         uv(0f,28f,36f), uv(0f,32f,36f), 5f,
     )
 
     private val rightArmVertices = floatArrayOf(
@@ -258,40 +236,40 @@ object PlayerModelMale {
 
     private val rightArmLayerVertices = floatArrayOf(
         //TOP
-        ((0f + 0.25f) + 0.75f - 0.03f), (1f - 1f + 0.03f), (0f + 0.25f - 0.03f),                     uv(1f,44f,48f), uv(1f,32f,36f), 0f,
-        ((1f - 0.25f) + 0.75f + 0.03f), (1f - 1f + 0.03f), (0f + 0.25f - 0.03f),                     uv(0f,44f,48f), uv(1f,32f,36f), 0f,
-        ((1f - 0.25f) + 0.75f + 0.03f), (1f - 1f + 0.03f), (1f - 0.25f + 0.03f),                     uv(0f,44f,48f), uv(0f,32f,36f), 0f,
-        ((0f + 0.25f) + 0.75f - 0.03f), (1f - 1f + 0.03f), (1f - 0.25f + 0.03f),                     uv(1f,44f,48f), uv(0f,32f,36f), 0f,
+        ((0f + 0.25f) + 0.75f - LAYER), (1f - 1f + LAYER), (0f + 0.25f - LAYER),                     uv(1f,44f,48f), uv(1f,32f,36f), 0f,
+        ((1f - 0.25f) + 0.75f + LAYER), (1f - 1f + LAYER), (0f + 0.25f - LAYER),                     uv(0f,44f,48f), uv(1f,32f,36f), 0f,
+        ((1f - 0.25f) + 0.75f + LAYER), (1f - 1f + LAYER), (1f - 0.25f + LAYER),                     uv(0f,44f,48f), uv(0f,32f,36f), 0f,
+        ((0f + 0.25f) + 0.75f - LAYER), (1f - 1f + LAYER), (1f - 0.25f + LAYER),                     uv(1f,44f,48f), uv(0f,32f,36f), 0f,
 
         //FRONT
-        ((0f + 0.25f) + 0.75f - 0.03f), (0f - 1f - 0.5f - 0.03f), (0f + 0.25f - 0.03f),              uv(1f,44f,48f), uv(1f,36f,48f), 1f,
-        ((1f - 0.25f) + 0.75f + 0.03f), (0f - 1f - 0.5f - 0.03f), (0f + 0.25f - 0.03f),              uv(0f,44f,48f), uv(1f,36f,48f), 1f,
-        ((1f - 0.25f) + 0.75f + 0.03f), (1f - 1f + 0.03f), (0f + 0.25f - 0.03f),                     uv(0f,44f,48f), uv(0f,36f,48f), 1f,
-        ((0f + 0.25f) + 0.75f - 0.03f), (1f - 1f + 0.03f), (0f + 0.25f - 0.03f),                     uv(1f,44f,48f), uv(0f,36f,48f), 1f,
+        ((0f + 0.25f) + 0.75f - LAYER), (0f - 1f - 0.5f - LAYER), (0f + 0.25f - LAYER),              uv(1f,44f,48f), uv(1f,36f,48f), 1f,
+        ((1f - 0.25f) + 0.75f + LAYER), (0f - 1f - 0.5f - LAYER), (0f + 0.25f - LAYER),              uv(0f,44f,48f), uv(1f,36f,48f), 1f,
+        ((1f - 0.25f) + 0.75f + LAYER), (1f - 1f + LAYER), (0f + 0.25f - LAYER),                     uv(0f,44f,48f), uv(0f,36f,48f), 1f,
+        ((0f + 0.25f) + 0.75f - LAYER), (1f - 1f + LAYER), (0f + 0.25f - LAYER),                     uv(1f,44f,48f), uv(0f,36f,48f), 1f,
 
         //BACK
-        ((0f + 0.25f) + 0.75f - 0.03f), (0f - 1f - 0.5f - 0.03f), (1f - 0.25f + 0.03f),              uv(0f,52f,56f), uv(1f,36f,48f), 2f,
-        ((1f - 0.25f) + 0.75f + 0.03f), (0f - 1f - 0.5f - 0.03f), (1f - 0.25f + 0.03f),              uv(1f,52f,56f), uv(1f,36f,48f), 2f,
-        ((1f - 0.25f) + 0.75f + 0.03f), (1f - 1f + 0.03f), (1f - 0.25f + 0.03f),                     uv(1f,52f,56f), uv(0f,36f,48f), 2f,
-        ((0f + 0.25f) + 0.75f - 0.03f), (1f - 1f + 0.03f), (1f - 0.25f + 0.03f),                     uv(0f,52f,56f), uv(0f,36f,48f), 2f,
+        ((0f + 0.25f) + 0.75f - LAYER), (0f - 1f - 0.5f - LAYER), (1f - 0.25f + LAYER),              uv(0f,52f,56f), uv(1f,36f,48f), 2f,
+        ((1f - 0.25f) + 0.75f + LAYER), (0f - 1f - 0.5f - LAYER), (1f - 0.25f + LAYER),              uv(1f,52f,56f), uv(1f,36f,48f), 2f,
+        ((1f - 0.25f) + 0.75f + LAYER), (1f - 1f + LAYER), (1f - 0.25f + LAYER),                     uv(1f,52f,56f), uv(0f,36f,48f), 2f,
+        ((0f + 0.25f) + 0.75f - LAYER), (1f - 1f + LAYER), (1f - 0.25f + LAYER),                     uv(0f,52f,56f), uv(0f,36f,48f), 2f,
 
         //LEFT
-        ((0f + 0.25f) + 0.75f - 0.03f), (0f - 1f - 0.5f - 0.03f), (0f + 0.25f - 0.03f),              uv(0f,48f,52f), uv(1f,36f,48f), 3f,
-        ((0f + 0.25f) + 0.75f - 0.03f), (1f - 1f + 0.03f), (0f + 0.25f - 0.03f),                     uv(0f,48f,52f), uv(0f,36f,48f), 3f,
-        ((0f + 0.25f) + 0.75f - 0.03f), (1f - 1f + 0.03f), (1f - 0.25f + 0.03f),                     uv(1f,48f,52f), uv(0f,36f,48f), 3f,
-        ((0f + 0.25f) + 0.75f - 0.03f), (0f - 1f - 0.5f - 0.03f), (1f - 0.25f + 0.03f),              uv(1f,48f,52f), uv(1f,36f,48f), 3f,
+        ((0f + 0.25f) + 0.75f - LAYER), (0f - 1f - 0.5f - LAYER), (0f + 0.25f - LAYER),              uv(0f,48f,52f), uv(1f,36f,48f), 3f,
+        ((0f + 0.25f) + 0.75f - LAYER), (1f - 1f + LAYER), (0f + 0.25f - LAYER),                     uv(0f,48f,52f), uv(0f,36f,48f), 3f,
+        ((0f + 0.25f) + 0.75f - LAYER), (1f - 1f + LAYER), (1f - 0.25f + LAYER),                     uv(1f,48f,52f), uv(0f,36f,48f), 3f,
+        ((0f + 0.25f) + 0.75f - LAYER), (0f - 1f - 0.5f - LAYER), (1f - 0.25f + LAYER),              uv(1f,48f,52f), uv(1f,36f,48f), 3f,
 
         //RIGHT
-        ((1f - 0.25f) + 0.75f + 0.03f), (0f - 1f - 0.5f - 0.03f), (0f + 0.25f - 0.03f),              uv(1f,40f,44f), uv(1f,36f,48f), 4f,
-        ((1f - 0.25f) + 0.75f + 0.03f), (1f - 1f + 0.03f), (0f + 0.25f - 0.03f),                     uv(1f,40f,44f), uv(0f,36f,48f), 4f,
-        ((1f - 0.25f) + 0.75f + 0.03f), (1f - 1f + 0.03f), (1f - 0.25f + 0.03f),                     uv(0f,40f,44f), uv(0f,36f,48f), 4f,
-        ((1f - 0.25f) + 0.75f + 0.03f), (0f - 1f - 0.5f - 0.03f), (1f - 0.25f + 0.03f),              uv(0f,40f,44f), uv(1f,36f,48f), 4f,
+        ((1f - 0.25f) + 0.75f + LAYER), (0f - 1f - 0.5f - LAYER), (0f + 0.25f - LAYER),              uv(1f,40f,44f), uv(1f,36f,48f), 4f,
+        ((1f - 0.25f) + 0.75f + LAYER), (1f - 1f + LAYER), (0f + 0.25f - LAYER),                     uv(1f,40f,44f), uv(0f,36f,48f), 4f,
+        ((1f - 0.25f) + 0.75f + LAYER), (1f - 1f + LAYER), (1f - 0.25f + LAYER),                     uv(0f,40f,44f), uv(0f,36f,48f), 4f,
+        ((1f - 0.25f) + 0.75f + LAYER), (0f - 1f - 0.5f - LAYER), (1f - 0.25f + LAYER),              uv(0f,40f,44f), uv(1f,36f,48f), 4f,
 
         //BOTTOM
-        ((0f + 0.25f) + 0.75f - 0.03f), (0f - 1f - 0.5f - 0.03f), (0f + 0.25f - 0.03f),              uv(1f,48f,52f), uv(1f,32f,36f), 5f,
-        ((1f - 0.25f) + 0.75f + 0.03f), (0f - 1f - 0.5f - 0.03f), (0f + 0.25f - 0.03f),              uv(0f,48f,52f), uv(1f,32f,36f), 5f,
-        ((1f - 0.25f) + 0.75f + 0.03f), (0f - 1f - 0.5f - 0.03f), (1f - 0.25f + 0.03f),              uv(0f,48f,52f), uv(0f,32f,36f), 5f,
-        ((0f + 0.25f) + 0.75f - 0.03f), (0f - 1f - 0.5f - 0.03f), (1f - 0.25f + 0.03f),              uv(1f,48f,52f), uv(0f,32f,36f), 5f,
+        ((0f + 0.25f) + 0.75f - LAYER), (0f - 1f - 0.5f - LAYER), (0f + 0.25f - LAYER),              uv(1f,48f,52f), uv(1f,32f,36f), 5f,
+        ((1f - 0.25f) + 0.75f + LAYER), (0f - 1f - 0.5f - LAYER), (0f + 0.25f - LAYER),              uv(0f,48f,52f), uv(1f,32f,36f), 5f,
+        ((1f - 0.25f) + 0.75f + LAYER), (0f - 1f - 0.5f - LAYER), (1f - 0.25f + LAYER),              uv(0f,48f,52f), uv(0f,32f,36f), 5f,
+        ((0f + 0.25f) + 0.75f - LAYER), (0f - 1f - 0.5f - LAYER), (1f - 0.25f + LAYER),              uv(1f,48f,52f), uv(0f,32f,36f), 5f,
     )
 
     private val leftArmVertices = floatArrayOf(
@@ -334,40 +312,40 @@ object PlayerModelMale {
 
     private val leftArmLayerVertices = floatArrayOf(
         //TOP
-        ((0f + 0.25f) - 0.75f - 0.03f), (1f - 1f + 0.03f), (0f + 0.25f - 0.03f),                     uv(1f,52f,56f), uv(1f,48f,52f), 0f,
-        ((1f - 0.25f) - 0.75f + 0.03f), (1f - 1f + 0.03f), (0f + 0.25f - 0.03f),                     uv(0f,52f,56f), uv(1f,48f,52f), 0f,
-        ((1f - 0.25f) - 0.75f + 0.03f), (1f - 1f + 0.03f), (1f - 0.25f + 0.03f),                     uv(0f,52f,56f), uv(0f,48f,52f), 0f,
-        ((0f + 0.25f) - 0.75f - 0.03f), (1f - 1f + 0.03f), (1f - 0.25f + 0.03f),                     uv(1f,52f,56f), uv(0f,48f,52f), 0f,
+        ((0f + 0.25f) - 0.75f - LAYER), (1f - 1f + LAYER), (0f + 0.25f - LAYER),                     uv(1f,52f,56f), uv(1f,48f,52f), 0f,
+        ((1f - 0.25f) - 0.75f + LAYER), (1f - 1f + LAYER), (0f + 0.25f - LAYER),                     uv(0f,52f,56f), uv(1f,48f,52f), 0f,
+        ((1f - 0.25f) - 0.75f + LAYER), (1f - 1f + LAYER), (1f - 0.25f + LAYER),                     uv(0f,52f,56f), uv(0f,48f,52f), 0f,
+        ((0f + 0.25f) - 0.75f - LAYER), (1f - 1f + LAYER), (1f - 0.25f + LAYER),                     uv(1f,52f,56f), uv(0f,48f,52f), 0f,
 
         //FRONT
-        ((0f + 0.25f) - 0.75f - 0.03f), (0f - 1f - 0.5f - 0.03f), (0f + 0.25f - 0.03f),              uv(1f,52f,56f), uv(1f,52f,64f), 1f,
-        ((1f - 0.25f) - 0.75f + 0.03f), (0f - 1f - 0.5f - 0.03f), (0f + 0.25f - 0.03f),              uv(0f,52f,56f), uv(1f,52f,64f), 1f,
-        ((1f - 0.25f) - 0.75f + 0.03f), (1f - 1f + 0.03f), (0f + 0.25f - 0.03f),                     uv(0f,52f,56f), uv(0f,52f,64f), 1f,
-        ((0f + 0.25f) - 0.75f - 0.03f), (1f - 1f + 0.03f), (0f + 0.25f - 0.03f),                     uv(1f,52f,56f), uv(0f,52f,64f), 1f,
+        ((0f + 0.25f) - 0.75f - LAYER), (0f - 1f - 0.5f - LAYER), (0f + 0.25f - LAYER),              uv(1f,52f,56f), uv(1f,52f,64f), 1f,
+        ((1f - 0.25f) - 0.75f + LAYER), (0f - 1f - 0.5f - LAYER), (0f + 0.25f - LAYER),              uv(0f,52f,56f), uv(1f,52f,64f), 1f,
+        ((1f - 0.25f) - 0.75f + LAYER), (1f - 1f + LAYER), (0f + 0.25f - LAYER),                     uv(0f,52f,56f), uv(0f,52f,64f), 1f,
+        ((0f + 0.25f) - 0.75f - LAYER), (1f - 1f + LAYER), (0f + 0.25f - LAYER),                     uv(1f,52f,56f), uv(0f,52f,64f), 1f,
 
         //BACK
-        ((0f + 0.25f) - 0.75f - 0.03f), (0f - 1f - 0.5f - 0.03f), (1f - 0.25f + 0.03f),              uv(0f,60f,64f), uv(1f,52f,64f), 2f,
-        ((1f - 0.25f) - 0.75f + 0.03f), (0f - 1f - 0.5f - 0.03f), (1f - 0.25f + 0.03f),              uv(1f,60f,64f), uv(1f,52f,64f), 2f,
-        ((1f - 0.25f) - 0.75f + 0.03f), (1f - 1f + 0.03f), (1f - 0.25f + 0.03f),                     uv(1f,60f,64f), uv(0f,52f,64f), 2f,
-        ((0f + 0.25f) - 0.75f - 0.03f), (1f - 1f + 0.03f), (1f - 0.25f + 0.03f),                     uv(0f,60f,64f), uv(0f,52f,64f), 2f,
+        ((0f + 0.25f) - 0.75f - LAYER), (0f - 1f - 0.5f - LAYER), (1f - 0.25f + LAYER),              uv(0f,60f,64f), uv(1f,52f,64f), 2f,
+        ((1f - 0.25f) - 0.75f + LAYER), (0f - 1f - 0.5f - LAYER), (1f - 0.25f + LAYER),              uv(1f,60f,64f), uv(1f,52f,64f), 2f,
+        ((1f - 0.25f) - 0.75f + LAYER), (1f - 1f + LAYER), (1f - 0.25f + LAYER),                     uv(1f,60f,64f), uv(0f,52f,64f), 2f,
+        ((0f + 0.25f) - 0.75f - LAYER), (1f - 1f + LAYER), (1f - 0.25f + LAYER),                     uv(0f,60f,64f), uv(0f,52f,64f), 2f,
 
         //LEFT
-        ((0f + 0.25f) - 0.75f - 0.03f), (0f - 1f - 0.5f - 0.03f), (0f + 0.25f - 0.03f),              uv(0f,56f,60f), uv(1f,52f,64f), 3f,
-        ((0f + 0.25f) - 0.75f - 0.03f), (1f - 1f + 0.03f), (0f + 0.25f - 0.03f),                     uv(0f,56f,60f), uv(0f,52f,64f), 3f,
-        ((0f + 0.25f) - 0.75f - 0.03f), (1f - 1f + 0.03f), (1f - 0.25f + 0.03f),                     uv(1f,56f,60f), uv(0f,52f,64f), 3f,
-        ((0f + 0.25f) - 0.75f - 0.03f), (0f - 1f - 0.5f - 0.03f), (1f - 0.25f + 0.03f),              uv(1f,56f,60f), uv(1f,52f,64f), 3f,
+        ((0f + 0.25f) - 0.75f - LAYER), (0f - 1f - 0.5f - LAYER), (0f + 0.25f - LAYER),              uv(0f,56f,60f), uv(1f,52f,64f), 3f,
+        ((0f + 0.25f) - 0.75f - LAYER), (1f - 1f + LAYER), (0f + 0.25f - LAYER),                     uv(0f,56f,60f), uv(0f,52f,64f), 3f,
+        ((0f + 0.25f) - 0.75f - LAYER), (1f - 1f + LAYER), (1f - 0.25f + LAYER),                     uv(1f,56f,60f), uv(0f,52f,64f), 3f,
+        ((0f + 0.25f) - 0.75f - LAYER), (0f - 1f - 0.5f - LAYER), (1f - 0.25f + LAYER),              uv(1f,56f,60f), uv(1f,52f,64f), 3f,
 
         //RIGHT
-        ((1f - 0.25f) - 0.75f + 0.03f), (0f - 1f - 0.5f - 0.03f), (0f + 0.25f - 0.03f),              uv(1f,48f,52f), uv(1f,52f,64f), 4f,
-        ((1f - 0.25f) - 0.75f + 0.03f), (1f - 1f + 0.03f), (0f + 0.25f - 0.03f),                     uv(1f,48f,52f), uv(0f,52f,64f), 4f,
-        ((1f - 0.25f) - 0.75f + 0.03f), (1f - 1f + 0.03f), (1f - 0.25f + 0.03f),                     uv(0f,48f,52f), uv(0f,52f,64f), 4f,
-        ((1f - 0.25f) - 0.75f + 0.03f), (0f - 1f - 0.5f - 0.03f), (1f - 0.25f + 0.03f),              uv(0f,48f,52f), uv(1f,52f,64f), 4f,
+        ((1f - 0.25f) - 0.75f + LAYER), (0f - 1f - 0.5f - LAYER), (0f + 0.25f - LAYER),              uv(1f,48f,52f), uv(1f,52f,64f), 4f,
+        ((1f - 0.25f) - 0.75f + LAYER), (1f - 1f + LAYER), (0f + 0.25f - LAYER),                     uv(1f,48f,52f), uv(0f,52f,64f), 4f,
+        ((1f - 0.25f) - 0.75f + LAYER), (1f - 1f + LAYER), (1f - 0.25f + LAYER),                     uv(0f,48f,52f), uv(0f,52f,64f), 4f,
+        ((1f - 0.25f) - 0.75f + LAYER), (0f - 1f - 0.5f - LAYER), (1f - 0.25f + LAYER),              uv(0f,48f,52f), uv(1f,52f,64f), 4f,
 
         //BOTTOM
-        ((0f + 0.25f) - 0.75f - 0.03f), (0f - 1f - 0.5f - 0.03f), (0f + 0.25f - 0.03f),              uv(1f,56f,60f), uv(1f,48f,52f), 5f,
-        ((1f - 0.25f) - 0.75f + 0.03f), (0f - 1f - 0.5f - 0.03f), (0f + 0.25f - 0.03f),              uv(0f,56f,60f), uv(1f,48f,52f), 5f,
-        ((1f - 0.25f) - 0.75f + 0.03f), (0f - 1f - 0.5f - 0.03f), (1f - 0.25f + 0.03f),              uv(0f,56f,60f), uv(0f,48f,52f), 5f,
-        ((0f + 0.25f) - 0.75f - 0.03f), (0f - 1f - 0.5f - 0.03f), (1f - 0.25f + 0.03f),              uv(1f,56f,60f), uv(0f,48f,52f), 5f,
+        ((0f + 0.25f) - 0.75f - LAYER), (0f - 1f - 0.5f - LAYER), (0f + 0.25f - LAYER),              uv(1f,56f,60f), uv(1f,48f,52f), 5f,
+        ((1f - 0.25f) - 0.75f + LAYER), (0f - 1f - 0.5f - LAYER), (0f + 0.25f - LAYER),              uv(0f,56f,60f), uv(1f,48f,52f), 5f,
+        ((1f - 0.25f) - 0.75f + LAYER), (0f - 1f - 0.5f - LAYER), (1f - 0.25f + LAYER),              uv(0f,56f,60f), uv(0f,48f,52f), 5f,
+        ((0f + 0.25f) - 0.75f - LAYER), (0f - 1f - 0.5f - LAYER), (1f - 0.25f + LAYER),              uv(1f,56f,60f), uv(0f,48f,52f), 5f,
     )
 
     private val rightLegVertices = floatArrayOf(
@@ -410,40 +388,40 @@ object PlayerModelMale {
 
     private val rightLegLayerVertices = floatArrayOf(
         //TOP
-        ((0f + 0.25f) + 0.25f - 0.03f), (1f - 2.5f + 0.03f), (0f + 0.25f - 0.03f),                     uv(1f,4f,8f), uv(1f,32f,36f), 0f,
-        ((1f - 0.25f) + 0.25f + 0.03f), (1f - 2.5f + 0.03f), (0f + 0.25f - 0.03f),                     uv(0f,4f,8f), uv(1f,32f,36f), 0f,
-        ((1f - 0.25f) + 0.25f + 0.03f), (1f - 2.5f + 0.03f), (1f - 0.25f + 0.03f),                     uv(0f,4f,8f), uv(0f,32f,36f), 0f,
-        ((0f + 0.25f) + 0.25f - 0.03f), (1f - 2.5f + 0.03f), (1f - 0.25f + 0.03f),                     uv(1f,4f,8f), uv(0f,32f,36f), 0f,
+        ((0f + 0.25f) + 0.25f - LAYER), (1f - 2.5f + LAYER), (0f + 0.25f - LAYER),                     uv(1f,4f,8f), uv(1f,32f,36f), 0f,
+        ((1f - 0.25f) + 0.25f + LAYER), (1f - 2.5f + LAYER), (0f + 0.25f - LAYER),                     uv(0f,4f,8f), uv(1f,32f,36f), 0f,
+        ((1f - 0.25f) + 0.25f + LAYER), (1f - 2.5f + LAYER), (1f - 0.25f + LAYER),                     uv(0f,4f,8f), uv(0f,32f,36f), 0f,
+        ((0f + 0.25f) + 0.25f - LAYER), (1f - 2.5f + LAYER), (1f - 0.25f + LAYER),                     uv(1f,4f,8f), uv(0f,32f,36f), 0f,
 
         //FRONT
-        ((0f + 0.25f) + 0.25f - 0.03f), (0f - 2.5f - 0.5f - 0.03f), (0f + 0.25f - 0.03f),              uv(1f,4f,8f), uv(1f,36f,48f), 1f,
-        ((1f - 0.25f) + 0.25f + 0.03f), (0f - 2.5f - 0.5f - 0.03f), (0f + 0.25f - 0.03f),              uv(0f,4f,8f), uv(1f,36f,48f), 1f,
-        ((1f - 0.25f) + 0.25f + 0.03f), (1f - 2.5f + 0.03f), (0f + 0.25f - 0.03f),                     uv(0f,4f,8f), uv(0f,36f,48f), 1f,
-        ((0f + 0.25f) + 0.25f - 0.03f), (1f - 2.5f + 0.03f), (0f + 0.25f - 0.03f),                     uv(1f,4f,8f), uv(0f,36f,48f), 1f,
+        ((0f + 0.25f) + 0.25f - LAYER), (0f - 2.5f - 0.5f - LAYER), (0f + 0.25f - LAYER),              uv(1f,4f,8f), uv(1f,36f,48f), 1f,
+        ((1f - 0.25f) + 0.25f + LAYER), (0f - 2.5f - 0.5f - LAYER), (0f + 0.25f - LAYER),              uv(0f,4f,8f), uv(1f,36f,48f), 1f,
+        ((1f - 0.25f) + 0.25f + LAYER), (1f - 2.5f + LAYER), (0f + 0.25f - LAYER),                     uv(0f,4f,8f), uv(0f,36f,48f), 1f,
+        ((0f + 0.25f) + 0.25f - LAYER), (1f - 2.5f + LAYER), (0f + 0.25f - LAYER),                     uv(1f,4f,8f), uv(0f,36f,48f), 1f,
 
         //BACK
-        ((0f + 0.25f) + 0.25f - 0.03f), (0f - 2.5f - 0.5f - 0.03f), (1f - 0.25f + 0.03f),              uv(0f,12f,16f), uv(1f,36f,48f), 2f,
-        ((1f - 0.25f) + 0.25f + 0.03f), (0f - 2.5f - 0.5f - 0.03f), (1f - 0.25f + 0.03f),              uv(1f,12f,16f), uv(1f,36f,48f), 2f,
-        ((1f - 0.25f) + 0.25f + 0.03f), (1f - 2.5f + 0.03f), (1f - 0.25f + 0.03f),                     uv(1f,12f,16f), uv(0f,36f,48f), 2f,
-        ((0f + 0.25f) + 0.25f - 0.03f), (1f - 2.5f + 0.03f), (1f - 0.25f + 0.03f),                     uv(0f,12f,16f), uv(0f,36f,48f), 2f,
+        ((0f + 0.25f) + 0.25f - LAYER), (0f - 2.5f - 0.5f - LAYER), (1f - 0.25f + LAYER),              uv(0f,12f,16f), uv(1f,36f,48f), 2f,
+        ((1f - 0.25f) + 0.25f + LAYER), (0f - 2.5f - 0.5f - LAYER), (1f - 0.25f + LAYER),              uv(1f,12f,16f), uv(1f,36f,48f), 2f,
+        ((1f - 0.25f) + 0.25f + LAYER), (1f - 2.5f + LAYER), (1f - 0.25f + LAYER),                     uv(1f,12f,16f), uv(0f,36f,48f), 2f,
+        ((0f + 0.25f) + 0.25f - LAYER), (1f - 2.5f + LAYER), (1f - 0.25f + LAYER),                     uv(0f,12f,16f), uv(0f,36f,48f), 2f,
 
         //LEFT
-        ((0f + 0.25f) + 0.25f - 0.03f), (0f - 2.5f - 0.5f - 0.03f), (0f + 0.25f - 0.03f),              uv(0f,8f,12f), uv(1f,36f,48f), 3f,
-        ((0f + 0.25f) + 0.25f - 0.03f), (1f - 2.5f + 0.03f), (0f + 0.25f - 0.03f),                     uv(0f,8f,12f), uv(0f,36f,48f), 3f,
-        ((0f + 0.25f) + 0.25f - 0.03f), (1f - 2.5f + 0.03f), (1f - 0.25f + 0.03f),                     uv(1f,8f,12f), uv(0f,36f,48f), 3f,
-        ((0f + 0.25f) + 0.25f - 0.03f), (0f - 2.5f - 0.5f - 0.03f), (1f - 0.25f + 0.03f),              uv(1f,8f,12f), uv(1f,36f,48f), 3f,
+        ((0f + 0.25f) + 0.25f - LAYER), (0f - 2.5f - 0.5f - LAYER), (0f + 0.25f - LAYER),              uv(0f,8f,12f), uv(1f,36f,48f), 3f,
+        ((0f + 0.25f) + 0.25f - LAYER), (1f - 2.5f + LAYER), (0f + 0.25f - LAYER),                     uv(0f,8f,12f), uv(0f,36f,48f), 3f,
+        ((0f + 0.25f) + 0.25f - LAYER), (1f - 2.5f + LAYER), (1f - 0.25f + LAYER),                     uv(1f,8f,12f), uv(0f,36f,48f), 3f,
+        ((0f + 0.25f) + 0.25f - LAYER), (0f - 2.5f - 0.5f - LAYER), (1f - 0.25f + LAYER),              uv(1f,8f,12f), uv(1f,36f,48f), 3f,
 
         //RIGHT
-        ((1f - 0.25f) + 0.25f + 0.03f), (0f - 2.5f - 0.5f - 0.03f), (0f + 0.25f - 0.03f),              uv(1f,0f,4f), uv(1f,36f,48f), 4f,
-        ((1f - 0.25f) + 0.25f + 0.03f), (1f - 2.5f + 0.03f), (0f + 0.25f - 0.03f),                     uv(1f,0f,4f), uv(0f,36f,48f), 4f,
-        ((1f - 0.25f) + 0.25f + 0.03f), (1f - 2.5f + 0.03f), (1f - 0.25f + 0.03f),                     uv(0f,0f,4f), uv(0f,36f,48f), 4f,
-        ((1f - 0.25f) + 0.25f + 0.03f), (0f - 2.5f - 0.5f - 0.03f), (1f - 0.25f + 0.03f),              uv(0f,0f,4f), uv(1f,36f,48f), 4f,
+        ((1f - 0.25f) + 0.25f + LAYER), (0f - 2.5f - 0.5f - LAYER), (0f + 0.25f - LAYER),              uv(1f,0f,4f), uv(1f,36f,48f), 4f,
+        ((1f - 0.25f) + 0.25f + LAYER), (1f - 2.5f + LAYER), (0f + 0.25f - LAYER),                     uv(1f,0f,4f), uv(0f,36f,48f), 4f,
+        ((1f - 0.25f) + 0.25f + LAYER), (1f - 2.5f + LAYER), (1f - 0.25f + LAYER),                     uv(0f,0f,4f), uv(0f,36f,48f), 4f,
+        ((1f - 0.25f) + 0.25f + LAYER), (0f - 2.5f - 0.5f - LAYER), (1f - 0.25f + LAYER),              uv(0f,0f,4f), uv(1f,36f,48f), 4f,
 
         //BOTTOM
-        ((0f + 0.25f) + 0.25f - 0.03f), (0f - 2.5f - 0.5f - 0.03f), (0f + 0.25f - 0.03f),              uv(1f,8f,12f), uv(1f,32f,36f), 5f,
-        ((1f - 0.25f) + 0.25f + 0.03f), (0f - 2.5f - 0.5f - 0.03f), (0f + 0.25f - 0.03f),              uv(0f,8f,12f), uv(1f,32f,36f), 5f,
-        ((1f - 0.25f) + 0.25f + 0.03f), (0f - 2.5f - 0.5f - 0.03f), (1f - 0.25f + 0.03f),              uv(0f,8f,12f), uv(0f,32f,36f), 5f,
-        ((0f + 0.25f) + 0.25f - 0.03f), (0f - 2.5f - 0.5f - 0.03f), (1f - 0.25f + 0.03f),              uv(1f,8f,12f), uv(0f,32f,36f), 5f,
+        ((0f + 0.25f) + 0.25f - LAYER), (0f - 2.5f - 0.5f - LAYER), (0f + 0.25f - LAYER),              uv(1f,8f,12f), uv(1f,32f,36f), 5f,
+        ((1f - 0.25f) + 0.25f + LAYER), (0f - 2.5f - 0.5f - LAYER), (0f + 0.25f - LAYER),              uv(0f,8f,12f), uv(1f,32f,36f), 5f,
+        ((1f - 0.25f) + 0.25f + LAYER), (0f - 2.5f - 0.5f - LAYER), (1f - 0.25f + LAYER),              uv(0f,8f,12f), uv(0f,32f,36f), 5f,
+        ((0f + 0.25f) + 0.25f - LAYER), (0f - 2.5f - 0.5f - LAYER), (1f - 0.25f + LAYER),              uv(1f,8f,12f), uv(0f,32f,36f), 5f,
     )
 
     private val leftLegVertices = floatArrayOf(
@@ -486,42 +464,41 @@ object PlayerModelMale {
 
     private val leftLegLayerVertices = floatArrayOf(
         //TOP
-        ((0f + 0.25f) - 0.25f - 0.03f), (1f - 2.5f + 0.03f), (0f + 0.25f - 0.03f),                     uv(1f,4f,8f), uv(1f,48f,52f), 0f,
-        ((1f - 0.25f) - 0.25f + 0.03f), (1f - 2.5f + 0.03f), (0f + 0.25f - 0.03f),                     uv(0f,4f,8f), uv(1f,48f,52f), 0f,
-        ((1f - 0.25f) - 0.25f + 0.03f), (1f - 2.5f + 0.03f), (1f - 0.25f + 0.03f),                     uv(0f,4f,8f), uv(0f,48f,52f), 0f,
-        ((0f + 0.25f) - 0.25f - 0.03f), (1f - 2.5f + 0.03f), (1f - 0.25f + 0.03f),                     uv(1f,4f,8f), uv(0f,48f,52f), 0f,
+        ((0f + 0.25f) - 0.25f - (LAYER - 0.001F)), (1f - 2.5f + (LAYER - 0.001F)), (0f + 0.25f - (LAYER - 0.001F)),                     uv(1f,4f,8f), uv(1f,48f,52f), 0f,
+        ((1f - 0.25f) - 0.25f + (LAYER - 0.001F)), (1f - 2.5f + (LAYER - 0.001F)), (0f + 0.25f - (LAYER - 0.001F)),                     uv(0f,4f,8f), uv(1f,48f,52f), 0f,
+        ((1f - 0.25f) - 0.25f + (LAYER - 0.001F)), (1f - 2.5f + (LAYER - 0.001F)), (1f - 0.25f + (LAYER - 0.001F)),                     uv(0f,4f,8f), uv(0f,48f,52f), 0f,
+        ((0f + 0.25f) - 0.25f - (LAYER - 0.001F)), (1f - 2.5f + (LAYER - 0.001F)), (1f - 0.25f + (LAYER - 0.001F)),                     uv(1f,4f,8f), uv(0f,48f,52f), 0f,
 
         //FRONT
-        ((0f + 0.25f) - 0.25f - 0.03f), (0f - 2.5f - 0.5f - 0.03f), (0f + 0.25f - 0.03f),              uv(1f,4f,8f), uv(1f,52f,64f), 1f,
-        ((1f - 0.25f) - 0.25f + 0.03f), (0f - 2.5f - 0.5f - 0.03f), (0f + 0.25f - 0.03f),              uv(0f,4f,8f), uv(1f,52f,64f), 1f,
-        ((1f - 0.25f) - 0.25f + 0.03f), (1f - 2.5f + 0.03f), (0f + 0.25f - 0.03f),                     uv(0f,4f,8f), uv(0f,52f,64f), 1f,
-        ((0f + 0.25f) - 0.25f - 0.03f), (1f - 2.5f + 0.03f), (0f + 0.25f - 0.03f),                     uv(1f,4f,8f), uv(0f,52f,64f), 1f,
+        ((0f + 0.25f) - 0.25f - (LAYER - 0.001F)), (0f - 2.5f - 0.5f - (LAYER - 0.001F)), (0f + 0.25f - (LAYER - 0.001F)),              uv(1f,4f,8f), uv(1f,52f,64f), 1f,
+        ((1f - 0.25f) - 0.25f + (LAYER - 0.001F)), (0f - 2.5f - 0.5f - (LAYER - 0.001F)), (0f + 0.25f - (LAYER - 0.001F)),              uv(0f,4f,8f), uv(1f,52f,64f), 1f,
+        ((1f - 0.25f) - 0.25f + (LAYER - 0.001F)), (1f - 2.5f + (LAYER - 0.001F)), (0f + 0.25f - (LAYER - 0.001F)),                     uv(0f,4f,8f), uv(0f,52f,64f), 1f,
+        ((0f + 0.25f) - 0.25f - (LAYER - 0.001F)), (1f - 2.5f + (LAYER - 0.001F)), (0f + 0.25f - (LAYER - 0.001F)),                     uv(1f,4f,8f), uv(0f,52f,64f), 1f,
 
         //BACK
-        ((0f + 0.25f) - 0.25f - 0.03f), (0f - 2.5f - 0.5f - 0.03f), (1f - 0.25f + 0.03f),              uv(0f,12f,16f), uv(1f,52f,64f), 2f,
-        ((1f - 0.25f) - 0.25f + 0.03f), (0f - 2.5f - 0.5f - 0.03f), (1f - 0.25f + 0.03f),              uv(1f,12f,16f), uv(1f,52f,64f), 2f,
-        ((1f - 0.25f) - 0.25f + 0.03f), (1f - 2.5f + 0.03f), (1f - 0.25f + 0.03f),                     uv(1f,12f,16f), uv(0f,52f,64f), 2f,
-        ((0f + 0.25f) - 0.25f - 0.03f), (1f - 2.5f + 0.03f), (1f - 0.25f + 0.03f),                     uv(0f,12f,16f), uv(0f,52f,64f), 2f,
+        ((0f + 0.25f) - 0.25f - (LAYER - 0.001F)), (0f - 2.5f - 0.5f - (LAYER - 0.001F)), (1f - 0.25f + (LAYER - 0.001F)),              uv(0f,12f,16f), uv(1f,52f,64f), 2f,
+        ((1f - 0.25f) - 0.25f + (LAYER - 0.001F)), (0f - 2.5f - 0.5f - (LAYER - 0.001F)), (1f - 0.25f + (LAYER - 0.001F)),              uv(1f,12f,16f), uv(1f,52f,64f), 2f,
+        ((1f - 0.25f) - 0.25f + (LAYER - 0.001F)), (1f - 2.5f + (LAYER - 0.001F)), (1f - 0.25f + (LAYER - 0.001F)),                     uv(1f,12f,16f), uv(0f,52f,64f), 2f,
+        ((0f + 0.25f) - 0.25f - (LAYER - 0.001F)), (1f - 2.5f + (LAYER - 0.001F)), (1f - 0.25f + (LAYER - 0.001F)),                     uv(0f,12f,16f), uv(0f,52f,64f), 2f,
 
         //LEFT
-        ((0f + 0.25f) - 0.25f - 0.03f), (0f - 2.5f - 0.5f - 0.03f), (0f + 0.25f - 0.03f),              uv(0f,8f,12f), uv(1f,52f,64f), 3f,
-        ((0f + 0.25f) - 0.25f - 0.03f), (1f - 2.5f + 0.03f), (0f + 0.25f - 0.03f),                     uv(0f,8f,12f), uv(0f,52f,64f), 3f,
-        ((0f + 0.25f) - 0.25f - 0.03f), (1f - 2.5f + 0.03f), (1f - 0.25f + 0.03f),                     uv(1f,8f,12f), uv(0f,52f,64f), 3f,
-        ((0f + 0.25f) - 0.25f - 0.03f), (0f - 2.5f - 0.5f - 0.03f), (1f - 0.25f + 0.03f),              uv(1f,8f,12f), uv(1f,52f,64f), 3f,
+        ((0f + 0.25f) - 0.25f - (LAYER - 0.001F)), (0f - 2.5f - 0.5f - (LAYER - 0.001F)), (0f + 0.25f - (LAYER - 0.001F)),              uv(0f,8f,12f), uv(1f,52f,64f), 3f,
+        ((0f + 0.25f) - 0.25f - (LAYER - 0.001F)), (1f - 2.5f + (LAYER - 0.001F)), (0f + 0.25f - (LAYER - 0.001F)),                     uv(0f,8f,12f), uv(0f,52f,64f), 3f,
+        ((0f + 0.25f) - 0.25f - (LAYER - 0.001F)), (1f - 2.5f + (LAYER - 0.001F)), (1f - 0.25f + (LAYER - 0.001F)),                     uv(1f,8f,12f), uv(0f,52f,64f), 3f,
+        ((0f + 0.25f) - 0.25f - (LAYER - 0.001F)), (0f - 2.5f - 0.5f - (LAYER - 0.001F)), (1f - 0.25f + (LAYER - 0.001F)),              uv(1f,8f,12f), uv(1f,52f,64f), 3f,
 
         //RIGHT
-        ((1f - 0.25f) - 0.25f + 0.03f), (0f - 2.5f - 0.5f - 0.03f), (0f + 0.25f - 0.03f),              uv(1f,0f,4f), uv(1f,52f,64f), 4f,
-        ((1f - 0.25f) - 0.25f + 0.03f), (1f - 2.5f + 0.03f), (0f + 0.25f - 0.03f),                     uv(1f,0f,4f), uv(0f,52f,64f), 4f,
-        ((1f - 0.25f) - 0.25f + 0.03f), (1f - 2.5f + 0.03f), (1f - 0.25f + 0.03f),                     uv(0f,0f,4f), uv(0f,52f,64f), 4f,
-        ((1f - 0.25f) - 0.25f + 0.03f), (0f - 2.5f - 0.5f - 0.03f), (1f - 0.25f + 0.03f),              uv(0f,0f,4f), uv(1f,52f,64f), 4f,
+        ((1f - 0.25f) - 0.25f + (LAYER - 0.001F)), (0f - 2.5f - 0.5f - (LAYER - 0.001F)), (0f + 0.25f - (LAYER - 0.001F)),              uv(1f,0f,4f), uv(1f,52f,64f), 4f,
+        ((1f - 0.25f) - 0.25f + (LAYER - 0.001F)), (1f - 2.5f + (LAYER - 0.001F)), (0f + 0.25f - (LAYER - 0.001F)),                     uv(1f,0f,4f), uv(0f,52f,64f), 4f,
+        ((1f - 0.25f) - 0.25f + (LAYER - 0.001F)), (1f - 2.5f + (LAYER - 0.001F)), (1f - 0.25f + (LAYER - 0.001F)),                     uv(0f,0f,4f), uv(0f,52f,64f), 4f,
+        ((1f - 0.25f) - 0.25f + (LAYER - 0.001F)), (0f - 2.5f - 0.5f - (LAYER - 0.001F)), (1f - 0.25f + (LAYER - 0.001F)),              uv(0f,0f,4f), uv(1f,52f,64f), 4f,
 
         //BOTTOM
-        ((0f + 0.25f) - 0.25f - 0.03f), (0f - 2.5f - 0.5f - 0.03f), (0f + 0.25f - 0.03f),              uv(1f,8f,12f), uv(1f,48f,52f), 5f,
-        ((1f - 0.25f) - 0.25f + 0.03f), (0f - 2.5f - 0.5f - 0.03f), (0f + 0.25f - 0.03f),              uv(0f,8f,12f), uv(1f,48f,52f), 5f,
-        ((1f - 0.25f) - 0.25f + 0.03f), (0f - 2.5f - 0.5f - 0.03f), (1f - 0.25f + 0.03f),              uv(0f,8f,12f), uv(0f,48f,52f), 5f,
-        ((0f + 0.25f) - 0.25f - 0.03f), (0f - 2.5f - 0.5f - 0.03f), (1f - 0.25f + 0.03f),              uv(1f,8f,12f), uv(0f,48f,52f), 5f,
+        ((0f + 0.25f) - 0.25f - (LAYER - 0.001F)), (0f - 2.5f - 0.5f - (LAYER - 0.001F)), (0f + 0.25f - (LAYER - 0.001F)),              uv(1f,8f,12f), uv(1f,48f,52f), 5f,
+        ((1f - 0.25f) - 0.25f + (LAYER - 0.001F)), (0f - 2.5f - 0.5f - (LAYER - 0.001F)), (0f + 0.25f - (LAYER - 0.001F)),              uv(0f,8f,12f), uv(1f,48f,52f), 5f,
+        ((1f - 0.25f) - 0.25f + (LAYER - 0.001F)), (0f - 2.5f - 0.5f - (LAYER - 0.001F)), (1f - 0.25f + (LAYER - 0.001F)),              uv(0f,8f,12f), uv(0f,48f,52f), 5f,
+        ((0f + 0.25f) - 0.25f - (LAYER - 0.001F)), (0f - 2.5f - 0.5f - (LAYER - 0.001F)), (1f - 0.25f + (LAYER - 0.001F)),              uv(1f,8f,12f), uv(0f,48f,52f), 5f,
     )
-
 
     init {
         val head = mutableListOf<Float>()

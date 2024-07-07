@@ -21,7 +21,8 @@ class EntityOtherPlayer(
     rotation: Vector2f = Vector2f(),
 ) : Entity(id, position, rotation) {
 
-    private val texture = Texture("steve.png", false)
+    private val texture = Texture("nep.png", false)
+    private val model = PlayerModelFemale(texture.id)
     private val vertexShader = Shader(GL_VERTEX_SHADER, "/shaders/cube.vert")
     private val fragmentShader = Shader(GL_FRAGMENT_SHADER, "/shaders/cube.frag")
     private val shaderProgram = ShaderProgram(vertexShader, fragmentShader)
@@ -61,7 +62,6 @@ class EntityOtherPlayer(
             swingRotation = 0f
         }
 
-
         val radSwing = sin(swingRotation) * 0.85f
         val offset = Vector3f(-0.5f)
 
@@ -86,8 +86,8 @@ class EntityOtherPlayer(
         glActiveTexture(GL_TEXTURE0)
         glBindTexture(GL_TEXTURE_2D, texture.id)
 
-        glBindVertexArray(PlayerModelMale.vaos["head"]!!)
-        glDrawElements(GL_TRIANGLES, PlayerModelMale.indices.size, GL_UNSIGNED_INT, 0)
+        glBindVertexArray(model.vaos["head"]!!)
+        glDrawElements(GL_TRIANGLES, model.indices["head"]!!.size, GL_UNSIGNED_INT, 0)
 
         shaderProgram.setUniformMat4("model",
             Matrix()
@@ -98,8 +98,8 @@ class EntityOtherPlayer(
                 .translate(Vector3f(-0.5f))
         )
 
-        glBindVertexArray(PlayerModelMale.vaos["body"]!!)
-        glDrawElements(GL_TRIANGLES, PlayerModelMale.indices.size, GL_UNSIGNED_INT, 0)
+        glBindVertexArray(model.vaos["body"]!!)
+        glDrawElements(GL_TRIANGLES, model.indices["body"]!!.size, GL_UNSIGNED_INT, 0)
 
 
         shaderProgram.setUniformMat4("model",
@@ -112,8 +112,8 @@ class EntityOtherPlayer(
                 .translate(Vector3f(-0.5f, 0.0f, -0.5f))
         )
 
-        glBindVertexArray(PlayerModelMale.vaos["leftArm"]!!)
-        glDrawElements(GL_TRIANGLES, PlayerModelMale.indices.size, GL_UNSIGNED_INT, 0)
+        glBindVertexArray(model.vaos["leftArm"]!!)
+        glDrawElements(GL_TRIANGLES, model.indices["leftArm"]!!.size, GL_UNSIGNED_INT, 0)
 
         shaderProgram.setUniformMat4("model",
             Matrix()
@@ -125,8 +125,8 @@ class EntityOtherPlayer(
                 .translate(Vector3f(-0.5f, 0.0f, -0.5f))
         )
 
-        glBindVertexArray(PlayerModelMale.vaos["rightArm"]!!)
-        glDrawElements(GL_TRIANGLES, PlayerModelMale.indices.size, GL_UNSIGNED_INT, 0)
+        glBindVertexArray(model.vaos["rightArm"]!!)
+        glDrawElements(GL_TRIANGLES, model.indices["rightArm"]!!.size, GL_UNSIGNED_INT, 0)
 
 
         shaderProgram.setUniformMat4("model",
@@ -139,8 +139,8 @@ class EntityOtherPlayer(
                 .translate(Vector3f(-0.5f, 1.5f, -0.5f))
         )
 
-        glBindVertexArray(PlayerModelMale.vaos["leftLeg"]!!)
-        glDrawElements(GL_TRIANGLES, PlayerModelMale.indices.size, GL_UNSIGNED_INT, 0)
+        glBindVertexArray(model.vaos["leftLeg"]!!)
+        glDrawElements(GL_TRIANGLES, model.indices["leftLeg"]!!.size, GL_UNSIGNED_INT, 0)
 
         shaderProgram.setUniformMat4("model",
             Matrix()
@@ -152,7 +152,7 @@ class EntityOtherPlayer(
                 .translate(Vector3f(-0.5f, 1.5f, -0.5f))
         )
 
-        glBindVertexArray(PlayerModelMale.vaos["rightLeg"]!!)
-        glDrawElements(GL_TRIANGLES, PlayerModelMale.indices.size, GL_UNSIGNED_INT, 0)
+        glBindVertexArray(model.vaos["rightLeg"]!!)
+        glDrawElements(GL_TRIANGLES, model.indices["rightLeg"]!!.size, GL_UNSIGNED_INT, 0)
     }
 }

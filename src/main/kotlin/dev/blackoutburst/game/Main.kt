@@ -71,6 +71,7 @@ fun main() {
         while(queue.isNotEmpty()) queue.poll()?.invoke()
         Window.clear()
 
+        glDisable(GL_CULL_FACE)
         EntityManager.update()
         EntityManager.render()
 

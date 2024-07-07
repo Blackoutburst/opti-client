@@ -18,8 +18,8 @@ object EntityManager {
     fun update() {
         entities.forEach {
             if (it.id != Connection.id) {
-                it.position = it.position.lerp(it.rawPosition, 0.1f)
-                it.rotation = it.rotation.lerp(it.rawRotation, 0.1f)
+                it.position = it.position.lerp(it.rawPosition, 50f)
+                it.rotation = it.rotation.lerp(it.rawRotation, 50f)
             }
             it.update()
         }

@@ -5,7 +5,7 @@ import dev.blackoutburst.game.utils.stack
 import org.lwjgl.opengl.GL30.*
 import org.lwjgl.stb.STBImage
 
-class Texture(filePath: String) {
+class Texture(filePath: String, flip: Boolean = true) {
     var id = -1
 
     init {
@@ -17,7 +17,7 @@ class Texture(filePath: String) {
             val width = stack.mallocInt(1)
             val height = stack.mallocInt(1)
 
-            STBImage.stbi_set_flip_vertically_on_load(true)
+            STBImage.stbi_set_flip_vertically_on_load(flip)
 
             val data = STBImage.stbi_load_from_memory(
                 IOUtils.ioResourceToByteBuffer(filePath, 4096),

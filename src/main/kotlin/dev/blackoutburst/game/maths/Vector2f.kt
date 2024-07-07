@@ -1,5 +1,7 @@
 package dev.blackoutburst.game.maths
 
+import dev.blackoutburst.game.utils.Time
+import dev.blackoutburst.game.utils.expDecay
 import kotlin.math.sqrt
 
 class Vector2f {
@@ -55,9 +57,9 @@ class Vector2f {
         return (newVector)
     }
 
-    fun lerp(target: Vector2f, alpha: Float): Vector2f {
-        val newX = (1 - alpha) * x + alpha * target.x
-        val newY = (1 - alpha) * y + alpha * target.y
+    fun lerp(target: Vector2f, decay: Float): Vector2f {
+        val newX = expDecay(this.x, target.x, decay, Time.delta)
+        val newY = expDecay(this.y, target.y, decay, Time.delta)
         return Vector2f(newX, newY)
     }
 

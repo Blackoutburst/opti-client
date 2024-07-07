@@ -1,6 +1,8 @@
 #version 410
 
-layout(location = 0) in int data;
+layout(location = 0) in vec3 aPos;
+layout(location = 1) in vec2 aUv;
+layout(location = 2) in float aFace;
 
 uniform mat4 model;
 uniform mat4 view;
@@ -24,21 +26,9 @@ vec3 getNormal(int index) {
 }
 
 void main() {
-	//XXXXX YYYYY ZZZZZ UUUUU VVVVV NNN TTT
-
-	int X = data & 31;
-	int Y = (data >> 5) & 31;
-	int Z = (data >> 10) & 31;
-	int U = (data >> 15) & 31;
-	int V = (data >> 20) & 31;
-	int F = (data >> 25) & 7;
-	int T = (data >> 28) & 31;
-
-	FragPos = vec3(X, Y, Z);
-	norm = getNormal(F);
-	layer = T;
-
-	uv = vec2(U, V);
+	FragPos = aPos;
+	norm = getNormal(int(aFace));
+	uv = aUv;
 
 	gl_Position = projection * view * model * vec4(FragPos, 1.0);
 }

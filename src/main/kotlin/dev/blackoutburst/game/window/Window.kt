@@ -67,6 +67,13 @@ object Window {
     }
 
     fun update() {
+        if (Keyboard.isKeyPressed(GLFW_KEY_O)) {
+            glfwSetInputMode(id, GLFW_CURSOR, GLFW_CURSOR_NORMAL)
+        }
+        if (Keyboard.isKeyPressed(GLFW_KEY_P)) {
+            glfwSetInputMode(id, GLFW_CURSOR, GLFW_CURSOR_DISABLED)
+        }
+
         isOpen = !(glfwWindowShouldClose(id) || Keyboard.isKeyPressed(GLFW_KEY_ESCAPE))
         Time.updateDelta()
         Mouse.update()

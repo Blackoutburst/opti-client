@@ -3,6 +3,7 @@ package dev.blackoutburst.game.entity
 import dev.blackoutburst.game.maths.Vector2f
 import dev.blackoutburst.game.maths.Vector3f
 import dev.blackoutburst.game.network.Connection
+import dev.blackoutburst.game.utils.Time
 import java.util.*
 import kotlin.collections.LinkedHashSet
 
@@ -33,6 +34,7 @@ object EntityManager {
         if (id == Connection.id) return
 
         entities.find { it.id == id }?.let {
+            it.previousRawPosition = it.rawPosition
             it.rawPosition = position
         }
     }
@@ -41,6 +43,7 @@ object EntityManager {
         if (id == Connection.id) return
 
         entities.find { it.id == id }?.let {
+            it.previousRawRotation = it.rawRotation
             it.rawRotation = rotation
         }
     }

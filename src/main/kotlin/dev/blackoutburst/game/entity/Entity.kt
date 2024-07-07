@@ -9,6 +9,8 @@ abstract class Entity(
     var rotation: Vector2f,
     var rawPosition: Vector3f = Vector3f(),
     var rawRotation: Vector2f = Vector2f(),
+    var previousRawPosition: Vector3f = Vector3f(),
+    var previousRawRotation: Vector2f = Vector2f(),
 ) {
     abstract fun update()
     abstract fun render()

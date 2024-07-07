@@ -3,7 +3,7 @@ package dev.blackoutburst.game.utils
 import org.lwjgl.glfw.GLFW
 
 object Time {
-    private const val UPDATE = 1e9f / 20.0
+    const val UPDATE = 1e9f / 20.0
     private var init = System.nanoTime()
     private var lastTime = System.nanoTime()
     private var deltaTime = 0.0

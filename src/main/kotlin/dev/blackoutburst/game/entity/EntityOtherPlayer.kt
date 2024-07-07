@@ -9,8 +9,8 @@ import dev.blackoutburst.game.shader.ShaderProgram
 import dev.blackoutburst.game.texture.Texture
 import dev.blackoutburst.game.utils.Color
 import dev.blackoutburst.game.utils.Time
+import dev.blackoutburst.game.utils.expDecay
 import org.lwjgl.opengl.GL30.*
-import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.pow
 import kotlin.math.sin
@@ -29,18 +29,15 @@ class EntityOtherPlayer(
     private var bodyRotation = 0f
 
     private var swingRotation = 0f
-    private var invertRotation = false
 
-    private val SWING_SPEED = 300f
-
-    private var previousPosition = position
+    private var moving = false
 
     override fun update() {
+        moving = (previousRawPosition.x - rawPosition.x).pow(2) + (previousRawPosition.z - rawPosition.z).pow(2) != 0f
     }
 
     override fun render() {
-        val moving = (previousPosition.x - position.x).pow(2) + (previousPosition.z - position.z).pow(2) > 0
-        previousPosition = position
+
 
         val xRad = -rotation.x
         val yRad = -rotation.y
@@ -53,23 +50,19 @@ class EntityOtherPlayer(
 
         val bodyRad = -bodyRotation
         if (moving) {
-            if (swingRotation > 60f && !invertRotation)
-                invertRotation = true
-            if (swingRotation < -60f && invertRotation)
-                invertRotation = false
-
-            if (invertRotation)
-                swingRotation -= SWING_SPEED * Time.delta.toFloat()
-            else
-                swingRotation += SWING_SPEED * Time.delta.toFloat()
+            swingRotation += 10f * Time.delta.toFloat()
         } else {
-            if (swingRotation > 0)
-                swingRotation -= SWING_SPEED * Time.delta.toFloat()
-            if (swingRotation < 0)
-                swingRotation += SWING_SPEED * Time.delta.toFloat()
+            swingRotation = if (swingRotation > Math.PI)
+                expDecay(swingRotation, Math.PI.toFloat() * 2f, 5f, Time.delta)
+            else
+                expDecay(swingRotation, 0f, 5f, Time.delta)
+        }
+        if (swingRotation > Math.PI * 2) {
+            swingRotation = 0f
         }
 
-        val radSwing = Math.toRadians(swingRotation.toDouble()).toFloat()
+
+        val radSwing = sin(swingRotation) * 0.85f
         val offset = Vector3f(-0.5f)
 
         glUseProgram(shaderProgram.id)

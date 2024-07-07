@@ -72,11 +72,13 @@ fun main() {
         Window.clear()
 
         glDisable(GL_CULL_FACE)
+        glPolygonMode(GL_FRONT_AND_BACK, Render.renderMode)
         EntityManager.update()
         EntityManager.render()
 
         World.render()
 
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
         glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
         glDisable(GL_DEPTH_TEST)
@@ -87,6 +89,7 @@ fun main() {
         WorldInformation.render(130f, 0f, 130f, 140f)
         ConnectionStatus.render(0f, 70f, 130f, 70f)
         Position.render(260f, 0f, 130f, 140f)
+        Render.render(390f, 0f, 130f, 140f)
 
         Window.update()
     }

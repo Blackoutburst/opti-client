@@ -59,6 +59,8 @@ object Window {
         NK.init(id)
 
         glClearColor(Random.nextFloat(), Random.nextFloat(), Random.nextFloat(), 1f)
+        glLineWidth(2.0f)
+        glPointSize(2.0f)
 
         setCallbacks()
         setIcons()

@@ -327,7 +327,7 @@ class PlayerModelFemale(texture: Int) {
                         voxel(
                             x = (1 - ((x.toFloat() + 1) - 20) * voxelSize),
                             y = 1f - voxelSize + LAYER - 1f,
-                            z = (1 - ((y.toFloat() + 1) - 32) * voxelSize),
+                            z = (1 - ((y.toFloat() + 1) - 32) * voxelSize) - (voxelSize * 2),
                             scale = voxelSize,
                             u = x.toFloat(),
                             v = y.toFloat()
@@ -425,7 +425,7 @@ class PlayerModelFemale(texture: Int) {
                         voxel(
                             x = (1 - ((x.toFloat() + 1) - 28) * voxelSize),
                             y = 0f - LAYER - 1f,
-                            z = (1 - ((y.toFloat() + 1) - 32) * voxelSize),
+                            z = (1 - ((y.toFloat() + 1) - 32) * voxelSize) - (voxelSize * 2),
                             scale = voxelSize,
                             u = x.toFloat(),
                             v = y.toFloat()
@@ -588,7 +588,7 @@ class PlayerModelFemale(texture: Int) {
                     vertices.addAll(
                         voxel(
                             x = (1 - ((x.toFloat() + 1) - 47) * voxelSize) + (voxelSize * 3),
-                            y = 0f - LAYER - 1f,
+                            y = 0f - LAYER - 1f - (voxelSize * 4),
                             z = (1 - ((y.toFloat() + 1) - 32) * voxelSize) - (voxelSize * 2),
                             scale = voxelSize,
                             u = x.toFloat(),
@@ -754,7 +754,7 @@ class PlayerModelFemale(texture: Int) {
                     vertices.addAll(
                         voxel(
                             x = (1 - ((x.toFloat() + 1) - 55) * voxelSize) - (voxelSize * 8),
-                            y = 0f - LAYER - 1f,
+                            y = 0f - LAYER - 1f - (voxelSize * 4),
                             z = (1 - ((y.toFloat() + 1) - 48) * voxelSize) - (voxelSize * 2),
                             scale = voxelSize,
                             u = x.toFloat(),
@@ -821,7 +821,7 @@ class PlayerModelFemale(texture: Int) {
                         voxel(
                             x = (1 - ((x.toFloat() + 1) - 4) * voxelSize),
                             y = 1f - voxelSize + LAYER  - (voxelSize * 20),
-                            z = (1 - ((y.toFloat() + 1) - 32) * voxelSize),
+                            z = (1 - ((y.toFloat() + 1) - 32) * voxelSize) - (voxelSize * 2),
                             scale = voxelSize,
                             u = x.toFloat(),
                             v = y.toFloat()
@@ -918,7 +918,7 @@ class PlayerModelFemale(texture: Int) {
                     vertices.addAll(
                         voxel(
                             x = (1 - ((x.toFloat() + 1) - 8) * voxelSize),
-                            y = 0f - LAYER  - (voxelSize * 20),
+                            y = 0f - LAYER  - (voxelSize * 20) - (voxelSize * 4),
                             z = (1 - ((y.toFloat() + 1) - 32) * voxelSize) - (voxelSize * 2),
                             scale = voxelSize,
                             u = x.toFloat(),
@@ -985,7 +985,7 @@ class PlayerModelFemale(texture: Int) {
                         voxel(
                             x = (1 - ((x.toFloat() + 1) - 4) * voxelSize) - (voxelSize * 4),
                             y = 1f - voxelSize + LAYER  - (voxelSize * 20),
-                            z = (1 - ((y.toFloat() + 1) - 48) * voxelSize),
+                            z = (1 - ((y.toFloat() + 1) - 48) * voxelSize) - (voxelSize * 2),
                             scale = voxelSize,
                             u = x.toFloat(),
                             v = y.toFloat()
@@ -1082,7 +1082,7 @@ class PlayerModelFemale(texture: Int) {
                     vertices.addAll(
                         voxel(
                             x = (1 - ((x.toFloat() + 1) - 8) * voxelSize) - (voxelSize * 4),
-                            y = 0f - LAYER  - (voxelSize * 20),
+                            y = 0f - LAYER  - (voxelSize * 20) - (voxelSize * 4),
                             z = (1 - ((y.toFloat() + 1) - 48) * voxelSize) - (voxelSize * 2),
                             scale = voxelSize,
                             u = x.toFloat(),

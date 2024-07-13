@@ -1,7 +1,7 @@
 #version 410
 
-#define ambientStrength 0.6
-#define specularStrength 0.2
+#define ambientStrength 0.5
+#define specularStrength 0.1
 
 in vec3 FragPos;
 in vec2 uv;
@@ -22,7 +22,7 @@ void main() {
     }
 
     vec3 normal = normalize(norm);
-    vec3 lightDir = vec3(0.1, 0.4, 0.2);
+    vec3 lightDir = vec3(0.4, 0.5, 0.25);
     //vec3 lightDir = normalize(lightPos - FragPos);
 
     float diff = max(dot(normal, lightDir), 0.0);

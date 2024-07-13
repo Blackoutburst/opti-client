@@ -1,9 +1,9 @@
 package dev.blackoutburst.game.entity
 
+import dev.blackoutburst.game.maths.Matrix
 import dev.blackoutburst.game.maths.Vector2f
 import dev.blackoutburst.game.maths.Vector3f
 import dev.blackoutburst.game.network.Connection
-import dev.blackoutburst.game.utils.Time
 import java.util.*
 import kotlin.collections.LinkedHashSet
 
@@ -26,8 +26,8 @@ object EntityManager {
         }
     }
 
-    fun render() {
-        entities.forEach { it.render() }
+    fun render(view: Matrix, projection: Matrix) {
+        entities.forEach { it.render(view, projection) }
     }
 
     fun setPosition(id: Int, position: Vector3f) {

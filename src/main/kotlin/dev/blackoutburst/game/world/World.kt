@@ -2,6 +2,7 @@ package dev.blackoutburst.game.world
 
 import dev.blackoutburst.game.camera.Camera
 import dev.blackoutburst.game.camera.FrustumCulling
+import dev.blackoutburst.game.entity.EntityManager
 import dev.blackoutburst.game.graphics.Framebuffer
 import dev.blackoutburst.game.maths.Matrix
 import dev.blackoutburst.game.maths.Vector2f
@@ -85,14 +86,18 @@ object World {
         glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
 
         val a = 70f
-        shaderProgram.setUniformMat4("projection", Matrix()
-            .ortho2D(-a, a, -a, a, -100f, 100f))
 
-        shaderProgram.setUniformMat4("view", Matrix()
+        val projection =  Matrix()
+            .ortho2D(-a, a, -a, a, -100f, 100f)
+
+
+        val view = Matrix()
             .rotate(Math.toRadians(60.0).toFloat(), Vector3f(1f, 0f, 0f))
             .rotate(Math.toRadians(Camera.rotation.x.toDouble()).toFloat(), Vector3f(0f, 1f, 0f))
             .translate(Vector3f(-Camera.position.x, 0f, -Camera.position.z))
-        )
+
+        shaderProgram.setUniformMat4("view", view)
+        shaderProgram.setUniformMat4("projection", projection)
 
         glActiveTexture(GL_TEXTURE0)
         glBindTexture(GL_TEXTURE_2D_ARRAY, diffuseMap)
@@ -111,6 +116,8 @@ object World {
         }
         glEnable(GL_CULL_FACE)
 
+        EntityManager.render(view, projection)
+
         glBindFramebuffer(GL_FRAMEBUFFER, 0)
         glViewport(0, 0, Window.width, Window.height)
     }
@@ -123,14 +130,17 @@ object World {
         glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
 
         val a = 100f
-        shadowShaderProgram.setUniformMat4("projection", Matrix()
-            .ortho2D(-a, a, -a, a, -50f - Camera.position.y, 150f - Camera.position.y))
-
-        shadowShaderProgram.setUniformMat4("view", Matrix()
+        val view = Matrix()
             .rotate(Math.toRadians(40.0).toFloat(), Vector3f(1f, 0f, 0f))
             .rotate(Math.toRadians(-60.0).toFloat(), Vector3f(0f, 1f, 0f))
             .translate(Vector3f(-Camera.position.x, 0f, -Camera.position.z))
-        )
+
+        val projection = Matrix()
+            .ortho2D(-a, a, -a, a, -50f - Camera.position.y, 150f - Camera.position.y)
+
+
+        shadowShaderProgram.setUniformMat4("view", view)
+        shadowShaderProgram.setUniformMat4("projection", projection)
 
         glDisable(GL_CULL_FACE)
 
@@ -142,6 +152,8 @@ object World {
             chunk.render()
         }
         glEnable(GL_CULL_FACE)
+
+        EntityManager.render(view, projection)
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0)
         glViewport(0, 0, Window.width, Window.height)

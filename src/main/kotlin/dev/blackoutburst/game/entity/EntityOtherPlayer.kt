@@ -21,8 +21,8 @@ class EntityOtherPlayer(
     rotation: Vector2f = Vector2f(),
 ) : Entity(id, position, rotation) {
 
-    private val texture = Texture("nep.png", false)
-    private val model = PlayerModelFemale(texture.id)
+    private val texture = Texture("pol.png", false)
+    private val model = PlayerModelMale(texture.id)
     private val vertexShader = Shader(GL_VERTEX_SHADER, "/shaders/cube.vert")
     private val fragmentShader = Shader(GL_FRAGMENT_SHADER, "/shaders/cube.frag")
     private val shaderProgram = ShaderProgram(vertexShader, fragmentShader)
@@ -37,16 +37,14 @@ class EntityOtherPlayer(
         moving = (previousRawPosition.x - rawPosition.x).pow(2) + (previousRawPosition.z - rawPosition.z).pow(2) != 0f
     }
 
-    override fun render() {
-
-
+    override fun render(view: Matrix, projection: Matrix) {
         val xRad = -rotation.x
         val yRad = -rotation.y
 
         if (rotation.x - bodyRotation > if (moving) 0.1f else 0.75f) {
-            bodyRotation += 0.01f
+            bodyRotation += 10f * Time.delta.toFloat()
         } else if (rotation.x - bodyRotation < if (moving) -0.1f else -0.75f) {
-            bodyRotation -= 0.01f
+            bodyRotation -= 10f * Time.delta.toFloat()
         }
 
         val bodyRad = -bodyRotation
@@ -63,7 +61,13 @@ class EntityOtherPlayer(
         }
 
         val radSwing = sin(swingRotation) * 0.85f
-        val offset = Vector3f(-0.5f)
+        val offset = Vector3f(-0.25f, -0.25f, -0.25f)
+
+        shaderProgram.setUniformMat4("view", view)
+        shaderProgram.setUniformMat4("projection", projection)
+        shaderProgram.setUniform4f("color", Color.WHITE)
+        shaderProgram.setUniform3f("lightColor", Color.WHITE)
+        shaderProgram.setUniform3f("viewPos", Camera.position)
 
         glUseProgram(shaderProgram.id)
         shaderProgram.setUniform1i("diffuseMap", 0)
@@ -71,17 +75,13 @@ class EntityOtherPlayer(
             Matrix()
                 .translate(position)
                 .translate(offset)
+                .scale(Vector3f(0.5f))
                 .translate(Vector3f(0.5f, 0.0f, 0.5f))
                 .rotate(yRad, Vector3f(cos(xRad), 0f, -sin(xRad)))
                 .rotate(xRad, Vector3f(0f, 1f, 0f))
                 .translate(Vector3f(-0.5f, 0.0f, -0.5f))
-        )
-        shaderProgram.setUniformMat4("view", Camera.view)
-        shaderProgram.setUniformMat4("projection", Matrix().projectionMatrix(90f, 1000f, 0.1f))
-        shaderProgram.setUniform4f("color", Color.WHITE)
-        shaderProgram.setUniform3f("lightColor", Color.WHITE)
-        shaderProgram.setUniform3f("viewPos", Camera.position)
 
+        )
 
         glActiveTexture(GL_TEXTURE0)
         glBindTexture(GL_TEXTURE_2D, texture.id)
@@ -93,9 +93,11 @@ class EntityOtherPlayer(
             Matrix()
                 .translate(position)
                 .translate(offset)
+                .scale(Vector3f(0.5f))
                 .translate(Vector3f(0.5f))
                 .rotate(bodyRad, Vector3f(0f, 1f, 0f))
                 .translate(Vector3f(-0.5f))
+
         )
 
         glBindVertexArray(model.vaos["body"]!!)
@@ -106,6 +108,7 @@ class EntityOtherPlayer(
             Matrix()
                 .translate(position)
                 .translate(offset)
+                .scale(Vector3f(0.5f))
                 .translate(Vector3f(0.5f, 0.0f, 0.5f))
                 .rotate(radSwing, Vector3f(cos(bodyRad), 0f, -sin(bodyRad)))
                 .rotate(bodyRad, Vector3f(0f, 1f, 0f))
@@ -119,6 +122,7 @@ class EntityOtherPlayer(
             Matrix()
                 .translate(position)
                 .translate(offset)
+                .scale(Vector3f(0.5f))
                 .translate(Vector3f(0.5f, 0.0f, 0.5f))
                 .rotate(-radSwing, Vector3f(cos(bodyRad), 0f, -sin(bodyRad)))
                 .rotate(bodyRad, Vector3f(0f, 1f, 0f))
@@ -133,6 +137,7 @@ class EntityOtherPlayer(
             Matrix()
                 .translate(position)
                 .translate(offset)
+                .scale(Vector3f(0.5f))
                 .translate(Vector3f(0.5f, -1.5f, 0.5f))
                 .rotate(-radSwing, Vector3f(cos(bodyRad), 0f, -sin(bodyRad)))
                 .rotate(bodyRad, Vector3f(0f, 1f, 0f))
@@ -146,6 +151,7 @@ class EntityOtherPlayer(
             Matrix()
                 .translate(position)
                 .translate(offset)
+                .scale(Vector3f(0.5f))
                 .translate(Vector3f(0.5f, -1.5f, 0.5f))
                 .rotate(radSwing, Vector3f(cos(bodyRad), 0f, -sin(bodyRad)))
                 .rotate(bodyRad, Vector3f(0f, 1f, 0f))

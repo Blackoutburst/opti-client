@@ -4,6 +4,7 @@ import dev.blackoutburst.game.Main
 import dev.blackoutburst.game.camera.Camera
 import dev.blackoutburst.game.input.Keyboard
 import dev.blackoutburst.game.input.Mouse
+import dev.blackoutburst.game.maths.Matrix
 import dev.blackoutburst.game.maths.Vector2f
 import dev.blackoutburst.game.maths.Vector3f
 import dev.blackoutburst.game.network.Connection
@@ -13,7 +14,6 @@ import dev.blackoutburst.game.utils.Time
 import dev.blackoutburst.game.world.BlockType
 import dev.blackoutburst.game.world.World
 import org.lwjgl.glfw.GLFW
-import org.lwjgl.openal.AL10.alSourcePlay
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -47,7 +47,7 @@ class EntityPlayer(
         }
     }
 
-    override fun render() {
+    override fun render(view: Matrix, projection: Matrix) {
     }
 
     private fun updateCamera() {

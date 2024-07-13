@@ -4,8 +4,10 @@ import dev.blackoutburst.game.Main.blockType
 import dev.blackoutburst.game.Main.queue
 import dev.blackoutburst.game.Main.source
 import dev.blackoutburst.game.Main.source2
+import dev.blackoutburst.game.camera.Camera
 import dev.blackoutburst.game.entity.EntityManager
 import dev.blackoutburst.game.input.Keyboard
+import dev.blackoutburst.game.maths.Matrix
 import dev.blackoutburst.game.network.Connection
 import dev.blackoutburst.game.ui.*
 import dev.blackoutburst.game.window.Window
@@ -95,7 +97,7 @@ fun main() {
         glDisable(GL_CULL_FACE)
         glPolygonMode(GL_FRONT_AND_BACK, Render.renderMode)
         EntityManager.update()
-        EntityManager.render()
+        EntityManager.render(Camera.view, Matrix().projectionMatrix(90f, 1000f, 0.1f))
 
         World.render()
 

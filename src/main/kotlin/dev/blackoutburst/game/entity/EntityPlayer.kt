@@ -31,8 +31,6 @@ class EntityPlayer(
     private val runSpeed = 50f
     private val walkSpeed = 10f
 
-    private var blockType = BlockType.GRASS
-
     private var velocity = Vector3f()
 
     override fun update() {
@@ -141,8 +139,8 @@ class EntityPlayer(
             val result = World.dda(Camera.position, Camera.direction, 100)
             result.block?.let { b ->
                 result.face?.let { f ->
-                    alSourcePlay(Main.source2)
-                    Connection.write(C01UpdateBlock(blockType.id, b.position + f))
+                    //alSourcePlay(Main.source2)
+                    Connection.write(C01UpdateBlock(Main.blockType.id, b.position + f))
                 }
             }
         }
@@ -150,14 +148,14 @@ class EntityPlayer(
         if (Mouse.isButtonPressed(Mouse.LEFT_BUTTON)) {
             World.dda(Camera.position, Camera.direction, 100)
                 .block?.let {
-                    alSourcePlay(Main.source)
+                    //alSourcePlay(Main.source)
                     Connection.write(C01UpdateBlock(BlockType.AIR.id, it.position))
                 }
         }
 
         if (Mouse.isButtonPressed(Mouse.MIDDLE_BUTTON)) {
             World.dda(Camera.position, Camera.direction, 100).block?.let {
-                blockType = it.type
+                Main.blockType = it.type
             }
         }
     }

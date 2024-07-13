@@ -1,14 +1,18 @@
 package dev.blackoutburst.game
 
+import dev.blackoutburst.game.Main.blockType
 import dev.blackoutburst.game.Main.queue
 import dev.blackoutburst.game.Main.source
 import dev.blackoutburst.game.Main.source2
 import dev.blackoutburst.game.entity.EntityManager
+import dev.blackoutburst.game.input.Keyboard
 import dev.blackoutburst.game.network.Connection
 import dev.blackoutburst.game.ui.*
 import dev.blackoutburst.game.window.Window
+import dev.blackoutburst.game.world.BlockType
 import dev.blackoutburst.game.world.World
 import org.lwjgl.BufferUtils
+import org.lwjgl.glfw.GLFW
 import org.lwjgl.openal.ALC
 import org.lwjgl.opengl.GL11.*
 import org.lwjgl.openal.AL
@@ -25,6 +29,8 @@ object Main {
     var fps = 0
     var source = 0
     var source2 = 0
+
+    var blockType = BlockType.GRASS
 }
 
 fun main() {
@@ -71,6 +77,20 @@ fun main() {
     while (Window.isOpen) {
         while(queue.isNotEmpty()) queue.poll()?.invoke()
         Window.clear()
+
+        if (Keyboard.isKeyPressed(GLFW.GLFW_KEY_0))
+            blockType = BlockType.ERROR
+
+        if (Keyboard.isKeyPressed(GLFW.GLFW_KEY_1))
+            blockType = BlockType.GRASS
+        if (Keyboard.isKeyPressed(GLFW.GLFW_KEY_2))
+            blockType = BlockType.DIRT
+        if (Keyboard.isKeyPressed(GLFW.GLFW_KEY_3))
+            blockType = BlockType.STONE
+        if (Keyboard.isKeyPressed(GLFW.GLFW_KEY_4))
+            blockType = BlockType.OAK_LOG
+        if (Keyboard.isKeyPressed(GLFW.GLFW_KEY_5))
+            blockType = BlockType.OAK_LEAVES
 
         glDisable(GL_CULL_FACE)
         glPolygonMode(GL_FRONT_AND_BACK, Render.renderMode)

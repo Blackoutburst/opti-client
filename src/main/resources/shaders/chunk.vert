@@ -5,11 +5,15 @@ layout(location = 1) in int offsetData;
 
 uniform mat4 view;
 uniform mat4 projection;
+uniform mat4 lightView;
+uniform mat4 lightProjection;
+
 uniform vec3 chunkPos;
 
 out vec3 FragPos;
 out vec2 uv;
 out vec3 norm;
+out vec4 FragPosLightSpace;
 flat out float layer;
 
 vec3 getNormal(int index) {
@@ -67,6 +71,9 @@ void main() {
 	}
 
 	if (FACE == 5) { pos.y--; }
+
+
+	FragPosLightSpace = lightProjection * lightView * vec4(pos + offset + chunkPos, 1.0);
 
 	gl_Position = projection * view * vec4(pos + offset + chunkPos, 1.0);
 }

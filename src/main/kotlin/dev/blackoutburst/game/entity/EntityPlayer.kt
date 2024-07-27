@@ -11,9 +11,12 @@ import dev.blackoutburst.game.network.Connection
 import dev.blackoutburst.game.network.packets.client.C00UpdateEntity
 import dev.blackoutburst.game.network.packets.client.C01UpdateBlock
 import dev.blackoutburst.game.utils.Time
+import dev.blackoutburst.game.window.Window
 import dev.blackoutburst.game.world.BlockType
 import dev.blackoutburst.game.world.World
 import org.lwjgl.glfw.GLFW
+import java.nio.file.Files.move
+import java.util.Collections.rotate
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -34,11 +37,13 @@ class EntityPlayer(
     private var velocity = Vector3f()
 
     override fun update() {
+        networkUpdate()
+        if (Window.showCursor) return
+
         mouseAction()
         rotate()
         move()
         updateCamera()
-        networkUpdate()
     }
 
     private fun networkUpdate() {

@@ -49,7 +49,7 @@ class EntityOtherPlayer(
 
         val bodyRad = -bodyRotation
         if (moving) {
-            swingRotation += 10f * Time.delta.toFloat()
+            swingRotation += 4f * Time.delta.toFloat()
         } else {
             swingRotation = if (swingRotation > Math.PI)
                 expDecay(swingRotation, Math.PI.toFloat() * 2f, 5f, Time.delta)

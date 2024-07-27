@@ -30,6 +30,8 @@ class PacketManager {
     fun decode(id: Int, data: ByteArray) {
         val buffer = ByteBuffer.wrap(data)
 
+        println(id)
+
         default {
             packets[id]?.decode(buffer)
         }

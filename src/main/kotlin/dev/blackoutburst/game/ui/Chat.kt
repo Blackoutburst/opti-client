@@ -19,10 +19,22 @@ class DefaultFilter : NkPluginFilterI {
 object Chat {
     val messages = mutableListOf<String>()
     val text = MemoryUtil.memAlloc(4096).put(Array(4095) { 0.toByte() }.toByteArray()).flip()
+    var flags = 0
+
+    var totalHeight = 0
+
+    init {
+        messages.add("\r")
+    }
 
     fun clear() {
-        Connection.write(C03Chat(StandardCharsets.UTF_8.decode(text).toString()))
+        val msg = StandardCharsets.UTF_8.decode(text).toString()
+        Connection.write(C03Chat(msg))
         text.clear().put(Array(4095) { 0.toByte() }.toByteArray()).flip()
+
+        totalHeight = messages.size * 30
+
+        nk_window_set_scroll(ctx, 0, totalHeight + 200)
     }
 
     fun renderTextField(x: Float, y: Float, width: Float, height: Float) {
@@ -46,10 +58,7 @@ object Chat {
             ) {
 
                 nk_layout_row_dynamic(ctx, 30f, 1)
-                val flags = nk_edit_string_zero_terminated(ctx, NK_EDIT_FIELD or NK_EDIT_SELECTABLE, text, 4096, DefaultFilter())
-                if (flags and NK_EDIT_ACTIVE != 0 && Keyboard.isKeyPressed(GLFW.GLFW_KEY_ENTER)) {
-                    clear()
-                }
+                flags = nk_edit_string_zero_terminated(ctx, NK_EDIT_FIELD or NK_EDIT_SELECTABLE, text, 4096, DefaultFilter())
             }
             nk_end(ctx)
         }
@@ -70,9 +79,16 @@ object Chat {
                 )
             ) {
 
-                for (msg in messages) {
+                val size = messages.size
+                for (i in 0 until size) {
+                    val msg = try { messages[i] } catch (ignored: Exception) { null } ?: continue
+
                     nk_layout_row_dynamic(ctx, 20f, 1)
                     nk_label(ctx, msg, NK_TEXT_LEFT)
+                }
+
+                if (flags and NK_EDIT_ACTIVE != 0 && Keyboard.isKeyPressed(GLFW.GLFW_KEY_ENTER)) {
+                    clear()
                 }
             }
             nk_end(ctx)

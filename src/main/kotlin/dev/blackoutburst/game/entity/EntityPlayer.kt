@@ -14,6 +14,7 @@ import dev.blackoutburst.game.utils.Time
 import dev.blackoutburst.game.window.Window
 import dev.blackoutburst.game.world.BlockType
 import dev.blackoutburst.game.world.World
+import dev.blackoutburst.game.world.World.updateChunk
 import org.lwjgl.glfw.GLFW
 import java.nio.file.Files.move
 import java.util.Collections.rotate
@@ -48,7 +49,7 @@ class EntityPlayer(
 
     private fun networkUpdate() {
         if (Time.doUpdate()) {
-            Connection.write(C00UpdateEntity(id, position, rotation))
+            Connection.write(C00UpdateEntity(position, rotation))
         }
     }
 
@@ -145,6 +146,7 @@ class EntityPlayer(
             result.block?.let { b ->
                 result.face?.let { f ->
                     //alSourcePlay(Main.source2)
+                    updateChunk(b.position + f, Main.blockType.id)
                     Connection.write(C01UpdateBlock(Main.blockType.id, b.position + f))
                 }
             }
@@ -154,6 +156,7 @@ class EntityPlayer(
             World.dda(Camera.position, Camera.direction, 100)
                 .block?.let {
                     //alSourcePlay(Main.source)
+                    updateChunk(it.position, BlockType.AIR.id)
                     Connection.write(C01UpdateBlock(BlockType.AIR.id, it.position))
                 }
         }

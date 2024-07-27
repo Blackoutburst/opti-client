@@ -3,16 +3,10 @@ package dev.blackoutburst.game.world
 import dev.blackoutburst.game.maths.Vector3i
 import dev.blackoutburst.game.utils.main
 import dev.blackoutburst.game.utils.stack
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import org.lwjgl.opengl.ARBInstancedArrays
+import org.lwjgl.opengl.GL15
 import org.lwjgl.opengl.GL30.*
 import org.lwjgl.opengl.GL33.glDrawElementsInstanced
-import org.lwjgl.opengl.GL33.glVertexAttribDivisor
-import org.lwjgl.system.MemoryStack
-import java.nio.IntBuffer
-import kotlin.random.Random
 
 class Chunk(
     val position: Vector3i,
@@ -58,16 +52,16 @@ class Chunk(
             ((face and 7) shl 15) or
             ((texture and 31) shl 18)
 
-    fun update() {
+    init {
         World.chunkUpdate.incrementAndGet()
 
+        val offsets = getOffsets()
+
         main {
-            if (vaoID == 0) {
-                vaoID = glGenVertexArrays()
-                vboID = glGenBuffers()
-                eboID = glGenBuffers()
-                ssboId = glGenBuffers()
-            }
+            vaoID = glGenVertexArrays()
+            vboID = glGenBuffers()
+            eboID = glGenBuffers()
+            ssboId = glGenBuffers()
 
             stack(128 * 1024) { stack ->
                 glBindVertexArray(vaoID)
@@ -89,7 +83,6 @@ class Chunk(
 
                 //SSBO
                 glBindBuffer(GL_ARRAY_BUFFER, ssboId)
-                val offsets = getOffsets()
                 val instanceBuffer = stack.mallocInt(offsets.size)
                 instanceBuffer.put(offsets).flip()
                 glBufferData(GL_ARRAY_BUFFER, instanceBuffer, GL_STATIC_DRAW)
@@ -99,6 +92,17 @@ class Chunk(
                 glBindBuffer(GL_ARRAY_BUFFER, 0)
 
                 glBindVertexArray(0)
+
+                val oldChunk = World.chunks[position.toString()]
+
+                World.chunks[position.toString()] = this
+
+                oldChunk?.let {
+                    glDeleteVertexArrays(it.vaoID)
+                    glDeleteBuffers(it.vboID)
+                    glDeleteBuffers(it.eboID)
+                    glDeleteBuffers(it.ssboId)
+                }
 
                 World.chunkUpdate.decrementAndGet()
             }
@@ -141,67 +145,64 @@ class Chunk(
 
     private fun getVisibleFaces(position: Vector3i): Array<Boolean> {
         val faces = Array(6) { false }
-        val chunkX = this@Chunk.position.x
-        val chunkY = this@Chunk.position.y
-        val chunkZ = this@Chunk.position.z
 
         // TOP
         run {
-            val b = World.getBlockAt(Vector3i(chunkX + position.x, chunkY + position.y + 1, chunkZ + position.z))
-            if (b == null || b.type == BlockType.AIR || b.type.transparent) {
-                faces[0] = true
-            }
+            val b = getBlockAt(position.x, position.y + 1, position.z)
+            faces[0] = (b == null || b.type == BlockType.AIR || b.type.transparent)
         }
 
         // FRONT
         run {
-            val b = World.getBlockAt(Vector3i(chunkX + position.x, chunkY + position.y, chunkZ + position.z - 1))
-            if (b == null || b.type == BlockType.AIR || b.type.transparent) {
-                faces[1] = true
-            }
+            val b = getBlockAt(position.x, position.y, position.z - 1)
+            faces[1] = (b == null || b.type == BlockType.AIR || b.type.transparent)
         }
 
         // BACK
         run {
-            val b = World.getBlockAt(Vector3i(chunkX + position.x, chunkY + position.y, chunkZ + position.z + 1))
-            if (b == null || b.type == BlockType.AIR || b.type.transparent) {
-                faces[2] = true
-            }
+            val b = getBlockAt(position.x, position.y, position.z + 1)
+            faces[2] = (b == null || b.type == BlockType.AIR || b.type.transparent)
         }
 
         // LEFT
         run {
-            val b = World.getBlockAt(Vector3i(chunkX + position.x - 1, chunkY + position.y, chunkZ + position.z))
-            if (b == null || b.type == BlockType.AIR || b.type.transparent) {
-                faces[3] = true
-            }
+            val b = getBlockAt(position.x - 1, position.y, position.z)
+            faces[3] = (b == null || b.type == BlockType.AIR || b.type.transparent)
         }
 
         // RIGHT
         run {
-            val b = World.getBlockAt(Vector3i(chunkX + position.x + 1, chunkY + position.y, chunkZ + position.z))
-            if (b == null || b.type == BlockType.AIR || b.type.transparent) {
-                faces[4] = true
-            }
+            val b = getBlockAt(position.x + 1, position.y, position.z)
+            faces[4] = (b == null || b.type == BlockType.AIR || b.type.transparent)
         }
 
         // BOTTOM
         run {
-            val b = World.getBlockAt(Vector3i(chunkX + position.x, chunkY + position.y - 1, chunkZ + position.z))
-            if (b == null || b.type == BlockType.AIR || b.type.transparent) {
-                faces[5] = true
-            }
+            val b = getBlockAt(position.x, position.y - 1, position.z)
+            faces[5] = (b == null || b.type == BlockType.AIR || b.type.transparent)
         }
 
         return faces
     }
 
+    fun getBlockAt(x: Int, y: Int, z: Int): Block? {
+        if (x < 0 || x > 15 || y < 0 || y > 15 || z < 0 || z > 15) return null
+
+        return try {
+            val blockId = xyzToIndex(x, y, z)
+
+            Block(BlockType.getByID(blocks[blockId]), indexToXYZ(blockId) + position)
+        } catch (ignored: Exception) {
+            null
+        }
+    }
+
     companion object {
-        fun getIndex(position: Vector3i, chunkSize: Int): Vector3i {
+        fun getIndex(position: Vector3i): Vector3i {
             return Vector3i(
-                (if (position.x < 0) (position.x + 1) / chunkSize - 1 else position.x / chunkSize) * chunkSize,
-                (if (position.y < 0) (position.y + 1) / chunkSize - 1 else position.y / chunkSize) * chunkSize,
-                (if (position.z < 0) (position.z + 1) / chunkSize - 1 else position.z / chunkSize) * chunkSize
+                (if (position.x < 0) (position.x + 1) / CHUNK_SIZE - 1 else position.x / CHUNK_SIZE) * CHUNK_SIZE,
+                (if (position.y < 0) (position.y + 1) / CHUNK_SIZE - 1 else position.y / CHUNK_SIZE) * CHUNK_SIZE,
+                (if (position.z < 0) (position.z + 1) / CHUNK_SIZE - 1 else position.z / CHUNK_SIZE) * CHUNK_SIZE
             )
         }
     }

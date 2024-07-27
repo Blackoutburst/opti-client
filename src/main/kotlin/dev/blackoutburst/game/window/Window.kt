@@ -59,7 +59,7 @@ object Window {
 
         NK.init(id)
 
-        glClearColor(Random.nextFloat(), Random.nextFloat(), Random.nextFloat(), 1f)
+        glClearColor(0.69f, 0.83f, 0.89f, 1f)
         glLineWidth(2.0f)
         glPointSize(2.0f)
 

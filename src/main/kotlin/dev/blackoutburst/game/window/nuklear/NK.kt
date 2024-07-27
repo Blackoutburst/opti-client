@@ -30,10 +30,10 @@ object NK {
         .position(3).attribute(Nuklear.NK_VERTEX_ATTRIBUTE_COUNT).format(Nuklear.NK_FORMAT_COUNT).offset(0)
         .flip()
 
-    private const val BUFFER_INITIAL_SIZE = 4 * 1024
+    private val BUFFER_INITIAL_SIZE = 4 * 1024
 
-    private const val MAX_VERTEX_BUFFER = 512 * 1024
-    private const val MAX_ELEMENT_BUFFER = 128 * 1024
+    private val MAX_VERTEX_BUFFER = 512 * 1024
+    private val MAX_ELEMENT_BUFFER = 128 * 1024
 
     private var width = 0
     private var height = 0

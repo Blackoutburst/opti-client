@@ -17,6 +17,7 @@ class PacketManager {
         packets[0x03] = S03UpdateEntity(24)
         packets[0x04] = S04SendChunk(4108)
         packets[0x05] = S05SendMonoTypeChunk(13)
+        packets[0x06] = S06Chat(4096)
     }
 
     fun getId(data: ByteArray): Int {
@@ -29,8 +30,6 @@ class PacketManager {
 
     fun decode(id: Int, data: ByteArray) {
         val buffer = ByteBuffer.wrap(data)
-
-        println(id)
 
         default {
             packets[id]?.decode(buffer)

@@ -1,5 +1,6 @@
 package dev.blackoutburst.game.world
 
+import com.sun.security.ntlm.Server
 import dev.blackoutburst.game.camera.Camera
 import dev.blackoutburst.game.camera.FrustumCulling
 import dev.blackoutburst.game.entity.EntityManager
@@ -8,6 +9,8 @@ import dev.blackoutburst.game.maths.Matrix
 import dev.blackoutburst.game.maths.Vector2f
 import dev.blackoutburst.game.maths.Vector3f
 import dev.blackoutburst.game.maths.Vector3i
+import dev.blackoutburst.game.network.packets.server.S04SendChunk
+import dev.blackoutburst.game.network.packets.server.S05SendMonoTypeChunk
 import dev.blackoutburst.game.shader.Shader
 import dev.blackoutburst.game.shader.ShaderProgram
 import dev.blackoutburst.game.texture.TextureArray
@@ -44,17 +47,7 @@ object World {
     private val minimap = Framebuffer(400, 400)
     private val shadowMap = Framebuffer(4096 * 2, 4096 * 2, true)
 
-    fun addChunk(position: Vector3i, blockData: Array<Byte>) {
-        chunks[position.toString()]?.let {
-            it.blocks = blockData
-            it.update()
-        } ?: run {
-            val chunk = Chunk(position, blockData)
-            chunk.update()
-
-            chunks[position.toString()] = chunk
-        }
-    }
+    fun addChunk(position: Vector3i, blockData: Array<Byte>) = Chunk(position, blockData)
 
     private fun setUniforms() {
         shaderProgram.setUniform1i("shadowMap", 1)
@@ -161,7 +154,7 @@ object World {
 
     fun render() {
         shadowMapCreation()
-        minimapCreation()
+        //minimapCreation()
 
         glBindTexture(GL_TEXTURE_2D_ARRAY, diffuseMap)
 
@@ -185,12 +178,12 @@ object World {
         }
         glEnable(GL_CULL_FACE)
 
-        minimap.render(0f, 0f, 200f, 200f)
-        shadowMap.render(200f, 0f, 200f, 200f)
+        //minimap.render(0f, 0f, 200f, 200f)
+        //shadowMap.render(200f, 0f, 200f, 200f)
     }
 
     fun getBlockAt(position: Vector3i): Block? {
-        val chunkPosition = Chunk.getIndex(position, CHUNK_SIZE)
+        val chunkPosition = Chunk.getIndex(position)
         val chunk = chunks[chunkPosition.toString()] ?: return null
         val positionAsInt = Vector3i(
             ((position.x - chunk.position.x) % CHUNK_SIZE + CHUNK_SIZE) % CHUNK_SIZE,
@@ -243,5 +236,20 @@ object World {
         }
 
         return RayCastResult(null, mask)
+    }
+
+    fun updateChunk(position: Vector3i, blockType: Byte) {
+        val index = Chunk.getIndex(position)
+        val chunk = chunks[index.toString()] ?: return
+
+        val positionInChunk = Vector3i(
+            if (position.x % 16 < 0) position.x % 16 + CHUNK_SIZE else position.x % 16,
+            if (position.y % 16 < 0) position.y % 16 + CHUNK_SIZE else position.y % 16,
+            if (position.z % 16 < 0) position.z  % 16 + CHUNK_SIZE else position.z % 16,
+        )
+
+        val blockId = chunk.xyzToIndex(positionInChunk.x, positionInChunk.y, positionInChunk.z)
+        chunk.blocks[blockId] = blockType
+        addChunk(chunk.position, chunk.blocks)
     }
 }

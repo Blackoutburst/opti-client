@@ -114,6 +114,9 @@ fun main() {
         Position.render(260f, 0f, 130f, 140f)
         Render.render(390f, 0f, 130f, 140f)
 
+        Chat.renderTextField(0f, Window.height - 35f, 500f, 35f)
+        Chat.renderMessages(0f, Window.height - 235f, 500f, 200f)
+
         Window.update()
     }
 

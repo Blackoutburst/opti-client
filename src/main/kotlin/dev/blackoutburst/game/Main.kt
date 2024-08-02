@@ -1,6 +1,7 @@
 package dev.blackoutburst.game
 
 import dev.blackoutburst.game.Main.blockType
+import dev.blackoutburst.game.Main.chatOpen
 import dev.blackoutburst.game.Main.queue
 import dev.blackoutburst.game.Main.source
 import dev.blackoutburst.game.Main.source2
@@ -12,10 +13,11 @@ import dev.blackoutburst.game.network.Connection
 import dev.blackoutburst.game.network.packets.client.C04ClientMetadata
 import dev.blackoutburst.game.ui.*
 import dev.blackoutburst.game.window.Window
+import dev.blackoutburst.game.window.Window.id
 import dev.blackoutburst.game.world.BlockType
 import dev.blackoutburst.game.world.World
 import org.lwjgl.BufferUtils
-import org.lwjgl.glfw.GLFW
+import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.openal.ALC
 import org.lwjgl.opengl.GL11.*
 import org.lwjgl.openal.AL
@@ -28,6 +30,7 @@ import java.util.concurrent.ConcurrentLinkedQueue
 import javax.sound.sampled.AudioSystem
 
 object Main {
+    var chatOpen = false
     val queue: ConcurrentLinkedQueue<() -> Unit> = ConcurrentLinkedQueue()
     var fps = 0
     var source = 0
@@ -78,25 +81,28 @@ fun main() {
 
     //AL SHITPOST END
 
-    val text = Text(100f, 100f, 24f,"Paul Narchal The Boids Overlord")
-
     while (Window.isOpen) {
         while(queue.isNotEmpty()) queue.poll()?.invoke()
         Window.clear()
 
-        if (Keyboard.isKeyPressed(GLFW.GLFW_KEY_0))
+        if (Keyboard.isKeyPressed(GLFW_KEY_0))
             blockType = BlockType.ERROR
 
-        if (Keyboard.isKeyPressed(GLFW.GLFW_KEY_1))
+        if (Keyboard.isKeyPressed(GLFW_KEY_1))
             blockType = BlockType.GRASS
-        if (Keyboard.isKeyPressed(GLFW.GLFW_KEY_2))
+        if (Keyboard.isKeyPressed(GLFW_KEY_2))
             blockType = BlockType.DIRT
-        if (Keyboard.isKeyPressed(GLFW.GLFW_KEY_3))
+        if (Keyboard.isKeyPressed(GLFW_KEY_3))
             blockType = BlockType.STONE
-        if (Keyboard.isKeyPressed(GLFW.GLFW_KEY_4))
+        if (Keyboard.isKeyPressed(GLFW_KEY_4))
             blockType = BlockType.OAK_LOG
-        if (Keyboard.isKeyPressed(GLFW.GLFW_KEY_5))
+        if (Keyboard.isKeyPressed(GLFW_KEY_5))
             blockType = BlockType.OAK_LEAVES
+
+        if (!chatOpen && Keyboard.isKeyPressed(GLFW_KEY_T)) {
+            glfwSetInputMode(id, GLFW_CURSOR, GLFW_CURSOR_NORMAL)
+            chatOpen = true
+        }
 
         glDisable(GL_CULL_FACE)
         glPolygonMode(GL_FRONT_AND_BACK, Render.renderMode)
@@ -112,16 +118,14 @@ fun main() {
 
         Cursor.render()
 
-        text.render()
-
         SystemUsage.render(0f, 0f, 130f, 70f)
         WorldInformation.render(130f, 0f, 130f, 140f)
         ConnectionStatus.render(0f, 70f, 130f, 70f)
         Position.render(260f, 0f, 130f, 140f)
         Render.render(390f, 0f, 130f, 140f)
 
-        //Chat.renderTextField(0f, Window.height - 35f, 500f, 35f)
-        //Chat.renderMessages(0f, Window.height - 235f, 500f, 200f)
+        Chat.renderTextField()
+        Chat.renderMessages()
 
         Window.update()
     }

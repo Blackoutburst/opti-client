@@ -1,9 +1,11 @@
 package dev.blackoutburst.game.window
 
 import dev.blackoutburst.game.Main
+import dev.blackoutburst.game.Main.chatOpen
 import dev.blackoutburst.game.input.Keyboard
 import dev.blackoutburst.game.input.Mouse
 import dev.blackoutburst.game.maths.Vector2i
+import dev.blackoutburst.game.ui.Chat
 import dev.blackoutburst.game.utils.IOUtils
 import dev.blackoutburst.game.utils.Time
 import dev.blackoutburst.game.utils.stack
@@ -30,7 +32,6 @@ object Window {
     val title = MemoryStack.stackPush().UTF8("OpenGL [LWJGL - ${Version.getVersion()}]")
     var id = -1L
     var isOpen = false
-    var showCursor = false
 
     var renderPasses = 0
     var lastTime = glfwGetTime()
@@ -70,16 +71,13 @@ object Window {
     }
 
     fun update() {
-        if (Keyboard.isKeyPressed(GLFW_KEY_O)) {
-            glfwSetInputMode(id, GLFW_CURSOR, GLFW_CURSOR_NORMAL)
-            showCursor = true
-        }
-        if (Keyboard.isKeyPressed(GLFW_KEY_P)) {
+        isOpen = !(glfwWindowShouldClose(id) || (Keyboard.isKeyPressed(GLFW_KEY_ESCAPE) && !chatOpen))
+        if (Keyboard.isKeyPressed(GLFW_KEY_ESCAPE) && chatOpen) {
             glfwSetInputMode(id, GLFW_CURSOR, GLFW_CURSOR_DISABLED)
-            showCursor = false
+            chatOpen = false
+            Chat.clearInput()
         }
 
-        isOpen = !(glfwWindowShouldClose(id) || Keyboard.isKeyPressed(GLFW_KEY_ESCAPE))
         Time.updateDelta()
         Mouse.update()
         Keyboard.update()

@@ -1,6 +1,7 @@
 package dev.blackoutburst.game.entity
 
 import dev.blackoutburst.game.Main
+import dev.blackoutburst.game.Main.chatOpen
 import dev.blackoutburst.game.camera.Camera
 import dev.blackoutburst.game.input.Keyboard
 import dev.blackoutburst.game.input.Mouse
@@ -11,13 +12,10 @@ import dev.blackoutburst.game.network.Connection
 import dev.blackoutburst.game.network.packets.client.C00UpdateEntity
 import dev.blackoutburst.game.network.packets.client.C01UpdateBlock
 import dev.blackoutburst.game.utils.Time
-import dev.blackoutburst.game.window.Window
 import dev.blackoutburst.game.world.BlockType
 import dev.blackoutburst.game.world.World
 import dev.blackoutburst.game.world.World.updateChunk
 import org.lwjgl.glfw.GLFW
-import java.nio.file.Files.move
-import java.util.Collections.rotate
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -40,9 +38,13 @@ class EntityPlayer(
 
     override fun update() {
         networkUpdate()
-        mouseAction()
-        rotate()
-        move()
+
+        if (!chatOpen) {
+            mouseAction()
+            rotate()
+            move()
+        }
+
         updateCamera()
     }
 

@@ -9,7 +9,6 @@ class NuklearKeyboardCallback : GLFWKeyCallbackI {
     override fun invoke(window: Long, key: Int, scancode: Int, action: Int, mods: Int) {
         val press = action == GLFW.GLFW_PRESS
         when (key) {
-            GLFW.GLFW_KEY_ESCAPE -> GLFW.glfwSetWindowShouldClose(window, true)
             GLFW.GLFW_KEY_DELETE -> Nuklear.nk_input_key(NK.ctx, Nuklear.NK_KEY_DEL, press)
             GLFW.GLFW_KEY_ENTER -> Nuklear.nk_input_key(NK.ctx, Nuklear.NK_KEY_ENTER, press)
             GLFW.GLFW_KEY_TAB -> Nuklear.nk_input_key(NK.ctx, Nuklear.NK_KEY_TAB, press)

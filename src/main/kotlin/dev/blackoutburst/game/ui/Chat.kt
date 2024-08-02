@@ -1,95 +1,104 @@
 package dev.blackoutburst.game.ui
 
-import dev.blackoutburst.game.input.Keyboard
+import dev.blackoutburst.game.Main.chatOpen
 import dev.blackoutburst.game.network.Connection
 import dev.blackoutburst.game.network.packets.client.C03Chat
-import dev.blackoutburst.game.utils.stack
-import dev.blackoutburst.game.window.nuklear.NK.ctx
-import org.lwjgl.glfw.GLFW
-import org.lwjgl.nuklear.NkPluginFilterI
-import org.lwjgl.nuklear.NkRect
-import org.lwjgl.nuklear.Nuklear.*
-import org.lwjgl.system.MemoryUtil
-import java.nio.charset.StandardCharsets
-
-class DefaultFilter : NkPluginFilterI {
-    override fun invoke(p0: Long, p1: Int): Boolean = nnk_filter_ascii(p0, p1)
-}
+import dev.blackoutburst.game.utils.Color
+import dev.blackoutburst.game.window.Window
+import dev.blackoutburst.game.window.Window.id
+import org.lwjgl.glfw.GLFW.*
+import java.util.*
+import kotlin.concurrent.schedule
 
 object Chat {
-    val messages = mutableListOf<String>()
-    val text = MemoryUtil.memAlloc(4096).put(Array(4095) { 0.toByte() }.toByteArray()).flip()
-    var flags = 0
+    private val messages = mutableListOf<Text>()
+    private val sentHistory = mutableListOf<String>()
 
-    var totalHeight = 0
+    private val inputField = ColoredBox(0f,0f, 500f, 30f, Color(0f,0f,0f,0.25f))
+    private val messagesField = ColoredBox(0f,30f, 500f, 300f, Color(0f,0f,0f,0.25f))
+    private var inputText = Text(1f, 5f, 20f, "")
+    private var currentInputText = ""
+    private val tick = Text(1f, 5f, 20f, "_")
+    private var showTick = true
 
-    fun clear() {
-        val msg = StandardCharsets.UTF_8.decode(text).toString()
-        Connection.write(C03Chat(msg))
-        text.clear().put(Array(4095) { 0.toByte() }.toByteArray()).flip()
+    private var historyPosition = sentHistory.size
 
-        totalHeight = messages.size * 30
-
-        nk_window_set_scroll(ctx, 0, totalHeight + 200)
+    fun addMessage(text: String) {
+        messages.addFirst(Text(1f, 40f, 20f, text))
     }
 
-    fun renderTextField(x: Float, y: Float, width: Float, height: Float) {
-
-        stack { stack ->
-
-            ctx.style().window().fixed_background().data().color().set(10.toByte(), 10.toByte(), 10.toByte(), 150.toByte())
-            ctx.style().edit().border_color().set(100.toByte(), 100.toByte(), 100.toByte(), 255.toByte())
-            ctx.style().edit().border(1f)
-            ctx.style().edit().normal().data().color().set(0.toByte(), 0.toByte(), 0.toByte(), 0.toByte())
-            ctx.style().edit().hover().data().color().set(0.toByte(), 0.toByte(), 0.toByte(), 50.toByte())
-            ctx.style().edit().active().data().color().set(0.toByte(), 0.toByte(), 0.toByte(), 100.toByte())
-
-            val rect = NkRect.malloc(stack)
-            if (nk_begin(
-                    ctx,
-                    "Chat Input",
-                    nk_rect(x, y, width, height, rect),
-                    NK_WINDOW_NO_SCROLLBAR
-                )
-            ) {
-
-                nk_layout_row_dynamic(ctx, 30f, 1)
-                flags = nk_edit_string_zero_terminated(ctx, NK_EDIT_FIELD or NK_EDIT_SELECTABLE, text, 4096, DefaultFilter())
-            }
-            nk_end(ctx)
+    init {
+        Timer().schedule(0, 500) {
+            if (!Window.isOpen) this.cancel()
+            showTick = !showTick
         }
-
-        ctx.style().window().fixed_background().data().color().set(50.toByte(), 50.toByte(), 50.toByte(), 255.toByte())
     }
 
-    fun renderMessages(x: Float, y: Float, width: Float, height: Float) {
-        stack { stack ->
-            ctx.style().window().fixed_background().data().color().set(10.toByte(), 10.toByte(), 10.toByte(), 150.toByte())
-
-            val rect = NkRect.malloc(stack)
-            if (nk_begin(
-                    ctx,
-                    "Chat Messages",
-                    nk_rect(x, y, width, height, rect),
-                    0
-                )
-            ) {
-
-                val size = messages.size
-                for (i in 0 until size) {
-                    val msg = try { messages[i] } catch (ignored: Exception) { null } ?: continue
-
-                    nk_layout_row_dynamic(ctx, 20f, 1)
-                    nk_label(ctx, msg, NK_TEXT_LEFT)
-                }
-
-                if (flags and NK_EDIT_ACTIVE != 0 && Keyboard.isKeyPressed(GLFW.GLFW_KEY_ENTER)) {
-                    clear()
-                }
+    fun updateInput(code: Int) {
+        if (code == 265 && historyPosition > 0) {
+            if (historyPosition == sentHistory.size) {
+                currentInputText = inputText.text
             }
-            nk_end(ctx)
+
+            inputText = Text(1f, 5f, 20f, sentHistory[--historyPosition])
         }
 
-        ctx.style().window().fixed_background().data().color().set(50.toByte(), 50.toByte(), 50.toByte(), 255.toByte())
+        if (code == 264 && historyPosition != sentHistory.size) historyPosition++
+
+        if (code == 264 && historyPosition == sentHistory.size) {
+            inputText = Text(1f, 5f, 20f, currentInputText)
+        }
+        else if (code == 264 && historyPosition < sentHistory.size) {
+            inputText = Text(1f, 5f, 20f, sentHistory[historyPosition])
+        }
+
+        if (code == 257) {
+            if (inputText.text.isNotEmpty()) {
+                Connection.write(C03Chat(inputText.text))
+                sentHistory.add(inputText.text)
+            }
+            clearInput()
+        }
+
+        if (code >= 20 && code < 127 && inputText.text.length < 256) {
+            val str = inputText.text + Char(code)
+            inputText = Text(1f, 5f, 20f, str)
+        }
+
+        if (code == 259 && inputText.text.isNotEmpty()) {
+            val str = inputText.text.substring(0, inputText.text.length - 1)
+            inputText = Text(1f, 5f, 20f, str)
+        }
+    }
+
+    fun clearInput() {
+        chatOpen = false
+        currentInputText = ""
+        inputText = Text(1f, 5f, 20f, "")
+        historyPosition = sentHistory.size
+
+        glfwSetInputMode(id, GLFW_CURSOR, GLFW_CURSOR_DISABLED)
+    }
+
+    fun renderTextField() {
+        inputField.render()
+        inputText.render()
+
+        tick.x = (inputText.text.length * 10f) + 1f
+        if (chatOpen && showTick)
+            tick.render()
+
+
+        inputField.color = Color(0f, 0f, 0f,  if (chatOpen) 0.5f else 0.25f)
+    }
+
+    fun renderMessages() {
+        messagesField.render()
+
+        for (i in 0 until 14) {
+            val msg = try { messages[i] } catch (ignored: Exception) { null } ?: continue
+            msg.y = 40f + (20f * i)
+            msg.render()
+        }
     }
 }

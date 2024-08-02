@@ -23,10 +23,6 @@ object Chat {
 
     var totalHeight = 0
 
-    init {
-        messages.add("\r")
-    }
-
     fun clear() {
         val msg = StandardCharsets.UTF_8.decode(text).toString()
         Connection.write(C03Chat(msg))

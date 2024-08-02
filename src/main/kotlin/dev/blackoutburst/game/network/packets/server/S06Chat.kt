@@ -15,8 +15,6 @@ class S06Chat(override val size: Int): PacketPlayIn() {
 
         val buff = ByteBuffer.wrap(data.toByteArray())
 
-        Chat.messages.removeLast()
         Chat.messages.add(StandardCharsets.UTF_8.decode(buff).toString().replace("\u0000", ""))
-        Chat.messages.add("\r")
     }
 }

@@ -19,7 +19,8 @@ class EntityOtherPlayer(
     id: Int,
     position: Vector3f = Vector3f(),
     rotation: Vector2f = Vector2f(),
-) : Entity(id, position, rotation) {
+    name: String,
+) : Entity(id, position, rotation, name) {
 
     private val texture = Texture("pol.png", false)
     private val model = PlayerModelMale(texture.id)

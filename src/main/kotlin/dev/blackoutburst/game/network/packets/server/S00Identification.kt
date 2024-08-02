@@ -16,7 +16,7 @@ class S00Identification(override val size: Int): PacketPlayIn() {
             EntityManager.addEntity(
                 EntityPlayer(
                     id = entityId,
-                    position = Vector3f(),
+                    name = "unnamed"
                 )
             )
             Connection.id = entityId

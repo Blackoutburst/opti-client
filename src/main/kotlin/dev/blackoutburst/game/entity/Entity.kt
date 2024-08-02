@@ -8,6 +8,7 @@ abstract class Entity(
     val id: Int,
     var position: Vector3f,
     var rotation: Vector2f,
+    var name: String,
     var rawPosition: Vector3f = Vector3f(),
     var rawRotation: Vector2f = Vector2f(),
     var previousRawPosition: Vector3f = Vector3f(),

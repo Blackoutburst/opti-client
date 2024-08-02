@@ -25,7 +25,8 @@ class EntityPlayer(
     id: Int,
     position: Vector3f = Vector3f(),
     rotation: Vector2f = Vector2f(),
-): Entity(id, position, rotation) {
+    name: String,
+): Entity(id, position, rotation, name) {
 
     private var lastMousePosition = Mouse.position
     private val sensitivity = 0.1f

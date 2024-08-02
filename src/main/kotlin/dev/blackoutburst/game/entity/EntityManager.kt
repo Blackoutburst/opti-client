@@ -31,17 +31,19 @@ object EntityManager {
     }
 
     fun setPosition(id: Int, position: Vector3f) {
-        if (id == Connection.id) return
-
         entities.find { it.id == id }?.let {
             it.previousRawPosition = it.rawPosition
             it.rawPosition = position
         }
     }
 
-    fun setRotation(id: Int, rotation: Vector2f) {
-        if (id == Connection.id) return
+    fun setName(id: Int, name: String) {
+        entities.find { it.id == id }?.let {
+            it.name = name
+        }
+    }
 
+    fun setRotation(id: Int, rotation: Vector2f) {
         entities.find { it.id == id }?.let {
             it.previousRawRotation = it.rawRotation
             it.rawRotation = rotation

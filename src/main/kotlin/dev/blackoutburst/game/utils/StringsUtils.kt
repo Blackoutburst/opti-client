@@ -13,7 +13,7 @@ fun String.fit(length: Int): String {
     return newString
 }
 
-private fun String.toAscii(): String {
+fun String.toAscii(): String {
     var newString = ""
     for (c in this.toCharArray()) {
         if (c.code < 128)

@@ -78,6 +78,8 @@ fun main() {
 
     //AL SHITPOST END
 
+    val text = Text(100f, 100f, 24f,"Paul Narchal The Boids Overlord")
+
     while (Window.isOpen) {
         while(queue.isNotEmpty()) queue.poll()?.invoke()
         Window.clear()
@@ -110,14 +112,16 @@ fun main() {
 
         Cursor.render()
 
+        text.render()
+
         SystemUsage.render(0f, 0f, 130f, 70f)
         WorldInformation.render(130f, 0f, 130f, 140f)
         ConnectionStatus.render(0f, 70f, 130f, 70f)
         Position.render(260f, 0f, 130f, 140f)
         Render.render(390f, 0f, 130f, 140f)
 
-        Chat.renderTextField(0f, Window.height - 35f, 500f, 35f)
-        Chat.renderMessages(0f, Window.height - 235f, 500f, 200f)
+        //Chat.renderTextField(0f, Window.height - 35f, 500f, 35f)
+        //Chat.renderMessages(0f, Window.height - 235f, 500f, 200f)
 
         Window.update()
     }

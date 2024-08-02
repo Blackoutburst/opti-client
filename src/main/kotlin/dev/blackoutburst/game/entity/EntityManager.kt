@@ -6,6 +6,7 @@ import dev.blackoutburst.game.maths.Vector3f
 import dev.blackoutburst.game.network.Connection
 import java.util.*
 import kotlin.collections.LinkedHashSet
+import kotlin.math.round
 
 object EntityManager {
     private val entities: MutableSet<Entity> = Collections.synchronizedSet(LinkedHashSet())
@@ -32,8 +33,12 @@ object EntityManager {
 
     fun setPosition(id: Int, position: Vector3f) {
         entities.find { it.id == id }?.let {
-            it.previousRawPosition = it.rawPosition
-            it.rawPosition = position
+            if (it is EntityPlayer) {
+                it.position = position
+            } else {
+                it.previousRawPosition = it.rawPosition
+                it.rawPosition = position
+            }
         }
     }
 
@@ -45,8 +50,12 @@ object EntityManager {
 
     fun setRotation(id: Int, rotation: Vector2f) {
         entities.find { it.id == id }?.let {
-            it.previousRawRotation = it.rawRotation
-            it.rawRotation = rotation
+            if (it is EntityPlayer) {
+                it.rotation = rotation
+            } else {
+                it.previousRawRotation = it.rawRotation
+                it.rawRotation = rotation
+            }
         }
     }
 

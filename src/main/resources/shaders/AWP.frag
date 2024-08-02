@@ -13,13 +13,9 @@ void main() {
     }
 
     if (
-        texture(diffuseMap, uv).r < 100.0/255.0 &&
-        texture(diffuseMap, uv).g < 100.0/255.0 &&
-        texture(diffuseMap, uv).b < 100.0/255.0 &&
-        texture(diffuseMap, uv).g > texture(diffuseMap, uv).r &&
-        texture(diffuseMap, uv).g > texture(diffuseMap, uv).b
+        (texture(diffuseMap, uv).g - (texture(diffuseMap, uv).r + texture(diffuseMap, uv).b)) > 0.03
     ) {
-        FragColor = texture(text, vec3(uv * 10.0, layer)) * vec4(vec3(texture(diffuseMap, uv).r * 5.0), 1.0);
+        FragColor = texture(text, vec3(uv * 10.0, layer)) * vec4(vec3(texture(diffuseMap, uv).g * 2.0), 1.0);
         return;
     }
 

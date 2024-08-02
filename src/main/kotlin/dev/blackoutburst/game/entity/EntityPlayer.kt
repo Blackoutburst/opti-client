@@ -40,8 +40,6 @@ class EntityPlayer(
 
     override fun update() {
         networkUpdate()
-        if (Window.showCursor) return
-
         mouseAction()
         rotate()
         move()

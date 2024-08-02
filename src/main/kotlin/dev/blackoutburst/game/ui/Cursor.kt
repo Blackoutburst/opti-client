@@ -31,7 +31,7 @@ object Cursor {
 
     private var vaoID = 0
 
-    private val texture = Texture("./cursor.png")
+    private val texture = Texture("./cursor2.png")
     private val vertexShader = Shader(GL_VERTEX_SHADER, "/shaders/2D.vert")
     private val fragmentShader = Shader(GL_FRAGMENT_SHADER, "/shaders/AWP.frag")
     private val shaderProgram = ShaderProgram(vertexShader, fragmentShader)

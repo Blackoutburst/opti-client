@@ -9,6 +9,7 @@ import dev.blackoutburst.game.entity.EntityManager
 import dev.blackoutburst.game.input.Keyboard
 import dev.blackoutburst.game.maths.Matrix
 import dev.blackoutburst.game.network.Connection
+import dev.blackoutburst.game.network.packets.client.C04ClientMetadata
 import dev.blackoutburst.game.ui.*
 import dev.blackoutburst.game.window.Window
 import dev.blackoutburst.game.world.BlockType
@@ -41,6 +42,7 @@ fun main() {
 
     //Connection.open("162.19.137.231", 15000)
     Connection.open("localhost", 15000)
+    Connection.write(C04ClientMetadata(8, "Blackout"))
 
     // AL SHITPOST
 

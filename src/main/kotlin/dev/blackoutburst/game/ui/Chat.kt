@@ -11,17 +11,17 @@ import java.util.*
 import kotlin.concurrent.schedule
 
 object Chat {
-    private val messages = mutableListOf<Text>()
     private val sentHistory = mutableListOf<String>()
-
-    private val inputField = ColoredBox(0f,0f, 500f, 30f, Color(0f,0f,0f,0.25f))
-    private val messagesField = ColoredBox(0f,30f, 500f, 300f, Color(0f,0f,0f,0.25f))
+    private val inputField = ColoredBox(0f,0f, 500f, 30f, Color(0f,0f,0f,0.4f))
+    private val messagesField = ColoredBox(0f,30f, 500f, 300f, Color(0f,0f,0f,0.4f))
     private var inputText = Text(1f, 5f, 20f, "")
     private var currentInputText = ""
     private val tick = Text(1f, 5f, 20f, "_")
     private var showTick = true
-
     private var historyPosition = sentHistory.size
+
+    var scroll = 0
+    val messages = mutableListOf<Text>()
 
     fun addMessage(text: String) {
         messages.addFirst(Text(1f, 40f, 20f, text))
@@ -89,15 +89,15 @@ object Chat {
             tick.render()
 
 
-        inputField.color = Color(0f, 0f, 0f,  if (chatOpen) 0.5f else 0.25f)
+        inputField.color = Color(0f, 0f, 0f,  if (chatOpen) 0.7f else 0.4f)
     }
 
     fun renderMessages() {
         messagesField.render()
 
-        for (i in 0 until 14) {
+        for (i in 0 + scroll until 14 + scroll) {
             val msg = try { messages[i] } catch (ignored: Exception) { null } ?: continue
-            msg.y = 40f + (20f * i)
+            msg.y = 40f + (20f * (i - scroll))
             msg.render()
         }
     }

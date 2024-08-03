@@ -2,6 +2,7 @@ package dev.blackoutburst.game.network
 
 import dev.blackoutburst.game.network.packets.PacketManager
 import dev.blackoutburst.game.network.packets.PacketPlayOut
+import dev.blackoutburst.game.network.packets.client.C04ClientMetadata
 import dev.blackoutburst.game.utils.io
 import java.io.InputStream
 import java.io.OutputStream
@@ -28,6 +29,8 @@ object Connection {
                     it
                 }.also {
                     isOpen = true
+
+                    write(C04ClientMetadata(8, "Blackout"))
 
                     while (!it.isClosed) {
                         read()

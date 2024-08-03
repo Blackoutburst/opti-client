@@ -18,6 +18,7 @@ object Chat {
     private var currentInputText = ""
     private val tick = Text(1f, 5f, 20f, "_")
     private var showTick = true
+    private var cursorPosition = 0
     private var historyPosition = sentHistory.size
 
     var scroll = 0
@@ -35,6 +36,12 @@ object Chat {
     }
 
     fun updateInput(code: Int) {
+        if (code == 263 && cursorPosition > 0)
+            cursorPosition--
+
+        if (code == 262 && cursorPosition < inputText.text.length)
+            cursorPosition++
+
         if (code == 265 && historyPosition > 0) {
             if (historyPosition == sentHistory.size) {
                 currentInputText = inputText.text
@@ -60,13 +67,15 @@ object Chat {
             clearInput()
         }
 
-        if (code >= 20 && code < 127 && inputText.text.length < 256) {
-            val str = inputText.text + Char(code)
+        if (code in 20..126 && inputText.text.length < 256) {
+            val str = "${inputText.text.substring(0, cursorPosition)}${Char(code)}${inputText.text.substring(cursorPosition, inputText.text.length)}"
             inputText = Text(1f, 5f, 20f, str)
+            cursorPosition++
         }
 
         if (code == 259 && inputText.text.isNotEmpty()) {
-            val str = inputText.text.substring(0, inputText.text.length - 1)
+            val str = "${inputText.text.substring(0, cursorPosition - 1)}${inputText.text.substring(cursorPosition, inputText.text.length)}"
+            cursorPosition--
             inputText = Text(1f, 5f, 20f, str)
         }
     }
@@ -76,6 +85,7 @@ object Chat {
         currentInputText = ""
         inputText = Text(1f, 5f, 20f, "")
         historyPosition = sentHistory.size
+        cursorPosition = 0
 
         glfwSetInputMode(id, GLFW_CURSOR, GLFW_CURSOR_DISABLED)
     }
@@ -84,7 +94,7 @@ object Chat {
         inputField.render()
         inputText.render()
 
-        tick.x = (inputText.text.length * 10f) + 1f
+        tick.x = (cursorPosition * 10f) + 1f
         if (chatOpen && showTick)
             tick.render()
 

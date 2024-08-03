@@ -11,7 +11,45 @@ import dev.blackoutburst.game.utils.toAscii
 import dev.blackoutburst.game.window.Window
 import org.lwjgl.opengl.GL30.*
 
-class Text(var x: Float, var y: Float, var size: Float = 16f, val text: String) {
+class Text(var x: Float, var y: Float, var size: Float = 16f, var text: String) {
+
+    private val colorCharMap = mapOf(
+        "&0" to 200,
+        "&1" to 201,
+        "&2" to 202,
+        "&3" to 203,
+        "&4" to 204,
+        "&5" to 205,
+        "&6" to 206,
+        "&7" to 207,
+        "&8" to 208,
+        "&9" to 209,
+        "&a" to 210,
+        "&b" to 211,
+        "&c" to 212,
+        "&d" to 213,
+        "&e" to 214,
+        "&f" to 215,
+    )
+
+    private val colorMap = mapOf(
+        200 to Color(0f),
+        201 to Color(0f, 0f, 0.5f),
+        202 to Color(0f, 0.5f, 0f),
+        203 to Color(0f, 0.5f, 0.5f),
+        204 to Color(0.5f, 0f, 0f),
+        205 to Color(0.5f, 0f, 0.5f),
+        206 to Color(0.8f, 0.5f, 0f),
+        207 to Color(0.5f),
+        208 to Color(0.25f),
+        209 to Color(0f, 0f, 1f),
+        210 to Color(0f, 1f, 0f),
+        211 to Color(0f, 1f, 1f),
+        212 to Color(1f, 0f, 0f),
+        213 to Color(1f, 0f, 1f),
+        214 to Color(1f, 1f, 0f),
+        215 to Color(1f),
+    )
 
     private fun getVertices(pos: Float, x: Float, y: Float, color: Color) = floatArrayOf(
         0f + pos, 0f, (0f + x) / 16f, (0f + 15f - y) / 16f, color.r, color.g, color.b,
@@ -35,18 +73,27 @@ class Text(var x: Float, var y: Float, var size: Float = 16f, val text: String) 
     private val shaderProgram = ShaderProgram(vertexShader, fragmentShader)
 
     init {
-        val ascii = text.toAscii()
+        var ascii = text.toAscii()
+        colorCharMap.forEach { (k, v) -> ascii = ascii.replace(k, Char(v).toString()) }
+        text = ascii
+
+
         val vertex = mutableListOf<Float>()
         val index = mutableListOf<Int>()
 
         var i = 0
+        var color = Color.WHITE
         for (c in ascii.toCharArray()) {
-            val x = c.code % 16
-            val y = c.code / 16
+            colorMap[c.code]?.let {
+                color = it
+            } ?: run {
+                val x = c.code % 16
+                val y = c.code / 16
 
-            vertex.addAll(getVertices(i / 8f, x.toFloat(), y.toFloat(), Color(1f)).toTypedArray())
-            index.addAll(getIndices(i).toTypedArray())
-            i += 4
+                vertex.addAll(getVertices(i / 8f, x.toFloat(), y.toFloat(), color).toTypedArray())
+                index.addAll(getIndices(i).toTypedArray())
+                i += 4
+            }
         }
 
         val vertices = vertex.toFloatArray()

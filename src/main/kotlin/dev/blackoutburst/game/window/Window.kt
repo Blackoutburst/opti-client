@@ -118,8 +118,10 @@ object Window {
         val mousePos = MousePositionCallBack()
         val nkMouseButton = NuklearMouseButtonCallBack()
         val mouseButton = MouseButtonCallBack()
+        val charCallback = KeyboardCharCallBack()
 
         glfwSetWindowSizeCallback(id, windowCallback)
+
         glfwSetScrollCallback(id) { window: Long, xoffset: Double, yoffset: Double ->
             nkMouseScroll.invoke(window, xoffset, yoffset)
             mouseScroll.invoke(window, xoffset, yoffset)
@@ -139,6 +141,8 @@ object Window {
             nkMouseButton.invoke(window, button, action, mods)
             mouseButton.invoke(window, button, action, mods)
         }
+
+        glfwSetCharCallback(id, charCallback)
     }
 
     private fun setIcons() {

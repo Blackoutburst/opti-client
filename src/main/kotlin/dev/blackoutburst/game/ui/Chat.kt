@@ -47,16 +47,16 @@ object Chat {
                 currentInputText = inputText.text
             }
 
-            inputText = Text(1f, 5f, 20f, sentHistory[--historyPosition])
+            inputText = Text(1f, 5f, 20f, sentHistory[--historyPosition], false)
         }
 
         if (code == 264 && historyPosition != sentHistory.size) historyPosition++
 
         if (code == 264 && historyPosition == sentHistory.size) {
-            inputText = Text(1f, 5f, 20f, currentInputText)
+            inputText = Text(1f, 5f, 20f, currentInputText, false)
         }
         else if (code == 264 && historyPosition < sentHistory.size) {
-            inputText = Text(1f, 5f, 20f, sentHistory[historyPosition])
+            inputText = Text(1f, 5f, 20f, sentHistory[historyPosition], false)
         }
 
         if (code == 257) {
@@ -69,21 +69,21 @@ object Chat {
 
         if (code in 20..126 && inputText.text.length < 256) {
             val str = "${inputText.text.substring(0, cursorPosition)}${Char(code)}${inputText.text.substring(cursorPosition, inputText.text.length)}"
-            inputText = Text(1f, 5f, 20f, str)
+            inputText = Text(1f, 5f, 20f, str, false)
             cursorPosition++
         }
 
         if (code == 259 && inputText.text.isNotEmpty()) {
             val str = "${inputText.text.substring(0, cursorPosition - 1)}${inputText.text.substring(cursorPosition, inputText.text.length)}"
             cursorPosition--
-            inputText = Text(1f, 5f, 20f, str)
+            inputText = Text(1f, 5f, 20f, str, false)
         }
     }
 
     fun clearInput() {
         chatOpen = false
         currentInputText = ""
-        inputText = Text(1f, 5f, 20f, "")
+        inputText = Text(1f, 5f, 20f, "", false)
         historyPosition = sentHistory.size
         cursorPosition = 0
 

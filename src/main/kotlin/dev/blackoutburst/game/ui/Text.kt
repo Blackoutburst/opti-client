@@ -11,7 +11,7 @@ import dev.blackoutburst.game.utils.toAscii
 import dev.blackoutburst.game.window.Window
 import org.lwjgl.opengl.GL30.*
 
-class Text(var x: Float, var y: Float, var size: Float = 16f, var text: String) {
+class Text(var x: Float, var y: Float, var size: Float = 16f, var text: String, processColor: Boolean = true) {
 
     private val colorCharMap = mapOf(
         "&0" to 200,
@@ -74,9 +74,9 @@ class Text(var x: Float, var y: Float, var size: Float = 16f, var text: String) 
 
     init {
         var ascii = text.toAscii()
-        colorCharMap.forEach { (k, v) -> ascii = ascii.replace(k, Char(v).toString()) }
+        if (processColor)
+            colorCharMap.forEach { (k, v) -> ascii = ascii.replace(k, Char(v).toString()) }
         text = ascii
-
 
         val vertex = mutableListOf<Float>()
         val index = mutableListOf<Int>()

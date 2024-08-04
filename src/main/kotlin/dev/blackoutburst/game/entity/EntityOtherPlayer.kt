@@ -8,6 +8,7 @@ import dev.blackoutburst.game.shader.Shader
 import dev.blackoutburst.game.shader.ShaderProgram
 import dev.blackoutburst.game.texture.Texture
 import dev.blackoutburst.game.utils.Color
+import dev.blackoutburst.game.utils.SkinAPI
 import dev.blackoutburst.game.utils.Time
 import dev.blackoutburst.game.utils.expDecay
 import org.lwjgl.opengl.GL30.*
@@ -21,9 +22,9 @@ class EntityOtherPlayer(
     rotation: Vector2f = Vector2f(),
     name: String,
 ) : Entity(id, position, rotation, name) {
-
-    private val texture = Texture("pol.png", false)
-    private val model = PlayerModelMale(texture.id)
+    private val skin = SkinAPI.skins.find { it.name == name }
+    private val texture = if (skin != null) Texture(skin.data, false) else Texture("pol.png", false)
+    private val model = if (skin?.model == "slim") PlayerModelFemale(texture.id) else PlayerModelMale(texture.id)
     private val vertexShader = Shader(GL_VERTEX_SHADER, "/shaders/cube.vert")
     private val fragmentShader = Shader(GL_FRAGMENT_SHADER, "/shaders/cube.frag")
     private val shaderProgram = ShaderProgram(vertexShader, fragmentShader)

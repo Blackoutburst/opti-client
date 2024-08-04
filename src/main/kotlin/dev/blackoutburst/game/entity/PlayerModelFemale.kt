@@ -6,9 +6,9 @@ import kotlin.experimental.and
 
 private const val LAYER = 0.05f
 
-class PlayerModelFemale(texture: Int) {
+class PlayerModelFemale(texture: Int): PlayerModel(texture) {
 
-    val vaos = mutableMapOf(
+    override val vaos = mutableMapOf(
         "head" to 0,
         "body" to 0,
         "rightArm" to 0,
@@ -17,7 +17,7 @@ class PlayerModelFemale(texture: Int) {
         "leftLeg" to 0,
     )
 
-    val indices = mutableMapOf(
+    override val indices = mutableMapOf(
         "head" to mutableListOf<Int>(),
         "body" to mutableListOf(),
         "rightArm" to mutableListOf(),

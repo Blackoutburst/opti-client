@@ -5,6 +5,7 @@ import dev.blackoutburst.game.entity.EntityOtherPlayer
 import dev.blackoutburst.game.maths.Vector2f
 import dev.blackoutburst.game.maths.Vector3f
 import dev.blackoutburst.game.network.packets.PacketPlayIn
+import dev.blackoutburst.game.utils.SkinAPI
 import dev.blackoutburst.game.utils.main
 import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets
@@ -26,6 +27,8 @@ class S01AddEntity(override val size: Int) : PacketPlayIn() {
 
         val buff = ByteBuffer.wrap(data.toByteArray())
         val name = StandardCharsets.UTF_8.decode(buff).toString().replace("\u0000", "")
+
+        SkinAPI.load(name)
 
         main {
             EntityManager.addEntity(

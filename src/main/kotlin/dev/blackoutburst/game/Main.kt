@@ -12,6 +12,7 @@ import dev.blackoutburst.game.maths.Matrix
 import dev.blackoutburst.game.network.Connection
 import dev.blackoutburst.game.network.packets.client.C04ClientMetadata
 import dev.blackoutburst.game.ui.*
+import dev.blackoutburst.game.utils.SkinAPI
 import dev.blackoutburst.game.window.Window
 import dev.blackoutburst.game.window.Window.id
 import dev.blackoutburst.game.world.BlockType

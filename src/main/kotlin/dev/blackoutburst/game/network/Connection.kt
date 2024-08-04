@@ -30,7 +30,7 @@ object Connection {
                 }.also {
                     isOpen = true
 
-                    write(C04ClientMetadata(8, "Blackout"))
+                    write(C04ClientMetadata(8, "Blackoutburst"))
 
                     while (!it.isClosed) {
                         read()

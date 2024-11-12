@@ -44,8 +44,8 @@ fun main() {
     Window
     World
 
-    Connection.open("162.19.137.231", 15000)
-    //Connection.open("localhost", 15000)
+    //Connection.open("162.19.137.231", 15000)
+    Connection.open("localhost", 15000)
 
     // AL SHITPOST
 
@@ -98,6 +98,12 @@ fun main() {
             blockType = BlockType.OAK_LOG
         if (Keyboard.isKeyPressed(GLFW_KEY_5))
             blockType = BlockType.OAK_LEAVES
+        if (Keyboard.isKeyPressed(GLFW_KEY_6))
+            blockType = BlockType.GLASS
+        if (Keyboard.isKeyPressed(GLFW_KEY_7))
+            blockType = BlockType.WATER
+        if (Keyboard.isKeyPressed(GLFW_KEY_8))
+            blockType = BlockType.SAND
 
         if (!chatOpen && Keyboard.isKeyPressed(GLFW_KEY_T)) {
             glfwSetInputMode(id, GLFW_CURSOR, GLFW_CURSOR_NORMAL)

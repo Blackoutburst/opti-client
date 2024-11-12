@@ -9,7 +9,10 @@ enum class BlockType(val id: Byte, val transparent: Boolean, val textures: Array
     DIRT(2, false, Array(6) { Textures.DIRT.ordinal }),
     STONE(3, false, Array(6) { Textures.STONE.ordinal }),
     OAK_LOG(4, false, arrayOf(Textures.OAK_LOG_TOP.ordinal, Textures.OAK_SIDE.ordinal, Textures.OAK_SIDE.ordinal, Textures.OAK_SIDE.ordinal, Textures.OAK_SIDE.ordinal, Textures.OAK_LOG_TOP.ordinal)),
-    OAK_LEAVES(5, true, Array(6) { Textures.OAK_LEAVES.ordinal });
+    OAK_LEAVES(5, true, Array(6) { Textures.OAK_LEAVES.ordinal }),
+    GLASS(6, true, Array(6) { Textures.GLASS.ordinal }),
+    WATER(7, false, Array(6) { Textures.WATER.ordinal }),
+    SAND(8, false, Array(6) { Textures.SAND.ordinal });
 
     companion object {
         fun getByID(id: Byte): BlockType {

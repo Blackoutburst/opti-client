@@ -9,4 +9,7 @@ enum class Textures(val file: String) {
     OAK_LOG_TOP("blocks/log_oak_top.png"),
     OAK_SIDE("blocks/log_oak.png"),
     OAK_LEAVES("blocks/leaves_oak.png"),
+    GLASS("blocks/glass.png"),
+    WATER("blocks/water.png"),
+    SAND("blocks/sand.png"),
 }

@@ -16,7 +16,7 @@ enum class BlockType(val id: Byte, val transparent: Boolean, val textures: Array
 
     companion object {
         fun getByID(id: Byte): BlockType {
-            return entries.firstOrNull { it.id == id } ?: ERROR
+            return entries.firstOrNull {   it.id == id } ?: ERROR
         }
     }
 }

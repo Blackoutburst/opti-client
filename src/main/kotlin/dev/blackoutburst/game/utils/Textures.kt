@@ -12,4 +12,5 @@ enum class Textures(val file: String) {
     GLASS("blocks/glass.png"),
     WATER("blocks/water.png"),
     SAND("blocks/sand.png"),
+    SNOW("blocks/snow.png"),
 }

@@ -12,7 +12,8 @@ enum class BlockType(val id: Byte, val transparent: Boolean, val textures: Array
     OAK_LEAVES(5, true, Array(6) { Textures.OAK_LEAVES.ordinal }),
     GLASS(6, true, Array(6) { Textures.GLASS.ordinal }),
     WATER(7, false, Array(6) { Textures.WATER.ordinal }),
-    SAND(8, false, Array(6) { Textures.SAND.ordinal });
+    SAND(8, false, Array(6) { Textures.SAND.ordinal }),
+    SNOW(9, false, Array(6) { Textures.SNOW.ordinal });
 
     companion object {
         fun getByID(id: Byte): BlockType {

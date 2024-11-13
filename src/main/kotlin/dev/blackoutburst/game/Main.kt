@@ -104,6 +104,8 @@ fun main() {
             blockType = BlockType.WATER
         if (Keyboard.isKeyPressed(GLFW_KEY_8))
             blockType = BlockType.SAND
+        if (Keyboard.isKeyPressed(GLFW_KEY_9))
+            blockType = BlockType.SNOW
 
         if (!chatOpen && Keyboard.isKeyPressed(GLFW_KEY_T)) {
             glfwSetInputMode(id, GLFW_CURSOR, GLFW_CURSOR_NORMAL)

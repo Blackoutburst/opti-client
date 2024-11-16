@@ -248,14 +248,7 @@ class Chunk(
 
     private fun getBlockAt(x: Int, y: Int, z: Int): BlockType? {
         if (x < 0 || x > 15 || y < 0 || y > 15 || z < 0 || z > 15) return null
-
-        return try {
-            val blockId = xyzToIndex(x, y, z)
-
-            return BlockType.getByID(blocks[blockId])
-        } catch (ignored: Exception) {
-            null
-        }
+        return BlockType.getByID(blocks[xyzToIndex(x, y, z)])
     }
 
     companion object {

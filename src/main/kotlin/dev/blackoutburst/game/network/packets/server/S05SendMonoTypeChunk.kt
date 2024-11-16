@@ -14,6 +14,6 @@ class S05SendMonoTypeChunk(override val size: Int) : PacketPlayIn() {
         val type = buffer.get()
         val position = Vector3i(x, y, z)
 
-        World.addChunk(position, Array(4096) { type })
+        World.addChunk(position, Array(4096) { type }.toByteArray())
     }
 }

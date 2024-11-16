@@ -3,32 +3,25 @@ package dev.blackoutburst.game.world
 import dev.blackoutburst.game.maths.Vector3i
 import dev.blackoutburst.game.utils.main
 import dev.blackoutburst.game.utils.stack
-import org.lwjgl.opengl.ARBInstancedArrays
-import org.lwjgl.opengl.GL15
 import org.lwjgl.opengl.GL30.*
-import org.lwjgl.opengl.GL33.glDrawElementsInstanced
 
 class Chunk(
     val position: Vector3i,
-    var blocks: Array<Byte> = Array(4096) { BlockType.AIR.id }
+    var blocks: ByteArray = ByteArray(4096)
 ) {
     var vaoID = 0
     var vboID = 0
     var eboID = 0
-    var ssboId = 0
-    var instanceCount = 0
 
-    val vertices = intArrayOf(
-        packData(0, 1, 0, 0, 0),
-        packData(1, 1, 0, 1, 0),
-        packData(1, 1, 1, 1, 1),
-        packData(0, 1, 1, 0, 1),
-    )
+    var vertices = mutableListOf<Int>()
+    var indices = mutableListOf<Int>()
+    var indexCount = 0
 
-    val indices = intArrayOf(
-        0, 2, 1,
-        0, 3, 2,
-    )
+    fun clean() {
+        if (vaoID != 0) glDeleteVertexArrays(vaoID)
+        if (vboID != 0) glDeleteBuffers(vboID)
+        if (eboID != 0) glDeleteBuffers(eboID)
+    }
 
     private fun packData(
         x: Int,
@@ -36,62 +29,49 @@ class Chunk(
         z: Int,
         u: Int,
         v: Int,
+        n: Int,
+        t: Int,
     ): Int = (x and 31) or
             ((y and 31) shl 5) or
             ((z and 31) shl 10) or
             ((u and 31) shl 15) or
-            ((v and 31) shl 20)
-
-    private fun packData(
-        position: Vector3i,
-        face: Int,
-        texture: Int
-    ): Int = (position.x and 31) or
-            ((position.y and 31) shl 5) or
-            ((position.z and 31) shl 10) or
-            ((face and 7) shl 15) or
-            ((texture and 31) shl 18)
+            ((v and 31) shl 20) or
+            ((n and 7) shl 25) or
+            ((t and 15) shl 28)
 
     init {
         World.chunkUpdate.incrementAndGet()
 
-        val offsets = getOffsets()
+        genMesh()
+
+        val vertexArray = vertices.toIntArray()
+        val indexArray = indices.toIntArray()
+
+        indices.clear()
+        vertices.clear()
 
         main {
             vaoID = glGenVertexArrays()
             vboID = glGenBuffers()
             eboID = glGenBuffers()
-            ssboId = glGenBuffers()
 
-            stack(128 * 1024) { stack ->
+            stack((vertexArray.size + indexArray.size) * 4) { stack ->
                 glBindVertexArray(vaoID)
 
                 // VAO
                 glBindBuffer(GL_ARRAY_BUFFER, vboID)
-                val vertexBuffer = stack.mallocInt(vertices.size)
-                vertexBuffer.put(vertices).flip()
+                val vertexBuffer = stack.mallocInt(vertexArray.size)
+                vertexBuffer.put(vertexArray).flip()
                 glBufferData(GL_ARRAY_BUFFER, vertexBuffer, GL_STATIC_DRAW)
                 glEnableVertexAttribArray(0)
                 glVertexAttribIPointer(0, 1, GL_INT, 4, 0)
-                glBindBuffer(GL_ARRAY_BUFFER, 0)
 
                 //EBO
                 glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboID)
-                val indexBuffer = stack.mallocInt(indices.size)
-                indexBuffer.put(indices).flip()
+                val indexBuffer = stack.mallocInt(indexArray.size)
+                indexBuffer.put(indexArray).flip()
                 glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexBuffer, GL_STATIC_DRAW)
 
-                //SSBO
-                glBindBuffer(GL_ARRAY_BUFFER, ssboId)
-                val instanceBuffer = stack.mallocInt(offsets.size)
-                instanceBuffer.put(offsets).flip()
-                glBufferData(GL_ARRAY_BUFFER, instanceBuffer, GL_STATIC_DRAW)
-                glEnableVertexAttribArray(1)
-                glVertexAttribIPointer(1, 1, GL_INT, 0, 0)
-                ARBInstancedArrays.glVertexAttribDivisorARB(1, 1)
-                glBindBuffer(GL_ARRAY_BUFFER, 0)
-
-                glBindVertexArray(0)
 
                 val oldChunk = World.chunks[position.toString()]
 
@@ -101,7 +81,6 @@ class Chunk(
                     glDeleteVertexArrays(it.vaoID)
                     glDeleteBuffers(it.vboID)
                     glDeleteBuffers(it.eboID)
-                    glDeleteBuffers(it.ssboId)
                 }
 
                 World.chunkUpdate.decrementAndGet()
@@ -109,11 +88,9 @@ class Chunk(
         }
     }
 
-    private fun getOffsets(): IntArray {
-        val offsets = mutableListOf<Int>()
-        instanceCount = 0
-
-        block@for (i in blocks.indices) {
+    private fun genMesh() {
+        var offset = 0
+        block@for (i in 0 until 4096) {
             val block = blocks[i]
             if (block.toInt() == 0) continue@block
             val blockType = BlockType.getByID(block)
@@ -121,77 +98,182 @@ class Chunk(
             val position = indexToXYZ(i)
             val faces = getVisibleFaces(position)
 
-            face@for (j in faces.indices) {
-                val face = faces[j]
-                if (!face) continue@face
+            face@for (j in 0 until 6) {
+                if (!faces[j]) continue@face
+                when (j) {
+                    0 -> {
+                        val x = position.x
+                        val y = position.y
+                        val z = position.z
+                        val t = blockType.textures[j]
 
-                offsets.add(packData(position, j, blockType.textures[j]))
-                instanceCount++
+                        vertices.add(packData(0 + x, 1 + y, 0 + z, 0, 0, 0, t))
+                        vertices.add(packData(1 + x, 1 + y, 0 + z, 1, 0, 0, t))
+                        vertices.add(packData(1 + x, 1 + y, 1 + z, 1, 1, 0, t))
+                        vertices.add(packData(0 + x, 1 + y, 1 + z, 0, 1, 0, t))
+
+                        indices.add(0 + offset)
+                        indices.add(2 + offset)
+                        indices.add(1 + offset)
+                        indices.add(0 + offset)
+                        indices.add(3 + offset)
+                        indices.add(2 + offset)
+                    }
+                    1 -> {
+                        val x = position.x
+                        val y = position.y
+                        val z = position.z
+                        val t = blockType.textures[j]
+
+                        vertices.add(packData(0 + x, 0 + y, 0 + z, 1, 1, 1, t))
+                        vertices.add(packData(1 + x, 0 + y, 0 + z, 0, 1, 1, t))
+                        vertices.add(packData(1 + x, 1 + y, 0 + z, 0, 0, 1, t))
+                        vertices.add(packData(0 + x, 1 + y, 0 + z, 1, 0, 1, t))
+
+                        indices.add(0 + offset)
+                        indices.add(2 + offset)
+                        indices.add(1 + offset)
+                        indices.add(0 + offset)
+                        indices.add(3 + offset)
+                        indices.add(2 + offset)
+                    }
+                    2 -> {
+                        val x = position.x
+                        val y = position.y
+                        val z = position.z
+                        val t = blockType.textures[j]
+
+                        vertices.add(packData(0 + x, 0 + y, 1 + z, 0, 1, 2, t))
+                        vertices.add(packData(1 + x, 0 + y, 1 + z, 1, 1, 2, t))
+                        vertices.add(packData(1 + x, 1 + y, 1 + z, 1, 0, 2, t))
+                        vertices.add(packData(0 + x, 1 + y, 1 + z, 0, 0, 2, t))
+
+                        indices.add(1 + offset)
+                        indices.add(2 + offset)
+                        indices.add(0 + offset)
+                        indices.add(2 + offset)
+                        indices.add(3 + offset)
+                        indices.add(0 + offset)
+                    }
+                    3 -> {
+                        val x = position.x
+                        val y = position.y
+                        val z = position.z
+                        val t = blockType.textures[j]
+
+                        vertices.add(packData(0 + x, 0 + y, 0 + z, 1, 1, 3, t))
+                        vertices.add(packData(0 + x, 1 + y, 0 + z, 1, 0, 3, t))
+                        vertices.add(packData(0 + x, 1 + y, 1 + z, 0, 0, 3, t))
+                        vertices.add(packData(0 + x, 0 + y, 1 + z, 0, 1, 3, t))
+
+                        indices.add(0 + offset)
+                        indices.add(2 + offset)
+                        indices.add(1 + offset)
+                        indices.add(0 + offset)
+                        indices.add(3 + offset)
+                        indices.add(2 + offset)
+                    }
+                    4 -> {
+                        val x = position.x
+                        val y = position.y
+                        val z = position.z
+                        val t = blockType.textures[j]
+
+                        vertices.add(packData(1 + x, 0 + y, 0 + z, 0, 1, 4, t))
+                        vertices.add(packData(1 + x, 1 + y, 0 + z, 0, 0, 4, t))
+                        vertices.add(packData(1 + x, 1 + y, 1 + z, 1, 0, 4, t))
+                        vertices.add(packData(1 + x, 0 + y, 1 + z, 1, 1, 4, t))
+
+                        indices.add(1 + offset)
+                        indices.add(2 + offset)
+                        indices.add(0 + offset)
+                        indices.add(2 + offset)
+                        indices.add(3 + offset)
+                        indices.add(0 + offset)
+                    }
+                    5 -> {
+                        val x = position.x
+                        val y = position.y
+                        val z = position.z
+                        val t = blockType.textures[j]
+
+                        vertices.add(packData(0 + x, 0 + y, 0 + z, 0, 1, 5, t))
+                        vertices.add(packData(1 + x, 0 + y, 0 + z, 1, 1, 5, t))
+                        vertices.add(packData(1 + x, 0 + y, 1 + z, 1, 0, 5, t))
+                        vertices.add(packData(0 + x, 0 + y, 1 + z, 0, 0, 5, t))
+
+                        indices.add(1 + offset)
+                        indices.add(2 + offset)
+                        indices.add(0 + offset)
+                        indices.add(2 + offset)
+                        indices.add(3 + offset)
+                        indices.add(0 + offset)
+                    }
+                }
+                offset += 4
             }
         }
-
-        return offsets.toIntArray()
+        indexCount = indices.size
     }
 
     fun render() {
         glBindVertexArray(vaoID)
-        glDrawElementsInstanced(GL_TRIANGLES, indices.size, GL_UNSIGNED_INT, 0, instanceCount)
-        glBindVertexArray(0)
+        glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0)
     }
 
     fun indexToXYZ(index: Int): Vector3i = Vector3i(index % 16, (index / 16) % 16, (index / (16 * 16)) % 16)
 
     fun xyzToIndex(x: Int, y: Int, z: Int): Int = x + 16 * (y + 16 * z)
 
-    private fun getVisibleFaces(position: Vector3i): Array<Boolean> {
-        val faces = Array(6) { false }
+    private fun getVisibleFaces(position: Vector3i): BooleanArray {
+        val faces = BooleanArray(6)
 
         // TOP
         run {
             val b = getBlockAt(position.x, position.y + 1, position.z)
-            faces[0] = (b == null || b.type == BlockType.AIR || b.type.transparent)
+            faces[0] = (b == null || b == BlockType.AIR || b.transparent)
         }
 
         // FRONT
         run {
             val b = getBlockAt(position.x, position.y, position.z - 1)
-            faces[1] = (b == null || b.type == BlockType.AIR || b.type.transparent)
+            faces[1] = (b == null || b == BlockType.AIR || b.transparent)
         }
 
         // BACK
         run {
             val b = getBlockAt(position.x, position.y, position.z + 1)
-            faces[2] = (b == null || b.type == BlockType.AIR || b.type.transparent)
+            faces[2] = (b == null || b == BlockType.AIR || b.transparent)
         }
 
         // LEFT
         run {
             val b = getBlockAt(position.x - 1, position.y, position.z)
-            faces[3] = (b == null || b.type == BlockType.AIR || b.type.transparent)
+            faces[3] = (b == null || b == BlockType.AIR || b.transparent)
         }
 
         // RIGHT
         run {
             val b = getBlockAt(position.x + 1, position.y, position.z)
-            faces[4] = (b == null || b.type == BlockType.AIR || b.type.transparent)
+            faces[4] = (b == null || b == BlockType.AIR || b.transparent)
         }
 
         // BOTTOM
         run {
             val b = getBlockAt(position.x, position.y - 1, position.z)
-            faces[5] = (b == null || b.type == BlockType.AIR || b.type.transparent)
+            faces[5] = (b == null || b == BlockType.AIR || b.transparent)
         }
 
         return faces
     }
 
-    fun getBlockAt(x: Int, y: Int, z: Int): Block? {
+    private fun getBlockAt(x: Int, y: Int, z: Int): BlockType? {
         if (x < 0 || x > 15 || y < 0 || y > 15 || z < 0 || z > 15) return null
 
         return try {
             val blockId = xyzToIndex(x, y, z)
 
-            Block(BlockType.getByID(blocks[blockId]), indexToXYZ(blockId) + position)
+            return BlockType.getByID(blocks[blockId])
         } catch (ignored: Exception) {
             null
         }

@@ -1,6 +1,5 @@
 package dev.blackoutburst.game.world
 
-import com.sun.security.ntlm.Server
 import dev.blackoutburst.game.camera.Camera
 import dev.blackoutburst.game.camera.FrustumCulling
 import dev.blackoutburst.game.entity.EntityManager
@@ -9,8 +8,6 @@ import dev.blackoutburst.game.maths.Matrix
 import dev.blackoutburst.game.maths.Vector2f
 import dev.blackoutburst.game.maths.Vector3f
 import dev.blackoutburst.game.maths.Vector3i
-import dev.blackoutburst.game.network.packets.server.S04SendChunk
-import dev.blackoutburst.game.network.packets.server.S05SendMonoTypeChunk
 import dev.blackoutburst.game.shader.Shader
 import dev.blackoutburst.game.shader.ShaderProgram
 import dev.blackoutburst.game.texture.TextureArray
@@ -40,14 +37,14 @@ object World {
 
     private val diffuseMap = TextureArray(Textures.entries.map { it.file }).id
 
-    val chunks: ConcurrentHashMap<String, Chunk> = ConcurrentHashMap()
+    var chunks = mutableMapOf<String, Chunk>()
     var chunkRendered = 0
     var chunkUpdate = AtomicInteger(0)
 
     private val minimap = Framebuffer(400, 400)
     private val shadowMap = Framebuffer(4096 * 2, 4096 * 2, true)
 
-    fun addChunk(position: Vector3i, blockData: Array<Byte>) = Chunk(position, blockData)
+    fun addChunk(position: Vector3i, blockData: ByteArray) = Chunk(position, blockData)
 
     private fun setUniforms() {
         shaderProgram.setUniform1i("shadowMap", 1)
@@ -164,19 +161,28 @@ object World {
         glActiveTexture(GL_TEXTURE1)
         glBindTexture(GL_TEXTURE_2D, shadowMap.texture)
 
-        glDisable(GL_CULL_FACE)
-
         FrustumCulling.update(Matrix().projectionMatrix(90f, 1000f, 0.1f), Camera.view)
+
+        val deadChunk = mutableListOf<Chunk>()
 
         chunkRendered = 0
         for (chunk in chunks.values) {
-            if (chunk.instanceCount == 0 || !FrustumCulling.isInFrustum(chunk)) continue
+            if (distance(Vector3f(Camera.position.x, Camera.position.y, Camera.position.z), Vector3f(chunk.position.x.toFloat(), chunk.position.y.toFloat(), chunk.position.z.toFloat())) >= 200000) {
+                deadChunk.add(chunk)
+                chunk.clean()
+                continue
+            }
+
+            if (!FrustumCulling.isInFrustum(chunk)) continue
 
             shaderProgram.setUniform3f("chunkPos", chunk.position.toFloat())
             chunk.render()
             chunkRendered++
         }
-        glEnable(GL_CULL_FACE)
+
+        chunks = chunks.filter {
+            !deadChunk.contains(it.value)
+        }.toMutableMap()
 
         //minimap.render(0f, 0f, 200f, 200f)
         //shadowMap.render(200f, 0f, 200f, 200f)

@@ -13,7 +13,7 @@ class S04SendChunk(override val size: Int) : PacketPlayIn() {
         val z = buffer.getInt()
 
         val position = Vector3i(x, y, z)
-        val blockData = Array(4096) { buffer.get() }
+        val blockData = Array(4096) { buffer.get() }.toByteArray()
 
         World.addChunk(position, blockData)
     }

@@ -13,6 +13,8 @@ class Chunk(
     var vboID = 0
     var eboID = 0
 
+    private val internalXYZIndexObject = Vector3i()
+
     var vertices = mutableListOf<Int>()
     var indices = mutableListOf<Int>()
     var indexCount = 0
@@ -95,119 +97,106 @@ class Chunk(
             if (block.toInt() == 0) continue@block
             val blockType = BlockType.getByID(block)
 
-            val position = indexToXYZ(i)
-            val faces = getVisibleFaces(position)
+            _indexToXYZ(i)
+            val x = internalXYZIndexObject.x
+            val y = internalXYZIndexObject.y
+            val z = internalXYZIndexObject.z
+
+            val faces = getVisibleFaces(internalXYZIndexObject)
 
             face@for (j in 0 until 6) {
                 if (!faces[j]) continue@face
                 when (j) {
                     0 -> {
-                        val x = position.x
-                        val y = position.y
-                        val z = position.z
+
                         val t = blockType.textures[j]
 
-                        vertices.add(packData(0 + x, 1 + y, 0 + z, 0, 0, 0, t))
-                        vertices.add(packData(1 + x, 1 + y, 0 + z, 1, 0, 0, t))
+                        vertices.add(packData(x, 1 + y, z, 0, 0, 0, t))
+                        vertices.add(packData(1 + x, 1 + y, z, 1, 0, 0, t))
                         vertices.add(packData(1 + x, 1 + y, 1 + z, 1, 1, 0, t))
-                        vertices.add(packData(0 + x, 1 + y, 1 + z, 0, 1, 0, t))
+                        vertices.add(packData(x, 1 + y, 1 + z, 0, 1, 0, t))
 
-                        indices.add(0 + offset)
+                        indices.add(offset)
                         indices.add(2 + offset)
                         indices.add(1 + offset)
-                        indices.add(0 + offset)
+                        indices.add(offset)
                         indices.add(3 + offset)
                         indices.add(2 + offset)
                     }
                     1 -> {
-                        val x = position.x
-                        val y = position.y
-                        val z = position.z
                         val t = blockType.textures[j]
 
-                        vertices.add(packData(0 + x, 0 + y, 0 + z, 1, 1, 1, t))
-                        vertices.add(packData(1 + x, 0 + y, 0 + z, 0, 1, 1, t))
-                        vertices.add(packData(1 + x, 1 + y, 0 + z, 0, 0, 1, t))
-                        vertices.add(packData(0 + x, 1 + y, 0 + z, 1, 0, 1, t))
+                        vertices.add(packData(x, y, z, 1, 1, 1, t))
+                        vertices.add(packData(1 + x, y, z, 0, 1, 1, t))
+                        vertices.add(packData(1 + x, 1 + y, z, 0, 0, 1, t))
+                        vertices.add(packData(x, 1 + y, z, 1, 0, 1, t))
 
-                        indices.add(0 + offset)
+                        indices.add(offset)
                         indices.add(2 + offset)
                         indices.add(1 + offset)
-                        indices.add(0 + offset)
+                        indices.add(offset)
                         indices.add(3 + offset)
                         indices.add(2 + offset)
                     }
                     2 -> {
-                        val x = position.x
-                        val y = position.y
-                        val z = position.z
                         val t = blockType.textures[j]
 
-                        vertices.add(packData(0 + x, 0 + y, 1 + z, 0, 1, 2, t))
-                        vertices.add(packData(1 + x, 0 + y, 1 + z, 1, 1, 2, t))
+                        vertices.add(packData(x, y, 1 + z, 0, 1, 2, t))
+                        vertices.add(packData(1 + x, y, 1 + z, 1, 1, 2, t))
                         vertices.add(packData(1 + x, 1 + y, 1 + z, 1, 0, 2, t))
-                        vertices.add(packData(0 + x, 1 + y, 1 + z, 0, 0, 2, t))
+                        vertices.add(packData(x, 1 + y, 1 + z, 0, 0, 2, t))
 
                         indices.add(1 + offset)
                         indices.add(2 + offset)
-                        indices.add(0 + offset)
+                        indices.add(offset)
                         indices.add(2 + offset)
                         indices.add(3 + offset)
-                        indices.add(0 + offset)
+                        indices.add(offset)
                     }
                     3 -> {
-                        val x = position.x
-                        val y = position.y
-                        val z = position.z
                         val t = blockType.textures[j]
 
-                        vertices.add(packData(0 + x, 0 + y, 0 + z, 1, 1, 3, t))
-                        vertices.add(packData(0 + x, 1 + y, 0 + z, 1, 0, 3, t))
-                        vertices.add(packData(0 + x, 1 + y, 1 + z, 0, 0, 3, t))
-                        vertices.add(packData(0 + x, 0 + y, 1 + z, 0, 1, 3, t))
+                        vertices.add(packData(x, y, z, 1, 1, 3, t))
+                        vertices.add(packData(x, 1 + y, z, 1, 0, 3, t))
+                        vertices.add(packData(x, 1 + y, 1 + z, 0, 0, 3, t))
+                        vertices.add(packData(x, y, 1 + z, 0, 1, 3, t))
 
-                        indices.add(0 + offset)
+                        indices.add(offset)
                         indices.add(2 + offset)
                         indices.add(1 + offset)
-                        indices.add(0 + offset)
+                        indices.add(offset)
                         indices.add(3 + offset)
                         indices.add(2 + offset)
                     }
                     4 -> {
-                        val x = position.x
-                        val y = position.y
-                        val z = position.z
                         val t = blockType.textures[j]
 
-                        vertices.add(packData(1 + x, 0 + y, 0 + z, 0, 1, 4, t))
-                        vertices.add(packData(1 + x, 1 + y, 0 + z, 0, 0, 4, t))
+                        vertices.add(packData(1 + x, y, z, 0, 1, 4, t))
+                        vertices.add(packData(1 + x, 1 + y, z, 0, 0, 4, t))
                         vertices.add(packData(1 + x, 1 + y, 1 + z, 1, 0, 4, t))
-                        vertices.add(packData(1 + x, 0 + y, 1 + z, 1, 1, 4, t))
+                        vertices.add(packData(1 + x, y, 1 + z, 1, 1, 4, t))
 
                         indices.add(1 + offset)
                         indices.add(2 + offset)
-                        indices.add(0 + offset)
+                        indices.add(offset)
                         indices.add(2 + offset)
                         indices.add(3 + offset)
-                        indices.add(0 + offset)
+                        indices.add(offset)
                     }
                     5 -> {
-                        val x = position.x
-                        val y = position.y
-                        val z = position.z
                         val t = blockType.textures[j]
 
-                        vertices.add(packData(0 + x, 0 + y, 0 + z, 0, 1, 5, t))
-                        vertices.add(packData(1 + x, 0 + y, 0 + z, 1, 1, 5, t))
-                        vertices.add(packData(1 + x, 0 + y, 1 + z, 1, 0, 5, t))
-                        vertices.add(packData(0 + x, 0 + y, 1 + z, 0, 0, 5, t))
+                        vertices.add(packData(x, y, z, 0, 1, 5, t))
+                        vertices.add(packData(1 + x, y, z, 1, 1, 5, t))
+                        vertices.add(packData(1 + x, y, 1 + z, 1, 0, 5, t))
+                        vertices.add(packData(x, y, 1 + z, 0, 0, 5, t))
 
                         indices.add(1 + offset)
                         indices.add(2 + offset)
-                        indices.add(0 + offset)
+                        indices.add(offset)
                         indices.add(2 + offset)
                         indices.add(3 + offset)
-                        indices.add(0 + offset)
+                        indices.add(offset)
                     }
                 }
                 offset += 4
@@ -223,46 +212,36 @@ class Chunk(
 
     fun indexToXYZ(index: Int): Vector3i = Vector3i(index % 16, (index / 16) % 16, (index / (16 * 16)) % 16)
 
+    private fun _indexToXYZ(index: Int) = internalXYZIndexObject.set(index % 16, (index / 16) % 16, (index / (16 * 16)) % 16)
+
     fun xyzToIndex(x: Int, y: Int, z: Int): Int = x + 16 * (y + 16 * z)
 
     private fun getVisibleFaces(position: Vector3i): BooleanArray {
         val faces = BooleanArray(6)
 
         // TOP
-        run {
-            val b = getBlockAt(position.x, position.y + 1, position.z)
-            faces[0] = (b == null || b == BlockType.AIR || b.transparent)
-        }
+        val b1 = getBlockAt(position.x, position.y + 1, position.z)
+        faces[0] = (b1 == null || b1 == BlockType.AIR || b1.transparent)
 
         // FRONT
-        run {
-            val b = getBlockAt(position.x, position.y, position.z - 1)
-            faces[1] = (b == null || b == BlockType.AIR || b.transparent)
-        }
+        val b2 = getBlockAt(position.x, position.y, position.z - 1)
+        faces[1] = (b2 == null || b2 == BlockType.AIR || b2.transparent)
 
         // BACK
-        run {
-            val b = getBlockAt(position.x, position.y, position.z + 1)
-            faces[2] = (b == null || b == BlockType.AIR || b.transparent)
-        }
+        val b3 = getBlockAt(position.x, position.y, position.z + 1)
+        faces[2] = (b3 == null || b3 == BlockType.AIR || b3.transparent)
 
         // LEFT
-        run {
-            val b = getBlockAt(position.x - 1, position.y, position.z)
-            faces[3] = (b == null || b == BlockType.AIR || b.transparent)
-        }
+        val b4 = getBlockAt(position.x - 1, position.y, position.z)
+        faces[3] = (b4 == null || b4 == BlockType.AIR || b4.transparent)
 
         // RIGHT
-        run {
-            val b = getBlockAt(position.x + 1, position.y, position.z)
-            faces[4] = (b == null || b == BlockType.AIR || b.transparent)
-        }
+        val b5 = getBlockAt(position.x + 1, position.y, position.z)
+        faces[4] = (b5 == null || b5 == BlockType.AIR || b5.transparent)
 
         // BOTTOM
-        run {
-            val b = getBlockAt(position.x, position.y - 1, position.z)
-            faces[5] = (b == null || b == BlockType.AIR || b.transparent)
-        }
+        val b6 = getBlockAt(position.x, position.y - 1, position.z)
+        faces[5] = (b6 == null || b6 == BlockType.AIR || b6.transparent)
 
         return faces
     }

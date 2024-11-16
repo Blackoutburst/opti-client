@@ -16,9 +16,11 @@ enum class BlockType(val id: Byte, val transparent: Boolean, val textures: Array
     SNOW(9, false, Array(6) { Textures.SNOW.ordinal });
 
     companion object {
+        private val values = values()
+
         fun getByID(id: Byte): BlockType {
             if (id < 0 || id > 9) return ERROR
-            return entries[id.toInt() + 1]
+            return values[id.toInt() + 1]
         }
     }
 }

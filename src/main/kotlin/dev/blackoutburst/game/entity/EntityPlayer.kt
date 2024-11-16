@@ -31,7 +31,7 @@ class EntityPlayer(
 
     private var moving = false
     private var sprint = false
-    private val runSpeed = 50f
+    private val runSpeed = 250f
     private val walkSpeed = 10f
 
     private var velocity = Vector3f()

@@ -8,6 +8,7 @@ import dev.blackoutburst.game.maths.Vector2i
 import dev.blackoutburst.game.ui.Chat
 import dev.blackoutburst.game.utils.IOUtils
 import dev.blackoutburst.game.utils.Time
+import dev.blackoutburst.game.utils.extractDll
 import dev.blackoutburst.game.utils.stack
 import dev.blackoutburst.game.window.callbacks.*
 import dev.blackoutburst.game.window.nuklear.NK
@@ -23,12 +24,18 @@ import org.lwjgl.stb.STBImage
 import org.lwjgl.system.MemoryStack
 import org.lwjgl.system.MemoryUtil.NULL
 import org.lwjgl.system.Platform
+import java.io.File
+import java.io.FileNotFoundException
+import java.io.FileOutputStream
 import java.nio.ByteBuffer
 import java.security.Key
 import kotlin.random.Random
 import kotlin.system.exitProcess
 
 object Window {
+
+    external fun attachToWorkerW(hwnd: Long): Boolean
+
     val title = MemoryStack.stackPush().UTF8("OpenGL [LWJGL - ${Version.getVersion()}]")
     var id = -1L
     var isOpen = false
@@ -42,15 +49,24 @@ object Window {
         get() = getFrameBufferSize().y
 
     init {
+        System.load(extractDll("native/DesktopWindow.dll"))
+
         glfwInit()
-        glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE)
+        glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE)
+        glfwWindowHint(GLFW_DECORATED, GLFW_FALSE)
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3)
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2)
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE)
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE)
 
-        id = glfwCreateWindow(1280, 720, title, NULL, NULL)
+        id = glfwCreateWindow(1920, 1080, title, NULL, NULL)
         if (id == -1L) exitProcess(-1)
+
+        val hwnd = GLFWNativeWin32.glfwGetWin32Window(id)
+
+        if (!attachToWorkerW(hwnd)) {
+            println("Failed to attach GLFW window to WorkerW")
+        }
 
         glfwMakeContextCurrent(id)
         createCapabilities()

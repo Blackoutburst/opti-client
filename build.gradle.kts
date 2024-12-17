@@ -9,6 +9,7 @@ plugins {
 
 application {
     mainClass.set("dev.blackoutburst.game.MainKt")
+    applicationDefaultJvmArgs = listOf("-Djava.library.path=src/main/resources/native")
 }
 
 group = "dev.blackoutburst"
@@ -80,7 +81,17 @@ sourceSets {
     }
 }
 
+tasks {
+    processResources {
+        from("src/main/resources/native") {
+            into("native")
+        }
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    }
+}
+
 tasks.withType<ShadowJar>().configureEach {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     archiveBaseName.set("client-shadow")
     mergeServiceFiles()
     from(sourceSets.main.get().output)

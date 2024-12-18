@@ -128,14 +128,14 @@ void matrixScale2d(float* matrix, float x, float y) {
 }
 
 void matrixScale2dP(float* matrix, float* vector) {
-    matrix[M00] = matrix[M00] * vector[X];
-    matrix[M01] = matrix[M01] * vector[X];
-    matrix[M02] = matrix[M02] * vector[X];
-    matrix[M03] = matrix[M03] * vector[X];
-    matrix[M10] = matrix[M10] * vector[Y];
-    matrix[M11] = matrix[M11] * vector[Y];
-    matrix[M12] = matrix[M12] * vector[Y];
-    matrix[M13] = matrix[M13] * vector[Y];
+    matrix[M00] = matrix[M00] * vector[VX];
+    matrix[M01] = matrix[M01] * vector[VX];
+    matrix[M02] = matrix[M02] * vector[VX];
+    matrix[M03] = matrix[M03] * vector[VX];
+    matrix[M10] = matrix[M10] * vector[VY];
+    matrix[M11] = matrix[M11] * vector[VY];
+    matrix[M12] = matrix[M12] * vector[VY];
+    matrix[M13] = matrix[M13] * vector[VY];
 }
 
 void matrixScale3d(float* matrix, float x, float y, float z) {
@@ -154,18 +154,18 @@ void matrixScale3d(float* matrix, float x, float y, float z) {
 }
 
 void matrixScale3dP(float* matrix, float* vector) {
-    matrix[M00] = matrix[M00] * vector[X];
-    matrix[M01] = matrix[M01] * vector[X];
-    matrix[M02] = matrix[M02] * vector[X];
-    matrix[M03] = matrix[M03] * vector[X];
-    matrix[M10] = matrix[M10] * vector[Y];
-    matrix[M11] = matrix[M11] * vector[Y];
-    matrix[M12] = matrix[M12] * vector[Y];
-    matrix[M13] = matrix[M13] * vector[Y];
-    matrix[M20] = matrix[M20] * vector[Z];
-    matrix[M21] = matrix[M21] * vector[Z];
-    matrix[M22] = matrix[M22] * vector[Z];
-    matrix[M23] = matrix[M23] * vector[Z];
+    matrix[M00] = matrix[M00] * vector[VX];
+    matrix[M01] = matrix[M01] * vector[VX];
+    matrix[M02] = matrix[M02] * vector[VX];
+    matrix[M03] = matrix[M03] * vector[VX];
+    matrix[M10] = matrix[M10] * vector[VY];
+    matrix[M11] = matrix[M11] * vector[VY];
+    matrix[M12] = matrix[M12] * vector[VY];
+    matrix[M13] = matrix[M13] * vector[VY];
+    matrix[M20] = matrix[M20] * vector[VZ];
+    matrix[M21] = matrix[M21] * vector[VZ];
+    matrix[M22] = matrix[M22] * vector[VZ];
+    matrix[M23] = matrix[M23] * vector[VZ];
 }
 
 void matrixTranslate2d(float* matrix, float x, float y) {
@@ -184,10 +184,10 @@ void matrixTranslate2dP(float* matrix, float* vector) {
     float* src = identityMatrix();
     matrixCopy(matrix, src);
 
-    matrix[M30] += src[M00] * vector[X] + src[M10] * vector[Y];
-    matrix[M31] += src[M01] * vector[X] + src[M11] * vector[Y];
-    matrix[M32] += src[M02] * vector[X] + src[M12] * vector[Y];
-    matrix[M33] += src[M03] * vector[X] + src[M13] * vector[Y];
+    matrix[M30] += src[M00] * vector[VX] + src[M10] * vector[VY];
+    matrix[M31] += src[M01] * vector[VX] + src[M11] * vector[VY];
+    matrix[M32] += src[M02] * vector[VX] + src[M12] * vector[VY];
+    matrix[M33] += src[M03] * vector[VX] + src[M13] * vector[VY];
 
     free(src);
 }
@@ -208,10 +208,10 @@ void matrixTranslate3dP(float* matrix, float* vector) {
     float* src = identityMatrix();
     matrixCopy(matrix, src);
 
-    matrix[M30] += src[M00] * vector[X] + src[M10] * vector[Y] + src[M20] * vector[Z];
-    matrix[M31] += src[M01] * vector[X] + src[M11] * vector[Y] + src[M21] * vector[Z];
-    matrix[M32] += src[M02] * vector[X] + src[M12] * vector[Y] + src[M22] * vector[Z];
-    matrix[M33] += src[M03] * vector[X] + src[M13] * vector[Y] + src[M23] * vector[Z];
+    matrix[M30] += src[M00] * vector[VX] + src[M10] * vector[VY] + src[M20] * vector[VZ];
+    matrix[M31] += src[M01] * vector[VX] + src[M11] * vector[VY] + src[M21] * vector[VZ];
+    matrix[M32] += src[M02] * vector[VX] + src[M12] * vector[VY] + src[M22] * vector[VZ];
+    matrix[M33] += src[M03] * vector[VX] + src[M13] * vector[VY] + src[M23] * vector[VZ];
 
     free(src);
 }
@@ -223,22 +223,22 @@ void matrixRotateP(float* matrix, float angle, float* vector) {
     float c = cos(angle);
     float s = sin(angle);
     float oneMinusC = 1.0f - c;
-    float xy = vector[X] * vector[Y];
-    float yz = vector[Y] * vector[Z];
-    float xz = vector[X] * vector[Z];
-    float xs = vector[X] * s;
-    float ys = vector[Y] * s;
-    float zs = vector[Z] * s;
+    float xy = vector[VX] * vector[VY];
+    float yz = vector[VY] * vector[VZ];
+    float xz = vector[VX] * vector[VZ];
+    float xs = vector[VX] * s;
+    float ys = vector[VY] * s;
+    float zs = vector[VZ] * s;
 
-    float f00 = vector[X] * vector[X] * oneMinusC + c;
+    float f00 = vector[VX] * vector[VX] * oneMinusC + c;
     float f01 = xy * oneMinusC + zs;
     float f02 = xz * oneMinusC - ys;
     float f10 = xy * oneMinusC - zs;
-    float f11 = vector[Y] * vector[Y] * oneMinusC + c;
+    float f11 = vector[VY] * vector[VY] * oneMinusC + c;
     float f12 = yz * oneMinusC + xs;
     float f20 = xz * oneMinusC + ys;
     float f21 = yz * oneMinusC - xs;
-    float f22 = vector[Z] * vector[Z] * oneMinusC + c;
+    float f22 = vector[VZ] * vector[VZ] * oneMinusC + c;
 
     float t00 = src[M00] * f00 + src[M10] * f01 + src[M20] * f02;
     float t01 = src[M01] * f00 + src[M11] * f01 + src[M21] * f02;

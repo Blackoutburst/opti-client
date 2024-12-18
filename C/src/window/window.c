@@ -1,5 +1,16 @@
+#define GLFW_INCLUDE_NONE
+
 #include "GLFW/glfw3.h"
 #include <stdlib.h>
+
+#if defined(__APPLE__)
+    #include <OpenGL/gl3.h>
+#elif defined(_WIN32) || defined(_WIN64)
+    #include "GL/glew.h"
+    #include <GL/gl.h>
+#else
+    #include <GL/gl.h>
+#endif
 
 GLFWwindow* createWindow() {
     GLFWwindow* window;
@@ -17,6 +28,11 @@ GLFWwindow* createWindow() {
     }
 
     glfwMakeContextCurrent(window);
+
+    #if defined(_WIN32) || defined(_WIN64)
+        glewInit();
+    #endif
+    
     glClearColor(0.1f, 0.1f, 0.1f, 0.1f);
 
     glEnable(GL_DEPTH_TEST);

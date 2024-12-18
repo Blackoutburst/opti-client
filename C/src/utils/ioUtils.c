@@ -21,7 +21,7 @@ char* readFile(const char* path) {
     }
 
     size_t fileSize = getFileSize(&file);
-    if (fileSize < 0) {
+    if (!fileSize) {
         println("File size error");
         fclose(file);
         return NULL;

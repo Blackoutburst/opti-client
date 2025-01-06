@@ -1,4 +1,3 @@
-#include "utils/math.h"
 typedef struct chunk CHUNK;
 
 struct chunk {

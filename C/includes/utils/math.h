@@ -7,4 +7,6 @@
 
 #define PI 3.141592653589793
 
+typedef float* VECTOR;
+
 float rad(float angle);

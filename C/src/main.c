@@ -7,6 +7,7 @@
 #include "utils/matrix.h"
 #include "utils/math.h"
 #include "graphics/shader.h"
+#include "world/chunk.h"
 
 #if defined(__APPLE__)
     #include <OpenGL/gl3.h>
@@ -70,16 +71,16 @@ int triangle() {
         22, 23, 20
     };
 
-    const char *vertexShaderSource = readFile("./shaders/cube.vert");
-    const char *fragmentShaderSource = readFile("./shaders/cube.frag");
+    const char* vertexShaderSource = readFile("./shaders/cube.vert");
+    const char* fragmentShaderSource = readFile("./shaders/cube.frag");
 
     int vertexShader = compileShader(vertexShaderSource, GL_VERTEX_SHADER);
     int fragmentShader = compileShader(fragmentShaderSource, GL_FRAGMENT_SHADER);
     int shaderProgram = createShaderProgram(vertexShader, fragmentShader);
 
-    float* modelMatrix = identityMatrix();
-    float* viewMatrix = identityMatrix();
-    float* projectionMatrix = identityMatrix();
+    MATRIX modelMatrix = identityMatrix();
+    MATRIX viewMatrix = identityMatrix();
+    MATRIX projectionMatrix = identityMatrix();
     float angle = rad(50);
     matrixProjection(projectionMatrix, 1280, 720, 90, 0.001, 1000);
     matrixTranslate3d(modelMatrix, 0, 0, -3);
@@ -141,6 +142,9 @@ void update(GLFWwindow* window) {
 int main(void) {
     GLFWwindow* window = createWindow();
     update(window);
+
+    CHUNK chunk = createChunk();
+    printChunk(chunk);
 
     return 0;
 }

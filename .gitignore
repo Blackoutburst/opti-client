@@ -1,3 +1,6 @@
+### C ###
+C/a.out
+
 .gradle
 build/
 !gradle/wrapper/gradle-wrapper.jar

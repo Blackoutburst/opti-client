@@ -47,7 +47,7 @@ int** generateChunkMesh(CHUNK* chunk) {
     int vertexIndex = 0;
     int indexIndex = 0;
     int indexOffset = 0;
-    for(unsigned long i = 0; i < BLOCK_COUNT; i++) {
+    for (unsigned long i = 0; i < BLOCK_COUNT; i++) {
         // TOP
         vertices[vertexIndex++] = packVertexData(chunk->position[VX]    , chunk->position[VY] + 1, chunk->position[VZ]    , 0, 0, 0);
         vertices[vertexIndex++] = packVertexData(chunk->position[VX] + 1, chunk->position[VY] + 1, chunk->position[VZ]    , 1, 0, 0);

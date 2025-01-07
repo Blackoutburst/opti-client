@@ -25,10 +25,10 @@ int packVertexData(int x, int y, int z, int u, int v, int n) {
 void generateChunkVAO(CHUNK * chunk, int** mesh) {
     glBindVertexArray(chunk->vaoID);
 
-    glBufferData(GL_ARRAY_BUFFER, sizeof(mesh[0]), mesh[0], GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(int) * BLOCK_COUNT * 24, mesh[0], GL_STATIC_DRAW);
     glEnableVertexAttribArray(0);
     glVertexAttribIPointer(0, 1, GL_INT, 4, 0);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(mesh[1]), mesh[1], GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * BLOCK_COUNT * 36, mesh[1], GL_STATIC_DRAW);
 }
 
 void cleanChunkMesh(int** mesh) {

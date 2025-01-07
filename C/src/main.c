@@ -1,5 +1,6 @@
 #define GLFW_INCLUDE_NONE
 
+#include <stdlib.h>
 #include "GLFW/glfw3.h"
 #include "graphics/shader.h"
 #include "window/window.h"
@@ -8,6 +9,7 @@
 #include "utils/math.h"
 #include "graphics/shader.h"
 #include "world/chunk.h"
+#include "world/world.h"
 
 #if defined(__APPLE__)
     #include <OpenGL/gl3.h>
@@ -141,10 +143,15 @@ void update(GLFWwindow* window) {
 
 int main(void) {
     GLFWwindow* window = createWindow();
+
+    int* position = malloc(sizeof(int) * 3);
+    char* blocks = malloc(sizeof(char) * CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE);
+    CHUNK* chunk = createChunk(position, blocks);
+    printChunk(chunk);
+
     update(window);
 
-    CHUNK chunk = createChunk();
-    printChunk(chunk);
+    destroyChunk(chunk);
 
     return 0;
 }

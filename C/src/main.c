@@ -20,6 +20,7 @@
     #include <GL/gl.h>
 #endif
 
+/*
 int triangle() {
     const float vertices[] = {
          0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
@@ -125,17 +126,28 @@ int triangle() {
 
     return VAO;
 }
+*/
 
 void update(GLFWwindow* window) {
-    triangle();
+    //triangle();
+
+    int* position = malloc(sizeof(int) * 3);
+    char* blocks = malloc(sizeof(char) * CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE);
+    CHUNK* chunk = createChunk(position, blocks);
+    int** chunkMesh = generateChunkMesh(chunk);
+    printChunk(chunk);
+    generateChunkVAO(chunk, chunkMesh);
+    cleanChunkMesh(chunkMesh);
 
     while (!glfwWindowShouldClose(window)) {
         clearWindow();
 
-        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+        renderChunk(chunk);
 
         updateWindow(window);
     }
+
+    destroyChunk(chunk);
 
     glfwTerminate();
 }
@@ -144,14 +156,7 @@ void update(GLFWwindow* window) {
 int main(void) {
     GLFWwindow* window = createWindow();
 
-    int* position = malloc(sizeof(int) * 3);
-    char* blocks = malloc(sizeof(char) * CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE);
-    CHUNK* chunk = createChunk(position, blocks);
-    printChunk(chunk);
-
     update(window);
-
-    destroyChunk(chunk);
 
     return 0;
 }

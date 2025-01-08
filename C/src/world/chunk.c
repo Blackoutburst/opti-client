@@ -169,6 +169,10 @@ CHUNK* createChunk(int* position, char* blocks) {
     return chunk;
 }
 
+void renderChunk(CHUNK* chunk) {
+    glDrawElements(GL_TRIANGLES, chunk->indexCount, GL_UNSIGNED_INT, 0);
+}
+
 void destroyChunk(CHUNK* chunk) {
     glDeleteVertexArrays(1, &chunk->vaoID);
     glDeleteBuffers(1, &chunk->vboID);

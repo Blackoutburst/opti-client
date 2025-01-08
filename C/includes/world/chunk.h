@@ -15,5 +15,6 @@ void generateChunkVAO(CHUNK * chunk, int** mesh);
 void cleanChunkMesh(int** mesh);
 int** generateChunkMesh(CHUNK* chunk);
 CHUNK* createChunk(int* position, char* blocks);
+void renderChunk(CHUNK* chunk);
 void destroyChunk(CHUNK* chunk);
 

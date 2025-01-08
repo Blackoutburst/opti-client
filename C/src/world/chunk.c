@@ -22,7 +22,7 @@ int packVertexData(char x, char y, char z, char u, char v, char n) {
     return (x & 31) | (y & 31) << 5 | (z & 31) << 10 | (u & 31) << 15 | (v & 31) << 20 | (n & 7) << 25;
 }
 
-void generateChunkVAO(CHUNK * chunk, CHUNK_MESH* mesh) {
+void generateChunkVAO(CHUNK* chunk, CHUNK_MESH* mesh) {
     if (!mesh->vertexCount || !mesh->indexCount) return;
     glBindVertexArray(chunk->vaoID);
 

@@ -144,7 +144,12 @@ int** generateChunkMesh(CHUNK* chunk) {
 
         indexOffset += 4;
     }
-    
+
+    if (vertexIndex != BLOCK_COUNT * 24)
+        vertices = realloc(vertices, sizeof(int) * vertexIndex);
+    if (indexIndex != BLOCK_COUNT * 36)
+        indices = realloc(indices, sizeof(int) * indexIndex);
+
     free(blockPos);
 
     return mesh;

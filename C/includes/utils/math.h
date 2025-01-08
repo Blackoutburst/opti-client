@@ -9,4 +9,5 @@
 
 typedef float* VECTOR;
 
+void indexToXYZ(char* vector, short index);
 float rad(float angle);

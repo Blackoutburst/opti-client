@@ -10,7 +10,7 @@ struct chunk {
 };
 
 void printChunk(CHUNK* chunk);
-int packVertexData(int x, int y, int z, int u, int v, int n);
+int packVertexData(char x, char y, char z, char u, char v, char n);
 void generateChunkVAO(CHUNK * chunk, int** mesh);
 void cleanChunkMesh(int** mesh);
 int** generateChunkMesh(CHUNK* chunk);

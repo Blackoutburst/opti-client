@@ -134,10 +134,9 @@ void update(GLFWwindow* window) {
     int* position = malloc(sizeof(int) * 3);
     char* blocks = malloc(sizeof(char) * CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE);
     CHUNK* chunk = createChunk(position, blocks);
-    int** chunkMesh = generateChunkMesh(chunk);
-    printChunk(chunk);
-    generateChunkVAO(chunk, chunkMesh);
-    cleanChunkMesh(chunkMesh);
+    CHUNK_MESH* mesh = generateChunkMesh(chunk);
+    generateChunkVAO(chunk, mesh);
+    cleanChunkMesh(mesh);
 
     while (!glfwWindowShouldClose(window)) {
         clearWindow();

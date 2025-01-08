@@ -22,30 +22,34 @@ int packVertexData(char x, char y, char z, char u, char v, char n) {
     return (x & 31) | (y & 31) << 5 | (z & 31) << 10 | (u & 31) << 15 | (v & 31) << 20 | (n & 7) << 25;
 }
 
-void generateChunkVAO(CHUNK * chunk, int** mesh) {
+void generateChunkVAO(CHUNK * chunk, CHUNK_MESH* mesh) {
+    if (!mesh->vertexCount || !mesh->indexCount) return;
     glBindVertexArray(chunk->vaoID);
 
     glBindBuffer(GL_ARRAY_BUFFER, chunk->vboID);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(int) * BLOCK_COUNT * 24, mesh[0], GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(int) * mesh->vertexCount, mesh->vertices, GL_STATIC_DRAW);
     glEnableVertexAttribArray(0);
     glVertexAttribIPointer(0, 1, GL_INT, 4, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, chunk->eboID);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * BLOCK_COUNT * 36, mesh[1], GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * mesh->indexCount, mesh->indices, GL_STATIC_DRAW);
 }
 
-void cleanChunkMesh(int** mesh) {
-    free(mesh[0]);
-    free(mesh[1]);
+void cleanChunkMesh(CHUNK_MESH* mesh) {
+    if (mesh->vertexCount)
+        free(mesh->vertices);
+    if (mesh->indexCount)
+        free(mesh->indices);
     free(mesh);
 }
 
-int** generateChunkMesh(CHUNK* chunk) {
+CHUNK_MESH* generateChunkMesh(CHUNK* chunk) {
     int* vertices = malloc(sizeof(int) * BLOCK_COUNT * 24);
     int* indices = malloc(sizeof(int) * BLOCK_COUNT * 36);
-    int** mesh = malloc(sizeof(int*) * 2);
     char* blockPos = malloc(sizeof(char) * 3);
-    mesh[0] = vertices;
-    mesh[1] = indices;
+
+    CHUNK_MESH* mesh = malloc(sizeof(CHUNK_MESH));
+    mesh->vertices = vertices;
+    mesh->indices = indices;
 
     int vertexIndex = 0;
     int indexIndex = 0;
@@ -168,6 +172,8 @@ int** generateChunkMesh(CHUNK* chunk) {
     if (indexIndex != BLOCK_COUNT * 36)
         indices = realloc(indices, sizeof(int) * indexIndex);
 
+    mesh->vertexCount = vertexIndex;
+    mesh->indexCount = indexIndex;
     free(blockPos);
 
     return mesh;
@@ -188,6 +194,7 @@ CHUNK* createChunk(int* position, char* blocks) {
 }
 
 void renderChunk(CHUNK* chunk) {
+    if (!chunk->indexCount) return;
     glDrawElements(GL_TRIANGLES, chunk->indexCount, GL_UNSIGNED_INT, 0);
 }
 

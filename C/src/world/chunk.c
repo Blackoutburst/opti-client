@@ -56,7 +56,7 @@ int** generateChunkMesh(CHUNK* chunk) {
 
         // TOP
         unsigned int topIndex = xyzToIndex(blockPos[VX], blockPos[VY] + 1, blockPos[VZ]);
-        if (topIndex < 4096 && chunk->blocks[topIndex] == 0) {
+        if (topIndex < 4096 && !chunk->blocks[topIndex]) {
             vertices[vertexIndex++] = packVertexData(blockPos[VX]    , blockPos[VY] + 1, blockPos[VZ]    , 0, 0, 0);
             vertices[vertexIndex++] = packVertexData(blockPos[VX] + 1, blockPos[VY] + 1, blockPos[VZ]    , 1, 0, 0);
             vertices[vertexIndex++] = packVertexData(blockPos[VX] + 1, blockPos[VY] + 1, blockPos[VZ] + 1, 1, 1, 0);
@@ -74,7 +74,7 @@ int** generateChunkMesh(CHUNK* chunk) {
 
         // FRONT
         unsigned int frontIndex = xyzToIndex(blockPos[VX], blockPos[VY], blockPos[VZ] - 1);
-        if (frontIndex < 4096 && chunk->blocks[frontIndex] == 0) {
+        if (frontIndex < 4096 && !chunk->blocks[frontIndex]) {
             vertices[vertexIndex++] = packVertexData(blockPos[VX]    , blockPos[VY]    , blockPos[VZ]    , 1, 1, 1);
             vertices[vertexIndex++] = packVertexData(blockPos[VX] + 1, blockPos[VY]    , blockPos[VZ]    , 0, 1, 1);
             vertices[vertexIndex++] = packVertexData(blockPos[VX] + 1, blockPos[VY] + 1, blockPos[VZ]    , 0, 0, 1);
@@ -92,7 +92,7 @@ int** generateChunkMesh(CHUNK* chunk) {
 
         // BACK
         unsigned int backIndex = xyzToIndex(blockPos[VX], blockPos[VY], blockPos[VZ] + 1);
-        if (backIndex < 4096 && chunk->blocks[backIndex] == 0) {
+        if (backIndex < 4096 && !chunk->blocks[backIndex]) {
             vertices[vertexIndex++] = packVertexData(blockPos[VX]    , blockPos[VY]    , blockPos[VZ] + 1, 0, 1, 2);
             vertices[vertexIndex++] = packVertexData(blockPos[VX] + 1, blockPos[VY]    , blockPos[VZ] + 1, 1, 1, 2);
             vertices[vertexIndex++] = packVertexData(blockPos[VX] + 1, blockPos[VY] + 1, blockPos[VZ] + 1, 1, 0, 2);
@@ -110,7 +110,7 @@ int** generateChunkMesh(CHUNK* chunk) {
 
         // LEFT
         unsigned int leftIndex = xyzToIndex(blockPos[VX] - 1, blockPos[VY], blockPos[VZ]);
-        if (leftIndex < 4096 && chunk->blocks[leftIndex] == 0) {
+        if (leftIndex < 4096 && !chunk->blocks[leftIndex]) {
             vertices[vertexIndex++] = packVertexData(blockPos[VX]    , blockPos[VY]    , blockPos[VZ]    , 1, 1, 3);
             vertices[vertexIndex++] = packVertexData(blockPos[VX]    , blockPos[VY] + 1, blockPos[VZ]    , 1, 0, 3);
             vertices[vertexIndex++] = packVertexData(blockPos[VX]    , blockPos[VY] + 1, blockPos[VZ] + 1, 0, 0, 3);
@@ -128,7 +128,7 @@ int** generateChunkMesh(CHUNK* chunk) {
 
         // RIGHT
         unsigned int rightIndex = xyzToIndex(blockPos[VX] + 1, blockPos[VY], blockPos[VZ]);
-        if (rightIndex < 4096 && chunk->blocks[rightIndex] == 0) {
+        if (rightIndex < 4096 && !chunk->blocks[rightIndex]) {
             vertices[vertexIndex++] = packVertexData(blockPos[VX] + 1, blockPos[VY]    , blockPos[VZ]    , 0, 1, 4);
             vertices[vertexIndex++] = packVertexData(blockPos[VX] + 1, blockPos[VY] + 1, blockPos[VZ]    , 0, 0, 4);
             vertices[vertexIndex++] = packVertexData(blockPos[VX] + 1, blockPos[VY] + 1, blockPos[VZ] + 1, 1, 0, 4);
@@ -146,7 +146,7 @@ int** generateChunkMesh(CHUNK* chunk) {
 
         // BOTTOM
         unsigned int bottomIndex = xyzToIndex(blockPos[VX], blockPos[VY] - 1, blockPos[VZ]);
-        if (bottomIndex < 4096 && chunk->blocks[bottomIndex] == 0) {
+        if (bottomIndex < 4096 && !chunk->blocks[bottomIndex]) {
             vertices[vertexIndex++] = packVertexData(blockPos[VX]    , blockPos[VY]    , blockPos[VZ]    , 0, 1, 5);
             vertices[vertexIndex++] = packVertexData(blockPos[VX] + 1, blockPos[VY]    , blockPos[VZ]    , 1, 1, 5);
             vertices[vertexIndex++] = packVertexData(blockPos[VX] + 1, blockPos[VY]    , blockPos[VZ] + 1, 1, 0, 5);

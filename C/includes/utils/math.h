@@ -9,6 +9,6 @@
 
 typedef float* VECTOR;
 
-int xyzToIndex(int x, int y, int z);
+unsigned int xyzToIndex(int x, int y, int z);
 void indexToXYZ(char* vector, short index);
 float rad(float angle);

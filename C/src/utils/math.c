@@ -6,7 +6,7 @@ float rad(float angle) {
     return angle * PI / 180.0f;
 }
 
-int xyzToIndex(int x, int y, int z) {
+unsigned int xyzToIndex(int x, int y, int z) {
     return x + CHUNK_SIZE * (y + CHUNK_SIZE * z);
 }
 

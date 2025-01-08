@@ -51,98 +51,116 @@ int** generateChunkMesh(CHUNK* chunk) {
     int indexIndex = 0;
     int indexOffset = 0;
 
-    for (unsigned long i = 0; i < BLOCK_COUNT; i++) {
+    for (unsigned short i = BLOCK_COUNT; i; i--) {
         indexToXYZ(blockPos, i);
 
         // TOP
-        vertices[vertexIndex++] = packVertexData(blockPos[VX]    , blockPos[VY] + 1, blockPos[VZ]    , 0, 0, 0);
-        vertices[vertexIndex++] = packVertexData(blockPos[VX] + 1, blockPos[VY] + 1, blockPos[VZ]    , 1, 0, 0);
-        vertices[vertexIndex++] = packVertexData(blockPos[VX] + 1, blockPos[VY] + 1, blockPos[VZ] + 1, 1, 1, 0);
-        vertices[vertexIndex++] = packVertexData(blockPos[VX]    , blockPos[VY] + 1, blockPos[VZ] + 1, 0, 1, 0);
+        unsigned int topIndex = xyzToIndex(blockPos[VX], blockPos[VY] + 1, blockPos[VZ]);
+        if (topIndex < 4096 && chunk->blocks[topIndex] == 0) {
+            vertices[vertexIndex++] = packVertexData(blockPos[VX]    , blockPos[VY] + 1, blockPos[VZ]    , 0, 0, 0);
+            vertices[vertexIndex++] = packVertexData(blockPos[VX] + 1, blockPos[VY] + 1, blockPos[VZ]    , 1, 0, 0);
+            vertices[vertexIndex++] = packVertexData(blockPos[VX] + 1, blockPos[VY] + 1, blockPos[VZ] + 1, 1, 1, 0);
+            vertices[vertexIndex++] = packVertexData(blockPos[VX]    , blockPos[VY] + 1, blockPos[VZ] + 1, 0, 1, 0);
 
-        indices[indexIndex++] = 0 + indexOffset;
-        indices[indexIndex++] = 2 + indexOffset;
-        indices[indexIndex++] = 1 + indexOffset;
-        indices[indexIndex++] = 0 + indexOffset;
-        indices[indexIndex++] = 3 + indexOffset;
-        indices[indexIndex++] = 2 + indexOffset;
+            indices[indexIndex++] = 0 + indexOffset;
+            indices[indexIndex++] = 2 + indexOffset;
+            indices[indexIndex++] = 1 + indexOffset;
+            indices[indexIndex++] = 0 + indexOffset;
+            indices[indexIndex++] = 3 + indexOffset;
+            indices[indexIndex++] = 2 + indexOffset;
 
-        indexOffset += 4;
+            indexOffset += 4;
+        }
 
         // FRONT
-        vertices[vertexIndex++] = packVertexData(blockPos[VX]    , blockPos[VY]    , blockPos[VZ]    , 1, 1, 1);
-        vertices[vertexIndex++] = packVertexData(blockPos[VX] + 1, blockPos[VY]    , blockPos[VZ]    , 0, 1, 1);
-        vertices[vertexIndex++] = packVertexData(blockPos[VX] + 1, blockPos[VY] + 1, blockPos[VZ]    , 0, 0, 1);
-        vertices[vertexIndex++] = packVertexData(blockPos[VX]    , blockPos[VY] + 1, blockPos[VZ]    , 1, 0, 1);
+        unsigned int frontIndex = xyzToIndex(blockPos[VX], blockPos[VY], blockPos[VZ] - 1);
+        if (frontIndex < 4096 && chunk->blocks[frontIndex] == 0) {
+            vertices[vertexIndex++] = packVertexData(blockPos[VX]    , blockPos[VY]    , blockPos[VZ]    , 1, 1, 1);
+            vertices[vertexIndex++] = packVertexData(blockPos[VX] + 1, blockPos[VY]    , blockPos[VZ]    , 0, 1, 1);
+            vertices[vertexIndex++] = packVertexData(blockPos[VX] + 1, blockPos[VY] + 1, blockPos[VZ]    , 0, 0, 1);
+            vertices[vertexIndex++] = packVertexData(blockPos[VX]    , blockPos[VY] + 1, blockPos[VZ]    , 1, 0, 1);
 
-        indices[indexIndex++] = 0 + indexOffset;
-        indices[indexIndex++] = 2 + indexOffset;
-        indices[indexIndex++] = 1 + indexOffset;
-        indices[indexIndex++] = 0 + indexOffset;
-        indices[indexIndex++] = 3 + indexOffset;
-        indices[indexIndex++] = 2 + indexOffset;
+            indices[indexIndex++] = 0 + indexOffset;
+            indices[indexIndex++] = 2 + indexOffset;
+            indices[indexIndex++] = 1 + indexOffset;
+            indices[indexIndex++] = 0 + indexOffset;
+            indices[indexIndex++] = 3 + indexOffset;
+            indices[indexIndex++] = 2 + indexOffset;
 
-        indexOffset += 4;
+            indexOffset += 4;
+        }
 
         // BACK
-        vertices[vertexIndex++] = packVertexData(blockPos[VX]    , blockPos[VY]    , blockPos[VZ] + 1, 0, 1, 2);
-        vertices[vertexIndex++] = packVertexData(blockPos[VX] + 1, blockPos[VY]    , blockPos[VZ] + 1, 1, 1, 2);
-        vertices[vertexIndex++] = packVertexData(blockPos[VX] + 1, blockPos[VY] + 1, blockPos[VZ] + 1, 1, 0, 2);
-        vertices[vertexIndex++] = packVertexData(blockPos[VX]    , blockPos[VY] + 1, blockPos[VZ] + 1, 0, 0, 2);
+        unsigned int backIndex = xyzToIndex(blockPos[VX], blockPos[VY], blockPos[VZ] + 1);
+        if (backIndex < 4096 && chunk->blocks[backIndex] == 0) {
+            vertices[vertexIndex++] = packVertexData(blockPos[VX]    , blockPos[VY]    , blockPos[VZ] + 1, 0, 1, 2);
+            vertices[vertexIndex++] = packVertexData(blockPos[VX] + 1, blockPos[VY]    , blockPos[VZ] + 1, 1, 1, 2);
+            vertices[vertexIndex++] = packVertexData(blockPos[VX] + 1, blockPos[VY] + 1, blockPos[VZ] + 1, 1, 0, 2);
+            vertices[vertexIndex++] = packVertexData(blockPos[VX]    , blockPos[VY] + 1, blockPos[VZ] + 1, 0, 0, 2);
 
-        indices[indexIndex++] = 1 + indexOffset;
-        indices[indexIndex++] = 2 + indexOffset;
-        indices[indexIndex++] = 0 + indexOffset;
-        indices[indexIndex++] = 2 + indexOffset;
-        indices[indexIndex++] = 3 + indexOffset;
-        indices[indexIndex++] = 0 + indexOffset;
+            indices[indexIndex++] = 1 + indexOffset;
+            indices[indexIndex++] = 2 + indexOffset;
+            indices[indexIndex++] = 0 + indexOffset;
+            indices[indexIndex++] = 2 + indexOffset;
+            indices[indexIndex++] = 3 + indexOffset;
+            indices[indexIndex++] = 0 + indexOffset;
 
-        indexOffset += 4;
+            indexOffset += 4;
+        }
 
         // LEFT
-        vertices[vertexIndex++] = packVertexData(blockPos[VX]    , blockPos[VY]    , blockPos[VZ]    , 1, 1, 3);
-        vertices[vertexIndex++] = packVertexData(blockPos[VX]    , blockPos[VY] + 1, blockPos[VZ]    , 1, 0, 3);
-        vertices[vertexIndex++] = packVertexData(blockPos[VX]    , blockPos[VY] + 1, blockPos[VZ] + 1, 0, 0, 3);
-        vertices[vertexIndex++] = packVertexData(blockPos[VX]    , blockPos[VY]    , blockPos[VZ] + 1, 0, 1, 3);
+        unsigned int leftIndex = xyzToIndex(blockPos[VX] - 1, blockPos[VY], blockPos[VZ]);
+        if (leftIndex < 4096 && chunk->blocks[leftIndex] == 0) {
+            vertices[vertexIndex++] = packVertexData(blockPos[VX]    , blockPos[VY]    , blockPos[VZ]    , 1, 1, 3);
+            vertices[vertexIndex++] = packVertexData(blockPos[VX]    , blockPos[VY] + 1, blockPos[VZ]    , 1, 0, 3);
+            vertices[vertexIndex++] = packVertexData(blockPos[VX]    , blockPos[VY] + 1, blockPos[VZ] + 1, 0, 0, 3);
+            vertices[vertexIndex++] = packVertexData(blockPos[VX]    , blockPos[VY]    , blockPos[VZ] + 1, 0, 1, 3);
 
-        indices[indexIndex++] = 0 + indexOffset;
-        indices[indexIndex++] = 2 + indexOffset;
-        indices[indexIndex++] = 1 + indexOffset;
-        indices[indexIndex++] = 0 + indexOffset;
-        indices[indexIndex++] = 3 + indexOffset;
-        indices[indexIndex++] = 2 + indexOffset;
+            indices[indexIndex++] = 0 + indexOffset;
+            indices[indexIndex++] = 2 + indexOffset;
+            indices[indexIndex++] = 1 + indexOffset;
+            indices[indexIndex++] = 0 + indexOffset;
+            indices[indexIndex++] = 3 + indexOffset;
+            indices[indexIndex++] = 2 + indexOffset;
 
-        indexOffset += 4;
+            indexOffset += 4;
+        }
 
         // RIGHT
-        vertices[vertexIndex++] = packVertexData(blockPos[VX] + 1, blockPos[VY]    , blockPos[VZ]    , 0, 1, 4);
-        vertices[vertexIndex++] = packVertexData(blockPos[VX] + 1, blockPos[VY] + 1, blockPos[VZ]    , 0, 0, 4);
-        vertices[vertexIndex++] = packVertexData(blockPos[VX] + 1, blockPos[VY] + 1, blockPos[VZ] + 1, 1, 0, 4);
-        vertices[vertexIndex++] = packVertexData(blockPos[VX] + 1, blockPos[VY]    , blockPos[VZ] + 1, 1, 1, 4);
+        unsigned int rightIndex = xyzToIndex(blockPos[VX] + 1, blockPos[VY], blockPos[VZ]);
+        if (rightIndex < 4096 && chunk->blocks[rightIndex] == 0) {
+            vertices[vertexIndex++] = packVertexData(blockPos[VX] + 1, blockPos[VY]    , blockPos[VZ]    , 0, 1, 4);
+            vertices[vertexIndex++] = packVertexData(blockPos[VX] + 1, blockPos[VY] + 1, blockPos[VZ]    , 0, 0, 4);
+            vertices[vertexIndex++] = packVertexData(blockPos[VX] + 1, blockPos[VY] + 1, blockPos[VZ] + 1, 1, 0, 4);
+            vertices[vertexIndex++] = packVertexData(blockPos[VX] + 1, blockPos[VY]    , blockPos[VZ] + 1, 1, 1, 4);
 
-        indices[indexIndex++] = 1 + indexOffset;
-        indices[indexIndex++] = 2 + indexOffset;
-        indices[indexIndex++] = 0 + indexOffset;
-        indices[indexIndex++] = 2 + indexOffset;
-        indices[indexIndex++] = 3 + indexOffset;
-        indices[indexIndex++] = 0 + indexOffset;
+            indices[indexIndex++] = 1 + indexOffset;
+            indices[indexIndex++] = 2 + indexOffset;
+            indices[indexIndex++] = 0 + indexOffset;
+            indices[indexIndex++] = 2 + indexOffset;
+            indices[indexIndex++] = 3 + indexOffset;
+            indices[indexIndex++] = 0 + indexOffset;
 
-        indexOffset += 4;
+            indexOffset += 4;
+        }
 
         // BOTTOM
-        vertices[vertexIndex++] = packVertexData(blockPos[VX]    , blockPos[VY]    , blockPos[VZ]    , 0, 1, 5);
-        vertices[vertexIndex++] = packVertexData(blockPos[VX] + 1, blockPos[VY]    , blockPos[VZ]    , 1, 1, 5);
-        vertices[vertexIndex++] = packVertexData(blockPos[VX] + 1, blockPos[VY]    , blockPos[VZ] + 1, 1, 0, 5);
-        vertices[vertexIndex++] = packVertexData(blockPos[VX]    , blockPos[VY]    , blockPos[VZ] + 1, 0, 0, 5);
+        unsigned int bottomIndex = xyzToIndex(blockPos[VX], blockPos[VY] - 1, blockPos[VZ]);
+        if (bottomIndex < 4096 && chunk->blocks[bottomIndex] == 0) {
+            vertices[vertexIndex++] = packVertexData(blockPos[VX]    , blockPos[VY]    , blockPos[VZ]    , 0, 1, 5);
+            vertices[vertexIndex++] = packVertexData(blockPos[VX] + 1, blockPos[VY]    , blockPos[VZ]    , 1, 1, 5);
+            vertices[vertexIndex++] = packVertexData(blockPos[VX] + 1, blockPos[VY]    , blockPos[VZ] + 1, 1, 0, 5);
+            vertices[vertexIndex++] = packVertexData(blockPos[VX]    , blockPos[VY]    , blockPos[VZ] + 1, 0, 0, 5);
 
-        indices[indexIndex++] = 1 + indexOffset;
-        indices[indexIndex++] = 2 + indexOffset;
-        indices[indexIndex++] = 0 + indexOffset;
-        indices[indexIndex++] = 2 + indexOffset;
-        indices[indexIndex++] = 3 + indexOffset;
-        indices[indexIndex++] = 0 + indexOffset;
+            indices[indexIndex++] = 1 + indexOffset;
+            indices[indexIndex++] = 2 + indexOffset;
+            indices[indexIndex++] = 0 + indexOffset;
+            indices[indexIndex++] = 2 + indexOffset;
+            indices[indexIndex++] = 3 + indexOffset;
+            indices[indexIndex++] = 0 + indexOffset;
 
-        indexOffset += 4;
+            indexOffset += 4;
+        }
     }
 
     if (vertexIndex != BLOCK_COUNT * 24)

@@ -18,22 +18,22 @@
 #define M32 0x0E
 #define M33 0x0F
 
-typedef float* MATRIX;
-typedef float* VECTOR;
+typedef float MATRIX;
+typedef float VECTOR;
 
-void matrixSetIdentity(MATRIX matrix);
-MATRIX identityMatrix();
-void matrixCopy(MATRIX src, MATRIX dest);
-void matrixOrtho2D(MATRIX matrix, float left, float right, float bottom, float top, float near, float far);
-void matrixProjection(MATRIX matrix, float width, float height, float fov, float near, float far);
-void matrixScale2d(MATRIX matrix, float x, float y);
-void matrixScale2dP(MATRIX matrix, VECTOR vector);
-void matrixScale3d(MATRIX matrix, float x, float y, float z);
-void matrixScale3dP(MATRIX matrix, VECTOR vector);
-void matrixTranslate2d(MATRIX matrix, float x, float y);
-void matrixTranslate2dP(MATRIX matrix, VECTOR vector);
-void matrixTranslate3d(MATRIX matrix, float x, float y, float z);
-void matrixTranslate3dP(MATRIX matrix, VECTOR vector);
-void matrixRotate(MATRIX matrix, float angle, float x, float y, float z);
-void matrixRotateP(MATRIX matrix, float angle, VECTOR vector);
+void matrixSetIdentity(MATRIX* matrix);
+MATRIX* identityMatrix();
+void matrixCopy(MATRIX* src, MATRIX* dest);
+void matrixOrtho2D(MATRIX* matrix, float left, float right, float bottom, float top, float near, float far);
+void matrixProjection(MATRIX* matrix, float width, float height, float fov, float near, float far);
+void matrixScale2d(MATRIX* matrix, float x, float y);
+void matrixScale2dP(MATRIX* matrix, VECTOR* vector);
+void matrixScale3d(MATRIX* matrix, float x, float y, float z);
+void matrixScale3dP(MATRIX* matrix, VECTOR* vector);
+void matrixTranslate2d(MATRIX* matrix, float x, float y);
+void matrixTranslate2dP(MATRIX* matrix, VECTOR* vector);
+void matrixTranslate3d(MATRIX* matrix, float x, float y, float z);
+void matrixTranslate3dP(MATRIX* matrix, VECTOR* vector);
+void matrixRotate(MATRIX* matrix, float angle, float x, float y, float z);
+void matrixRotateP(MATRIX* matrix, float angle, VECTOR* vector);
 

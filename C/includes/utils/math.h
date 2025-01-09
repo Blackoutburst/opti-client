@@ -7,8 +7,7 @@
 
 #define PI 3.141592653589793
 
-typedef float* VECTOR;
-
+unsigned int xyzToIndexOobCheck(int x, int y, int z);
 unsigned int xyzToIndex(int x, int y, int z);
 void indexToXYZ(char* vector, short index);
 float rad(float angle);

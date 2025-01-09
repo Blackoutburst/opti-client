@@ -32,6 +32,9 @@ GLFWwindow* createWindow() {
     #if defined(_WIN32) || defined(_WIN64)
         glewInit();
     #endif
+
+    glfwSwapInterval(1);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     
     glClearColor(0.1f, 0.1f, 0.1f, 0.1f);
 

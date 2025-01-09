@@ -2,7 +2,7 @@
 #include "utils/math.h"
 #include "utils/matrix.h"
 
-void matrixSetIdentity(MATRIX matrix) {
+void matrixSetIdentity(MATRIX* matrix) {
     matrix[M00] = 1.0f;
     matrix[M01] = 0.0f;
     matrix[M02] = 0.0f;
@@ -24,14 +24,14 @@ void matrixSetIdentity(MATRIX matrix) {
     matrix[M33] = 1.0f;
 }
 
-MATRIX identityMatrix() {
-    MATRIX matrix = (MATRIX)malloc(16 * 4);
+MATRIX* identityMatrix() {
+    MATRIX* matrix = (MATRIX*)malloc(16 * 4);
     matrixSetIdentity(matrix);
 
     return matrix;
 }
 
-void matrixCopy(MATRIX src, MATRIX dest) {
+void matrixCopy(MATRIX* src, MATRIX* dest) {
     dest[M00] = src[M00];
     dest[M01] = src[M01];
     dest[M02] = src[M02];
@@ -53,7 +53,7 @@ void matrixCopy(MATRIX src, MATRIX dest) {
     dest[M33] = src[M33];
 }
 
-void matrixOrtho2D(MATRIX matrix, float left, float right, float bottom, float top, float near, float far) {
+void matrixOrtho2D(MATRIX* matrix, float left, float right, float bottom, float top, float near, float far) {
     float xOrt = 2.0f / (right - left);
     float yOrt = 2.0f / (top - bottom);
     float zOrt = -2.0f / (far - near);
@@ -83,7 +83,7 @@ void matrixOrtho2D(MATRIX matrix, float left, float right, float bottom, float t
     matrix[M33] = 1.0f;
 }
 
-void matrixProjection(MATRIX matrix, float width, float height, float fov, float near, float far) {
+void matrixProjection(MATRIX* matrix, float width, float height, float fov, float near, float far) {
     float aspectRatio = width / height;
     float yScale = 1.0f / tan(rad(fov / 2.0f));
     float xScale = yScale / aspectRatio;
@@ -97,7 +97,7 @@ void matrixProjection(MATRIX matrix, float width, float height, float fov, float
     matrix[M33] = 0.0f;
 }
 
-void matrixScale2d(MATRIX matrix, float x, float y) {
+void matrixScale2d(MATRIX* matrix, float x, float y) {
     matrix[M00] = matrix[M00] * x;
     matrix[M01] = matrix[M01] * x;
     matrix[M02] = matrix[M02] * x;
@@ -108,7 +108,7 @@ void matrixScale2d(MATRIX matrix, float x, float y) {
     matrix[M13] = matrix[M13] * y;
 }
 
-void matrixScale2dP(MATRIX matrix, VECTOR vector) {
+void matrixScale2dP(MATRIX* matrix, VECTOR* vector) {
     matrix[M00] = matrix[M00] * vector[VX];
     matrix[M01] = matrix[M01] * vector[VX];
     matrix[M02] = matrix[M02] * vector[VX];
@@ -119,7 +119,7 @@ void matrixScale2dP(MATRIX matrix, VECTOR vector) {
     matrix[M13] = matrix[M13] * vector[VY];
 }
 
-void matrixScale3d(MATRIX matrix, float x, float y, float z) {
+void matrixScale3d(MATRIX* matrix, float x, float y, float z) {
     matrix[M00] = matrix[M00] * x;
     matrix[M01] = matrix[M01] * x;
     matrix[M02] = matrix[M02] * x;
@@ -134,7 +134,7 @@ void matrixScale3d(MATRIX matrix, float x, float y, float z) {
     matrix[M23] = matrix[M23] * z;
 }
 
-void matrixScale3dP(MATRIX matrix, VECTOR vector) {
+void matrixScale3dP(MATRIX* matrix, VECTOR* vector) {
     matrix[M00] = matrix[M00] * vector[VX];
     matrix[M01] = matrix[M01] * vector[VX];
     matrix[M02] = matrix[M02] * vector[VX];
@@ -149,8 +149,8 @@ void matrixScale3dP(MATRIX matrix, VECTOR vector) {
     matrix[M23] = matrix[M23] * vector[VZ];
 }
 
-void matrixTranslate2d(MATRIX matrix, float x, float y) {
-    float* src = identityMatrix();
+void matrixTranslate2d(MATRIX* matrix, float x, float y) {
+    MATRIX* src = identityMatrix();
     matrixCopy(matrix, src);
 
     matrix[M30] += src[M00] * x + src[M10] * y;
@@ -161,8 +161,8 @@ void matrixTranslate2d(MATRIX matrix, float x, float y) {
     free(src);
 }
 
-void matrixTranslate2dP(MATRIX matrix, VECTOR vector) {
-    float* src = identityMatrix();
+void matrixTranslate2dP(MATRIX* matrix, VECTOR* vector) {
+    MATRIX* src = identityMatrix();
     matrixCopy(matrix, src);
 
     matrix[M30] += src[M00] * vector[VX] + src[M10] * vector[VY];
@@ -173,8 +173,8 @@ void matrixTranslate2dP(MATRIX matrix, VECTOR vector) {
     free(src);
 }
 
-void matrixTranslate3d(MATRIX matrix, float x, float y, float z) {
-    float* src = identityMatrix();
+void matrixTranslate3d(MATRIX* matrix, float x, float y, float z) {
+    MATRIX* src = identityMatrix();
     matrixCopy(matrix, src);
 
     matrix[M30] += src[M00] * x + src[M10] * y + src[M20] * z;
@@ -185,8 +185,8 @@ void matrixTranslate3d(MATRIX matrix, float x, float y, float z) {
     free(src);
 }
 
-void matrixTranslate3dP(MATRIX matrix, VECTOR vector) {
-    float* src = identityMatrix();
+void matrixTranslate3dP(MATRIX* matrix, VECTOR* vector) {
+    MATRIX* src = identityMatrix();
     matrixCopy(matrix, src);
 
     matrix[M30] += src[M00] * vector[VX] + src[M10] * vector[VY] + src[M20] * vector[VZ];
@@ -197,8 +197,8 @@ void matrixTranslate3dP(MATRIX matrix, VECTOR vector) {
     free(src);
 }
 
-void matrixRotateP(MATRIX matrix, float angle, VECTOR vector) {
-    float* src = identityMatrix();
+void matrixRotateP(MATRIX* matrix, float angle, VECTOR* vector) {
+    MATRIX* src = identityMatrix();
     matrixCopy(matrix, src);
 
     float c = cos(angle);
@@ -246,8 +246,8 @@ void matrixRotateP(MATRIX matrix, float angle, VECTOR vector) {
     free(src);
 }
 
-void matrixRotate(MATRIX matrix, float angle, float x, float y, float z) {
-    float* src = identityMatrix();
+void matrixRotate(MATRIX* matrix, float angle, float x, float y, float z) {
+    MATRIX* src = identityMatrix();
     matrixCopy(matrix, src);
 
     float c = cos(angle);

@@ -1,8 +1,6 @@
 #version 410
 
-layout(location = 0) in vec3 aPos;
-layout(location = 1) in vec2 aUv;
-layout(location = 2) in float aFace;
+layout(location = 0) in int data;
 
 uniform mat4 model;
 uniform mat4 view;
@@ -39,10 +37,17 @@ vec3 getNormal(int index) {
 }
 
 void main() {
-	FragPos = aPos - 0.5f;
-	norm = getNormal(int(aFace));
-	uv = aUv;
-	tamer = getColor(int(aFace));
+	int X = data & 31;
+	int Y = (data >> 5) & 31;
+	int Z = (data >> 10) & 31;
+	int U = (data >> 15) & 31;
+	int V = (data >> 20) & 31;
+	int N = (data >> 25) & 7;
+
+	FragPos = vec3(X, Y, Z);
+	norm = getNormal(int(N));
+	uv = vec2(U, V);
+	tamer = getColor(int(N));
 
 	gl_Position = projection * view * model * vec4(FragPos, 1.0);
 }

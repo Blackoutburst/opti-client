@@ -109,6 +109,7 @@ int* generateChunkMesh(CHUNK* chunk) {
         return vertices;
     }
 
+    // TODO: Take out use static malloc and reus each time we generate a chunk
     int* vertices = malloc(sizeof(int) * BLOCK_COUNT * 36);
     char* blockPos = malloc(sizeof(char) * 3);
 

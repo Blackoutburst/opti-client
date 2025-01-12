@@ -70,12 +70,13 @@ int blockTextureFace(int blockType, int face) {
         case WATER: return TEXTURE_WATER;
         case SAND: return TEXTURE_SAND;
         case SNOW: return TEXTURE_SNOW;
-        default: return ERROR;
+        default: return TEXTURE_ERROR;
     }
 }
 
 int* generateChunkMesh(CHUNK* chunk) {
     if (isChunkMonotype(chunk)) {
+        if (!chunk->blocks[0]) return NULL;
         int blockType = chunk->blocks[0];
         int* vertices = malloc(sizeof(int) * 36);
 
@@ -144,6 +145,7 @@ int* generateChunkMesh(CHUNK* chunk) {
     int vertexIndex = 0;
     for (unsigned short i = BLOCK_COUNT; i; i--) {
         int blockType = chunk->blocks[i];
+        if (!blockType) continue;
         indexToXYZ(blockPos, i);
 
         // TOP

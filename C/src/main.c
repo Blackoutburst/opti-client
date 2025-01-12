@@ -9,6 +9,7 @@
 #include "utils/matrix.h"
 #include "utils/math.h"
 #include "graphics/shader.h"
+#include "graphics/textureArray.h"
 #include "world/chunk.h"
 #include "world/world.h"
 
@@ -31,10 +32,33 @@ void update(GLFWwindow* window) {
     generateChunkVAO(chunk, mesh);
     cleanChunkMesh(mesh);
 
+    ////// TEXTURE ///////
+
+    char* textureFiles[] = {
+        "./res/blocks/error.png",
+        "./res/blocks/grass_top.png",
+        "./res/blocks/grass_side.png",
+        "./res/blocks/dirt.png",
+        "./res/blocks/stone.png",
+        "./res/blocks/log_oak_top.png",
+        "./res/blocks/log_oak.png",
+        "./res/blocks/leaves_oak.png",
+        "./res/blocks/glass.png",
+        "./res/blocks/water.png",
+        "./res/blocks/sand.png",
+        "./res/blocks/snow.png",
+    };
+
+    int diffuseMap = createTextureArray(textureFiles, 12, 16);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, diffuseMap);
+
     /////////////
 
-    const char* vertexShaderSource = readFile("./shaders/cube.vert");
-    const char* fragmentShaderSource = readFile("./shaders/cube.frag");
+    ////// SHADER ///////
+
+    const char* vertexShaderSource = readFile("./res/shaders/cube.vert");
+    const char* fragmentShaderSource = readFile("./res/shaders/cube.frag");
 
     int vertexShader = compileShader(vertexShaderSource, GL_VERTEX_SHADER);
     int fragmentShader = compileShader(fragmentShaderSource, GL_FRAGMENT_SHADER);
@@ -46,6 +70,9 @@ void update(GLFWwindow* window) {
     matrixProjection(projectionMatrix, 1280, 720, 90, 0.001, 1000);
 
     glUseProgram(shaderProgram);
+
+    setUniform1i(shaderProgram, "diffuseMap", 0);
+    
     setUniformMat4(shaderProgram, "model", modelMatrix);
     setUniformMat4(shaderProgram, "view", viewMatrix);
     setUniformMat4(shaderProgram, "projection", projectionMatrix);

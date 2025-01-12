@@ -9,20 +9,8 @@ uniform mat4 projection;
 out vec3 FragPos;
 out vec2 uv;
 out vec3 norm;
-out vec3 tamer;
-flat out float layer;
 
-vec3 getColor(int index) {
-	const vec3 normals[6] = vec3[6](
-		vec3(1.0f, 0.0f, 0.0f), // RED
-		vec3(0.0f, 0.0f, 1.0f), // GREEN
-		vec3(0.0f, 0.0f, 1.0f), // BLUE
-		vec3(0.0f, 1.0f, 1.0f), // CYAN
-		vec3(1.0f, 1.0f, 0.0f), // YELLOW
-		vec3(1.0f, 0.0f, 1.0f) // MAGENTA
-	);
-	return normals[index];
-}
+flat out float layer;
 
 vec3 getNormal(int index) {
 	const vec3 normals[6] = vec3[6](
@@ -43,11 +31,12 @@ void main() {
 	int U = (data >> 15) & 31;
 	int V = (data >> 20) & 31;
 	int N = (data >> 25) & 7;
+	int T = (data >> 28) & 15;
 
 	FragPos = vec3(X, Y, Z);
 	norm = getNormal(int(N));
 	uv = vec2(U, V);
-	tamer = getColor(int(N));
+	layer = T;
 
 	gl_Position = projection * view * model * vec4(FragPos, 1.0);
 }

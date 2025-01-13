@@ -1,1 +1,1 @@
-gcc src/utils/*.c src/*.c src/graphics/*.c src/window/*.c src/world/*.c src/network/*.c -Iincludes -Llibs -lglfw3 -lglew32 -lopengl32 -lws2_32 -W -Wall -Wextra -Wno-implicit-fallthrough -Wno-unused-parameter -Wno-pointer-sign
+gcc src/utils/*.c src/*.c src/graphics/*.c src/window/*.c src/world/*.c src/network/*.c -Iincludes -Llibs -lglfw3 -lglew32 -lopengl32 -lws2_32 -W -Wall -Wextra -Wno-implicit-fallthrough -Wno-unused-parameter

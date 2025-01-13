@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "utils/types.h"
 #include "world/chunk.h"
 #include "world/world.h"
 #include "world/blocks.h"
@@ -15,31 +16,31 @@
 
 #define BLOCK_COUNT CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE
 
-void printChunk(CHUNK* chunk) {
+void prI32Chunk(CHUNK* chunk) {
     printf("vao: %i, vbo: %i, ebo: %i, vertex count: %u position: %p blocks: %p\n", chunk->vaoID, chunk->vboID, chunk->eboID, chunk->vertexCount, chunk->position, chunk->blocks);
 }
 
-int packVertexData(char x, char y, char z, char u, char v, char n, char t) {
+I32 packVertexData(I8 x, I8 y, I8 z, I8 u, I8 v, I8 n, I8 t) {
     return (x & 31) | (y & 31) << 5 | (z & 31) << 10 | (u & 31) << 15 | (v & 31) << 20 | (n & 7) << 25 | (t & 15) << 28;
 }
 
-void generateChunkVAO(CHUNK* chunk, int* vertices) {
+void generateChunkVAO(CHUNK* chunk, I32* vertices) {
     if (!chunk->vertexCount) return;
     glBindVertexArray(chunk->vaoID);
 
     glBindBuffer(GL_ARRAY_BUFFER, chunk->vboID);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(int) * chunk->vertexCount, vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(I32) * chunk->vertexCount, vertices, GL_STATIC_DRAW);
     glEnableVertexAttribArray(0);
     glVertexAttribIPointer(0, 1, GL_INT, 4, 0);
 }
 
-void cleanChunkMesh(int* vertices) {
+void cleanChunkMesh(I32* vertices) {
     free(vertices);
 }
 
-char isChunkMonotype(CHUNK* chunk) {
-    int previous = chunk->blocks[0];
-    for (int i = BLOCK_COUNT - 1; i; i--) {
+I8 isChunkMonotype(CHUNK* chunk) {
+    I32 previous = chunk->blocks[0];
+    for (I32 i = BLOCK_COUNT - 1; i; i--) {
         if (previous != chunk->blocks[i])
             return 0;
         previous = chunk->blocks[i];
@@ -48,7 +49,7 @@ char isChunkMonotype(CHUNK* chunk) {
     return 1;
 }
 
-int blockTextureFace(int blockType, int face) {
+I32 blockTextureFace(I32 blockType, I32 face) {
     switch (blockType) {
         case GRASS: {
             switch (face) {
@@ -74,11 +75,11 @@ int blockTextureFace(int blockType, int face) {
     }
 }
 
-int* generateChunkMesh(CHUNK* chunk) {
+I32* generateChunkMesh(CHUNK* chunk) {
     if (isChunkMonotype(chunk)) {
         if (!chunk->blocks[0]) return NULL;
-        int blockType = chunk->blocks[0];
-        int* vertices = malloc(sizeof(int) * 36);
+        I32 blockType = chunk->blocks[0];
+        I32* vertices = malloc(sizeof(I32) * 36);
 
         // TOP
         vertices[ 0] = packVertexData(CHUNK_SIZE, CHUNK_SIZE,          0, CHUNK_SIZE,          0, 0, blockTextureFace(blockType, 0));
@@ -139,17 +140,17 @@ int* generateChunkMesh(CHUNK* chunk) {
     }
 
     // TODO: Take out use static malloc and reus each time we generate a chunk
-    int* vertices = malloc(sizeof(int) * BLOCK_COUNT * 36);
-    char* blockPos = malloc(sizeof(char) * 3);
+    I32* vertices = malloc(sizeof(I32) * BLOCK_COUNT * 36);
+    I8* blockPos = malloc(sizeof(I8) * 3);
 
-    int vertexIndex = 0;
-    for (unsigned short i = BLOCK_COUNT; i; i--) {
-        int blockType = chunk->blocks[i];
+    I32 vertexIndex = 0;
+    for (U16 i = BLOCK_COUNT; i; i--) {
+        I32 blockType = chunk->blocks[i];
         if (!blockType) continue;
         indexToXYZ(blockPos, i);
 
         // TOP
-        unsigned int topIndex = xyzToIndexOobCheck(blockPos[VX], blockPos[VY] + 1, blockPos[VZ]);
+        U32 topIndex = xyzToIndexOobCheck(blockPos[VX], blockPos[VY] + 1, blockPos[VZ]);
         if (topIndex >= BLOCK_COUNT || !chunk->blocks[topIndex]) {
             vertices[vertexIndex++] = packVertexData(blockPos[VX] + 1, blockPos[VY] + 1, blockPos[VZ]    , 1, 0, 0, blockTextureFace(blockType, 0));
             vertices[vertexIndex++] = packVertexData(blockPos[VX]    , blockPos[VY] + 1, blockPos[VZ]    , 0, 0, 0, blockTextureFace(blockType, 0));
@@ -161,7 +162,7 @@ int* generateChunkMesh(CHUNK* chunk) {
         }
 
         // FRONT
-        unsigned int frontIndex = xyzToIndexOobCheck(blockPos[VX], blockPos[VY], blockPos[VZ] - 1);
+        U32 frontIndex = xyzToIndexOobCheck(blockPos[VX], blockPos[VY], blockPos[VZ] - 1);
         if (frontIndex > BLOCK_COUNT || !chunk->blocks[frontIndex]) {
             vertices[vertexIndex++] = packVertexData(blockPos[VX] + 1, blockPos[VY]    , blockPos[VZ]    , 0, 1, 1, blockTextureFace(blockType, 1));
             vertices[vertexIndex++] = packVertexData(blockPos[VX]    , blockPos[VY]    , blockPos[VZ]    , 1, 1, 1, blockTextureFace(blockType, 1));
@@ -173,7 +174,7 @@ int* generateChunkMesh(CHUNK* chunk) {
         }
 
         // BACK
-        unsigned int backIndex = xyzToIndexOobCheck(blockPos[VX], blockPos[VY], blockPos[VZ] + 1);
+        U32 backIndex = xyzToIndexOobCheck(blockPos[VX], blockPos[VY], blockPos[VZ] + 1);
         if (backIndex >= BLOCK_COUNT || !chunk->blocks[backIndex]) {
             vertices[vertexIndex++] = packVertexData(blockPos[VX]    , blockPos[VY]    , blockPos[VZ] + 1, 0, 1, 2, blockTextureFace(blockType, 2));
             vertices[vertexIndex++] = packVertexData(blockPos[VX] + 1, blockPos[VY]    , blockPos[VZ] + 1, 1, 1, 2, blockTextureFace(blockType, 2));
@@ -185,7 +186,7 @@ int* generateChunkMesh(CHUNK* chunk) {
         }
 
         // LEFT
-        unsigned int leftIndex = xyzToIndexOobCheck(blockPos[VX] - 1, blockPos[VY], blockPos[VZ]);
+        U32 leftIndex = xyzToIndexOobCheck(blockPos[VX] - 1, blockPos[VY], blockPos[VZ]);
         if (leftIndex >= BLOCK_COUNT || !chunk->blocks[leftIndex]) {
             vertices[vertexIndex++] = packVertexData(blockPos[VX]    , blockPos[VY] + 1, blockPos[VZ] + 1, 0, 0, 3, blockTextureFace(blockType, 3));
             vertices[vertexIndex++] = packVertexData(blockPos[VX]    , blockPos[VY] + 1, blockPos[VZ]    , 1, 0, 3, blockTextureFace(blockType, 3));
@@ -197,7 +198,7 @@ int* generateChunkMesh(CHUNK* chunk) {
         }
 
         // RIGHT
-        unsigned int rightIndex = xyzToIndexOobCheck(blockPos[VX] + 1, blockPos[VY], blockPos[VZ]);
+        U32 rightIndex = xyzToIndexOobCheck(blockPos[VX] + 1, blockPos[VY], blockPos[VZ]);
         if (rightIndex >= BLOCK_COUNT || !chunk->blocks[rightIndex]) {
             vertices[vertexIndex++] = packVertexData(blockPos[VX] + 1, blockPos[VY]    , blockPos[VZ]    , 0, 1, 4, blockTextureFace(blockType, 4));
             vertices[vertexIndex++] = packVertexData(blockPos[VX] + 1, blockPos[VY] + 1, blockPos[VZ]    , 0, 0, 4, blockTextureFace(blockType, 4));
@@ -209,7 +210,7 @@ int* generateChunkMesh(CHUNK* chunk) {
         }
 
         // BOTTOM
-        unsigned int bottomIndex = xyzToIndexOobCheck(blockPos[VX], blockPos[VY] - 1, blockPos[VZ]);
+        U32 bottomIndex = xyzToIndexOobCheck(blockPos[VX], blockPos[VY] - 1, blockPos[VZ]);
         if (bottomIndex >= BLOCK_COUNT || !chunk->blocks[bottomIndex]) {
             vertices[vertexIndex++] = packVertexData(blockPos[VX]    , blockPos[VY]    , blockPos[VZ]    , 0, 1, 5, blockTextureFace(blockType, 5));
             vertices[vertexIndex++] = packVertexData(blockPos[VX] + 1, blockPos[VY]    , blockPos[VZ]    , 1, 1, 5, blockTextureFace(blockType, 5));
@@ -228,7 +229,7 @@ int* generateChunkMesh(CHUNK* chunk) {
     return vertices;
 }
 
-CHUNK* createChunk(int* position, char* blocks) {
+CHUNK* createChunk(I32* position, I8* blocks) {
     CHUNK* chunk = malloc(sizeof(CHUNK));
 
     glGenVertexArrays(1, &chunk->vaoID);

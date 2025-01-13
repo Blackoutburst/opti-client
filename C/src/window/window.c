@@ -1,6 +1,7 @@
 #define GLFW_INCLUDE_NONE
 
 #include "GLFW/glfw3.h"
+#include "utils/types.h"
 #include <stdlib.h>
 
 #if defined(__APPLE__)

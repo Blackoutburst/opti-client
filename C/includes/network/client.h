@@ -1,4 +1,5 @@
 #pragma once
+#include "utils/types.h"
 #define MAX_BUFFER_SIZE 5000
 
 #if defined(_WIN32) || defined(_WIN64)
@@ -6,27 +7,27 @@
     #include <ws2tcpip.h>
     
     void closeConnectionWIN32();
-    void connectionSendWIN32(char* buffer, short size);
+    void connectionSendWIN32(I8* buffer, I16 size);
     void connectionReadWIN32();
     DWORD WINAPI connectionReadLoopWIN32(LPVOID arg);
-    void openConnectionWIN32(char* ip, short port);
+    void openConnectionWIN32(I8* ip, I16 port);
 #else
     #include <pthread.h>
     #include <unistd.h>
     #include <arpa/inet.h>
 
     void closeConnectionPOSIX();
-    void connectionSendPOSIX(char* buffer, short size);
+    void connectionSendPOSIX(I8* buffer, I16 size);
     void connectionReadPOSIX();
     void* connectionReadLoopPOSIX(void* arg);
-    void openConnectionPOSIX(char* ip, short port);
+    void openConnectionPOSIX(I8* ip, I16 port);
 #endif
 
 void closeConnection();
-void connectionSend(char* buffer, short size);
+void connectionSend(I8* buffer, I16 size);
 void connectionRead();
-void openConnection(char* ip, short port);
-short getPacketSize(char packetID);
+void openConnection(I8* ip, I16 port);
+I16 getPacketSize(I8 packetID);
 
 enum Packets {
     PACKET_IDENTIFICATION,

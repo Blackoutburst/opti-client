@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include "utils/math.h"
 #include "utils/matrix.h"
+#include "utils/types.h"
 
 void matrixSetIdentity(MATRIX* matrix) {
     matrix[M00] = 1.0f;
@@ -53,14 +54,14 @@ void matrixCopy(MATRIX* src, MATRIX* dest) {
     dest[M33] = src[M33];
 }
 
-void matrixOrtho2D(MATRIX* matrix, float left, float right, float bottom, float top, float near, float far) {
-    float xOrt = 2.0f / (right - left);
-    float yOrt = 2.0f / (top - bottom);
-    float zOrt = -2.0f / (far - near);
+void matrixOrtho2D(MATRIX* matrix, F32 left, F32 right, F32 bottom, F32 top, F32 near, F32 far) {
+    F32 xOrt = 2.0f / (right - left);
+    F32 yOrt = 2.0f / (top - bottom);
+    F32 zOrt = -2.0f / (far - near);
 
-    float tx = -(right + left) / (right - left);
-    float ty = -(top + bottom) / (top - bottom);
-    float tz = -(far + near) / (far - near);
+    F32 tx = -(right + left) / (right - left);
+    F32 ty = -(top + bottom) / (top - bottom);
+    F32 tz = -(far + near) / (far - near);
 
     matrix[M00] = xOrt;
     matrix[M10] = 0.0f;
@@ -83,11 +84,11 @@ void matrixOrtho2D(MATRIX* matrix, float left, float right, float bottom, float 
     matrix[M33] = 1.0f;
 }
 
-void matrixProjection(MATRIX* matrix, float width, float height, float fov, float near, float far) {
-    float aspectRatio = width / height;
-    float yScale = 1.0f / tan(rad(fov / 2.0f));
-    float xScale = yScale / aspectRatio;
-    float frustumLength = far - near;
+void matrixProjection(MATRIX* matrix, F32 width, F32 height, F32 fov, F32 near, F32 far) {
+    F32 aspectRatio = width / height;
+    F32 yScale = 1.0f / tan(rad(fov / 2.0f));
+    F32 xScale = yScale / aspectRatio;
+    F32 frustumLength = far - near;
 
     matrix[M00] = xScale;
     matrix[M11] = yScale;
@@ -97,7 +98,7 @@ void matrixProjection(MATRIX* matrix, float width, float height, float fov, floa
     matrix[M33] = 0.0f;
 }
 
-void matrixScale2d(MATRIX* matrix, float x, float y) {
+void matrixScale2d(MATRIX* matrix, F32 x, F32 y) {
     matrix[M00] = matrix[M00] * x;
     matrix[M01] = matrix[M01] * x;
     matrix[M02] = matrix[M02] * x;
@@ -119,7 +120,7 @@ void matrixScale2dP(MATRIX* matrix, VECTOR* vector) {
     matrix[M13] = matrix[M13] * vector[VY];
 }
 
-void matrixScale3d(MATRIX* matrix, float x, float y, float z) {
+void matrixScale3d(MATRIX* matrix, F32 x, F32 y, F32 z) {
     matrix[M00] = matrix[M00] * x;
     matrix[M01] = matrix[M01] * x;
     matrix[M02] = matrix[M02] * x;
@@ -149,7 +150,7 @@ void matrixScale3dP(MATRIX* matrix, VECTOR* vector) {
     matrix[M23] = matrix[M23] * vector[VZ];
 }
 
-void matrixTranslate2d(MATRIX* matrix, float x, float y) {
+void matrixTranslate2d(MATRIX* matrix, F32 x, F32 y) {
     MATRIX* src = identityMatrix();
     matrixCopy(matrix, src);
 
@@ -173,7 +174,7 @@ void matrixTranslate2dP(MATRIX* matrix, VECTOR* vector) {
     free(src);
 }
 
-void matrixTranslate3d(MATRIX* matrix, float x, float y, float z) {
+void matrixTranslate3d(MATRIX* matrix, F32 x, F32 y, F32 z) {
     MATRIX* src = identityMatrix();
     matrixCopy(matrix, src);
 
@@ -197,38 +198,38 @@ void matrixTranslate3dP(MATRIX* matrix, VECTOR* vector) {
     free(src);
 }
 
-void matrixRotateP(MATRIX* matrix, float angle, VECTOR* vector) {
+void matrixRotateP(MATRIX* matrix, F32 angle, VECTOR* vector) {
     MATRIX* src = identityMatrix();
     matrixCopy(matrix, src);
 
-    float c = cos(angle);
-    float s = sin(angle);
-    float oneMinusC = 1.0f - c;
-    float xy = vector[VX] * vector[VY];
-    float yz = vector[VY] * vector[VZ];
-    float xz = vector[VX] * vector[VZ];
-    float xs = vector[VX] * s;
-    float ys = vector[VY] * s;
-    float zs = vector[VZ] * s;
+    F32 c = cos(angle);
+    F32 s = sin(angle);
+    F32 oneMinusC = 1.0f - c;
+    F32 xy = vector[VX] * vector[VY];
+    F32 yz = vector[VY] * vector[VZ];
+    F32 xz = vector[VX] * vector[VZ];
+    F32 xs = vector[VX] * s;
+    F32 ys = vector[VY] * s;
+    F32 zs = vector[VZ] * s;
 
-    float f00 = vector[VX] * vector[VX] * oneMinusC + c;
-    float f01 = xy * oneMinusC + zs;
-    float f02 = xz * oneMinusC - ys;
-    float f10 = xy * oneMinusC - zs;
-    float f11 = vector[VY] * vector[VY] * oneMinusC + c;
-    float f12 = yz * oneMinusC + xs;
-    float f20 = xz * oneMinusC + ys;
-    float f21 = yz * oneMinusC - xs;
-    float f22 = vector[VZ] * vector[VZ] * oneMinusC + c;
+    F32 f00 = vector[VX] * vector[VX] * oneMinusC + c;
+    F32 f01 = xy * oneMinusC + zs;
+    F32 f02 = xz * oneMinusC - ys;
+    F32 f10 = xy * oneMinusC - zs;
+    F32 f11 = vector[VY] * vector[VY] * oneMinusC + c;
+    F32 f12 = yz * oneMinusC + xs;
+    F32 f20 = xz * oneMinusC + ys;
+    F32 f21 = yz * oneMinusC - xs;
+    F32 f22 = vector[VZ] * vector[VZ] * oneMinusC + c;
 
-    float t00 = src[M00] * f00 + src[M10] * f01 + src[M20] * f02;
-    float t01 = src[M01] * f00 + src[M11] * f01 + src[M21] * f02;
-    float t02 = src[M02] * f00 + src[M12] * f01 + src[M22] * f02;
-    float t03 = src[M03] * f00 + src[M13] * f01 + src[M23] * f02;
-    float t10 = src[M00] * f10 + src[M10] * f11 + src[M20] * f12;
-    float t11 = src[M01] * f10 + src[M11] * f11 + src[M21] * f12;
-    float t12 = src[M02] * f10 + src[M12] * f11 + src[M22] * f12;
-    float t13 = src[M03] * f10 + src[M13] * f11 + src[M23] * f12;
+    F32 t00 = src[M00] * f00 + src[M10] * f01 + src[M20] * f02;
+    F32 t01 = src[M01] * f00 + src[M11] * f01 + src[M21] * f02;
+    F32 t02 = src[M02] * f00 + src[M12] * f01 + src[M22] * f02;
+    F32 t03 = src[M03] * f00 + src[M13] * f01 + src[M23] * f02;
+    F32 t10 = src[M00] * f10 + src[M10] * f11 + src[M20] * f12;
+    F32 t11 = src[M01] * f10 + src[M11] * f11 + src[M21] * f12;
+    F32 t12 = src[M02] * f10 + src[M12] * f11 + src[M22] * f12;
+    F32 t13 = src[M03] * f10 + src[M13] * f11 + src[M23] * f12;
 
     matrix[M20] = src[M00] * f20 + src[M10] * f21 + src[M20] * f22;
     matrix[M21] = src[M01] * f20 + src[M11] * f21 + src[M21] * f22;
@@ -246,38 +247,38 @@ void matrixRotateP(MATRIX* matrix, float angle, VECTOR* vector) {
     free(src);
 }
 
-void matrixRotate(MATRIX* matrix, float angle, float x, float y, float z) {
+void matrixRotate(MATRIX* matrix, F32 angle, F32 x, F32 y, F32 z) {
     MATRIX* src = identityMatrix();
     matrixCopy(matrix, src);
 
-    float c = cos(angle);
-    float s = sin(angle);
-    float oneMinusC = 1.0f - c;
-    float xy = x * y;
-    float yz = y * z;
-    float xz = x * z;
-    float xs = x * s;
-    float ys = y * s;
-    float zs = z * s;
+    F32 c = cos(angle);
+    F32 s = sin(angle);
+    F32 oneMinusC = 1.0f - c;
+    F32 xy = x * y;
+    F32 yz = y * z;
+    F32 xz = x * z;
+    F32 xs = x * s;
+    F32 ys = y * s;
+    F32 zs = z * s;
 
-    float f00 = x * x * oneMinusC + c;
-    float f01 = xy * oneMinusC + zs;
-    float f02 = xz * oneMinusC - ys;
-    float f10 = xy * oneMinusC - zs;
-    float f11 = y * y * oneMinusC + c;
-    float f12 = yz * oneMinusC + xs;
-    float f20 = xz * oneMinusC + ys;
-    float f21 = yz * oneMinusC - xs;
-    float f22 = z * z * oneMinusC + c;
+    F32 f00 = x * x * oneMinusC + c;
+    F32 f01 = xy * oneMinusC + zs;
+    F32 f02 = xz * oneMinusC - ys;
+    F32 f10 = xy * oneMinusC - zs;
+    F32 f11 = y * y * oneMinusC + c;
+    F32 f12 = yz * oneMinusC + xs;
+    F32 f20 = xz * oneMinusC + ys;
+    F32 f21 = yz * oneMinusC - xs;
+    F32 f22 = z * z * oneMinusC + c;
 
-    float t00 = src[M00] * f00 + src[M10] * f01 + src[M20] * f02;
-    float t01 = src[M01] * f00 + src[M11] * f01 + src[M21] * f02;
-    float t02 = src[M02] * f00 + src[M12] * f01 + src[M22] * f02;
-    float t03 = src[M03] * f00 + src[M13] * f01 + src[M23] * f02;
-    float t10 = src[M00] * f10 + src[M10] * f11 + src[M20] * f12;
-    float t11 = src[M01] * f10 + src[M11] * f11 + src[M21] * f12;
-    float t12 = src[M02] * f10 + src[M12] * f11 + src[M22] * f12;
-    float t13 = src[M03] * f10 + src[M13] * f11 + src[M23] * f12;
+    F32 t00 = src[M00] * f00 + src[M10] * f01 + src[M20] * f02;
+    F32 t01 = src[M01] * f00 + src[M11] * f01 + src[M21] * f02;
+    F32 t02 = src[M02] * f00 + src[M12] * f01 + src[M22] * f02;
+    F32 t03 = src[M03] * f00 + src[M13] * f01 + src[M23] * f02;
+    F32 t10 = src[M00] * f10 + src[M10] * f11 + src[M20] * f12;
+    F32 t11 = src[M01] * f10 + src[M11] * f11 + src[M21] * f12;
+    F32 t12 = src[M02] * f10 + src[M12] * f11 + src[M22] * f12;
+    F32 t13 = src[M03] * f10 + src[M13] * f11 + src[M23] * f12;
 
     matrix[M20] = src[M00] * f20 + src[M10] * f21 + src[M20] * f22;
     matrix[M21] = src[M01] * f20 + src[M11] * f21 + src[M21] * f22;

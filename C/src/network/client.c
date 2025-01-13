@@ -2,14 +2,15 @@
 #include <string.h>
 #include "utils/ioUtils.h"
 #include "network/client.h"
+#include "utils/types.h"
 
 #if defined(_WIN32) || defined(_WIN64)
     static SOCKET sockfd = INVALID_SOCKET;
 #else
-    static int sockfd = -1;
+    static I32 sockfd = -1;
 #endif
 
-short getPacketSize(char packetID) {
+I16 getPacketSize(I8 packetID) {
     switch (packetID) {
         case PACKET_IDENTIFICATION:
             return 4;
@@ -60,18 +61,18 @@ void closeConnection() {
 ///// SEND /////
 
 #if defined(_WIN32) || defined(_WIN64)
-    void connectionSendWIN32(char* buffer, short size) {
+    void connectionSendWIN32(I8* buffer, I16 size) {
         if (sockfd == INVALID_SOCKET) return;
         send(sockfd, buffer, size, 0);
     }
 #else
-    void connectionSendPOSIX(char* buffer, short size) {
+    void connectionSendPOSIX(I8* buffer, I16 size) {
         if (sockfd < 0) return;
         send(sockfd, buffer, size, 0);
     }
 #endif
 
-void connectionSend(char* buffer, short size) {
+void connectionSend(I8* buffer, I16 size) {
     #if defined(_WIN32) || defined(_WIN64)
         connectionSendWIN32(buffer, size);
     #else
@@ -84,23 +85,23 @@ void connectionSend(char* buffer, short size) {
 #if defined(_WIN32) || defined(_WIN64)
     void connectionReadWIN32() {
         if (sockfd == INVALID_SOCKET) return;
-        char idBuffer[1];
+        I8 idBuffer[1];
         if (recv(sockfd, idBuffer, 1, 0) <= 0) {
             println("Data read failed");
             closeConnection();
             return;
         }
 
-        short size = getPacketSize(idBuffer[0]);
+        I16 size = getPacketSize(idBuffer[0]);
         if (size <= 0) {
             printf("Invalid packet size: %i\n", size);
             return;
         }
 
-        char buffer[MAX_BUFFER_SIZE];
-        int totalBytesRead = 0;
+        I8 buffer[MAX_BUFFER_SIZE];
+        I32 totalBytesRead = 0;
         while (totalBytesRead < size) {
-            int bytesRead = recv(sockfd, buffer + totalBytesRead, size - totalBytesRead, 0);
+            I32 bytesRead = recv(sockfd, buffer + totalBytesRead, size - totalBytesRead, 0);
             if (bytesRead <= 0) {
                 println("Data read failed");
                 closeConnection();
@@ -113,22 +114,22 @@ void connectionSend(char* buffer, short size) {
 #else
     void connectionReadPOSIX() {
         if (sockfd < 0) return;
-        char idBuffer[1];
+        I8 idBuffer[1];
         if (recv(sockfd, idBuffer, 1, 0) <= 0) {
             println("Data read failed");
             closeConnection();
             return;
         }
-        short size = getPacketSize(idBuffer[0]);
+        I16 size = getPacketSize(idBuffer[0]);
         if (size <= 0) {
             printf("Invalid packet size: %i\n", size);
             return;
         }
 
-        char buffer[MAX_BUFFER_SIZE];
-        int totalBytesRead = 0;
+        I8 buffer[MAX_BUFFER_SIZE];
+        I32 totalBytesRead = 0;
         while (totalBytesRead < size) {
-            int bytesRead = recv(sockfd, buffer + totalBytesRead, size - totalBytesRead, 0);
+            I32 bytesRead = recv(sockfd, buffer + totalBytesRead, size - totalBytesRead, 0);
             totalBytesRead += bytesRead;
 
             if (bytesRead <= 0) {
@@ -172,11 +173,11 @@ void connectionRead() {
 ///// OPEN /////
 
 #if defined(_WIN32) || defined(_WIN64)
-    void openConnectionWIN32(char* ip, short port) {
+    void openConnectionWIN32(I8* ip, I16 port) {
         struct sockaddr_in server_addr;
         
         WSADATA wsaData;
-        int result = WSAStartup(MAKEWORD(2, 2), &wsaData);
+        I32 result = WSAStartup(MAKEWORD(2, 2), &wsaData);
         if (result != 0) {
             println("WSA startup failed");
             return;
@@ -216,7 +217,7 @@ void connectionRead() {
         CloseHandle(thread);
     }
 #else
-    void openConnectionPOSIX(char* ip, short port) {
+    void openConnectionPOSIX(I8* ip, I16 port) {
         struct sockaddr_in server_addr;
 
         sockfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -250,7 +251,7 @@ void connectionRead() {
     }
 #endif
 
-void openConnection(char* ip, short port) {
+void openConnection(I8* ip, I16 port) {
     #if defined(_WIN32) || defined(_WIN64)
         openConnectionWIN32(ip, port);
     #else

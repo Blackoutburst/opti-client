@@ -1,6 +1,7 @@
 #pragma once
 #include <stdio.h>
+#include "utils/types.h"
 
-void println(char* str);
-long getFileSize(FILE** file);
-char* readFile(const char* path);
+void println(I8* str);
+I64 getFileSize(FILE** file);
+I8* readFile(const I8* path);

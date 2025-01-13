@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include "utils/types.h"
 #include "GLFW/glfw3.h"
 #include "utils/math.h"
 #include "stb/stb_image.h"

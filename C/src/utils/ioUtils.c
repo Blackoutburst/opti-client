@@ -1,19 +1,20 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "utils/types.h"
 
-void println(char* str) {
+void println(I8* str) {
     printf("%s\n", str);
 }
 
-long getFileSize(FILE** file) {
+I64 getFileSize(FILE** file) {
     fseek(*file, 0, SEEK_END);
-    long fileSize = ftell(*file);
+    I64 fileSize = ftell(*file);
     rewind(*file);
 
     return fileSize;
 }
 
-char* readFile(const char* path) {
+I8* readFile(const I8* path) {
     FILE* file = fopen(path, "rb");
     if (!file) {
         println("Couldn't find file");
@@ -27,7 +28,7 @@ char* readFile(const char* path) {
         return NULL;
     }
 
-    char* buffer = (char*)malloc(fileSize + 1);
+    I8* buffer = (I8*)malloc(fileSize + 1);
     if (!buffer) {
         println("File allocation failed");
         fclose(file);

@@ -2,6 +2,7 @@
 
 #include <math.h>
 #include <stdlib.h>
+#include "utils/types.h"
 #include "GLFW/glfw3.h"
 #include "graphics/shader.h"
 #include "window/window.h"
@@ -24,18 +25,18 @@
 #endif
 
 void update(GLFWwindow* window) {
-    int* position = malloc(sizeof(int) * 3);
-    char* blocks = malloc(sizeof(char) * CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE);
-    for (int i = 0; i < CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE; i++) blocks[i] = 3;
+    I32* position = malloc(sizeof(I32) * 3);
+    I8* blocks = malloc(sizeof(I8) * CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE);
+    for (I32 i = 0; i < CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE; i++) blocks[i] = 3;
 
     CHUNK* chunk = createChunk(position, blocks);
-    int* mesh = generateChunkMesh(chunk);
+    I32* mesh = generateChunkMesh(chunk);
     generateChunkVAO(chunk, mesh);
     cleanChunkMesh(mesh);
 
     ////// TEXTURE ///////
 
-    char* textureFiles[] = {
+    I8* textureFiles[] = {
         "./res/blocks/error.png",
         "./res/blocks/grass_top.png",
         "./res/blocks/grass_side.png",
@@ -50,7 +51,7 @@ void update(GLFWwindow* window) {
         "./res/blocks/snow.png",
     };
 
-    int diffuseMap = createTextureArray(textureFiles, 12, 16);
+    I32 diffuseMap = createTextureArray(textureFiles, 12, 16);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D_ARRAY, diffuseMap);
 
@@ -58,12 +59,12 @@ void update(GLFWwindow* window) {
 
     ////// SHADER ///////
 
-    const char* vertexShaderSource = readFile("./res/shaders/cube.vert");
-    const char* fragmentShaderSource = readFile("./res/shaders/cube.frag");
+    const I8* vertexShaderSource = readFile("./res/shaders/cube.vert");
+    const I8* fragmentShaderSource = readFile("./res/shaders/cube.frag");
 
-    int vertexShader = compileShader(vertexShaderSource, GL_VERTEX_SHADER);
-    int fragmentShader = compileShader(fragmentShaderSource, GL_FRAGMENT_SHADER);
-    int shaderProgram = createShaderProgram(vertexShader, fragmentShader);
+    I32 vertexShader = compileShader(vertexShaderSource, GL_VERTEX_SHADER);
+    I32 fragmentShader = compileShader(fragmentShaderSource, GL_FRAGMENT_SHADER);
+    I32 shaderProgram = createShaderProgram(vertexShader, fragmentShader);
 
     MATRIX* modelMatrix = identityMatrix();
     MATRIX* viewMatrix = identityMatrix();
@@ -85,20 +86,20 @@ void update(GLFWwindow* window) {
 
     /////////////
 
-    float x = -8;
-    float y = -8;
-    float z = -30;
-    double mouseX = 0;
-    double mouseY = 0;
+    F32 x = 8;
+    F32 y = 8;
+    F32 z = 30;
+    F64 mouseX = 0;
+    F64 mouseY = 0;
     glfwGetCursorPos(window, &mouseX, &mouseY);
-    double prevMouseX = mouseX;
-    double prevMouseY = mouseY;
-    double pitch = 0;
-    double yaw = 0;
-    double pitchOffset = 0;
-    double yawOffset = 0;
-    float speed = 0.1f;
-    float sensitivity = 0.1f;
+    F64 prevMouseX = mouseX;
+    F64 prevMouseY = mouseY;
+    F64 pitch = 0;
+    F64 yaw = 0;
+    F64 pitchOffset = 0;
+    F64 yawOffset = 0;
+    F32 speed = 0.1f;
+    F32 sensitivity = 0.1f;
 
     while (!glfwWindowShouldClose(window) && !glfwGetKey(window, GLFW_KEY_ESCAPE)) {
         clearWindow();
@@ -166,7 +167,7 @@ void update(GLFWwindow* window) {
 }
 
 
-int main(void) {
+I32 main(void) {
     GLFWwindow* window = createWindow();
 
     openConnection("162.19.137.231", 15000);

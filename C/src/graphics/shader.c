@@ -1,6 +1,7 @@
 #define GLFW_INCLUDE_NONE
 
 #include <stdlib.h>
+#include "utils/types.h"
 #include "GLFW/glfw3.h"
 #include "utils/ioUtils.h"
 #include "utils/math.h"

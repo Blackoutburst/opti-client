@@ -1,4 +1,6 @@
 #pragma once
+#include "utils/types.h"
+
 #define M00 0x00
 #define M01 0x01
 #define M02 0x02
@@ -19,22 +21,22 @@
 #define M32 0x0E
 #define M33 0x0F
 
-typedef float MATRIX;
-typedef float VECTOR;
+typedef F32 MATRIX;
+typedef F32 VECTOR;
 
 void matrixSetIdentity(MATRIX* matrix);
 MATRIX* identityMatrix();
 void matrixCopy(MATRIX* src, MATRIX* dest);
-void matrixOrtho2D(MATRIX* matrix, float left, float right, float bottom, float top, float near, float far);
-void matrixProjection(MATRIX* matrix, float width, float height, float fov, float near, float far);
-void matrixScale2d(MATRIX* matrix, float x, float y);
+void matrixOrtho2D(MATRIX* matrix, F32 left, F32 right, F32 bottom, F32 top, F32 near, F32 far);
+void matrixProjection(MATRIX* matrix, F32 width, F32 height, F32 fov, F32 near, F32 far);
+void matrixScale2d(MATRIX* matrix, F32 x, F32 y);
 void matrixScale2dP(MATRIX* matrix, VECTOR* vector);
-void matrixScale3d(MATRIX* matrix, float x, float y, float z);
+void matrixScale3d(MATRIX* matrix, F32 x, F32 y, F32 z);
 void matrixScale3dP(MATRIX* matrix, VECTOR* vector);
-void matrixTranslate2d(MATRIX* matrix, float x, float y);
+void matrixTranslate2d(MATRIX* matrix, F32 x, F32 y);
 void matrixTranslate2dP(MATRIX* matrix, VECTOR* vector);
-void matrixTranslate3d(MATRIX* matrix, float x, float y, float z);
+void matrixTranslate3d(MATRIX* matrix, F32 x, F32 y, F32 z);
 void matrixTranslate3dP(MATRIX* matrix, VECTOR* vector);
-void matrixRotate(MATRIX* matrix, float angle, float x, float y, float z);
-void matrixRotateP(MATRIX* matrix, float angle, VECTOR* vector);
+void matrixRotate(MATRIX* matrix, F32 angle, F32 x, F32 y, F32 z);
+void matrixRotateP(MATRIX* matrix, F32 angle, VECTOR* vector);
 

@@ -2,6 +2,7 @@
 #include <string.h>
 #include "utils/ioUtils.h"
 #include "network/client.h"
+#include "network/packet.h"
 #include "utils/types.h"
 
 #if defined(_WIN32) || defined(_WIN64)
@@ -10,26 +11,26 @@
     static I32 sockfd = -1;
 #endif
 
-I16 getPacketSize(I8 packetID) {
+U16 getPacketSize(I8 packetID) {
     switch (packetID) {
-        case PACKET_IDENTIFICATION:
+        case CLIENT_PACKET_IDENTIFICATION:
             return 4;
-        case PACKET_ADD_ENTITY:
+        case CLIENT_PACKET_ADD_ENTITY:
             return 88;
-        case PACKET_REMOVE_ENTITY:
+        case CLIENT_PACKET_REMOVE_ENTITY:
             return 4;
-        case PACKET_UPDATE_ENTITY:
+        case CLIENT_PACKET_UPDATE_ENTITY:
             return 24;
-        case PACKET_SEND_CHUNK:
+        case CLIENT_PACKET_SEND_CHUNK:
             return 4108;
-        case PACKET_SEND_MONOTYPE_CHUNK:
+        case CLIENT_PACKET_SEND_MONOTYPE_CHUNK:
             return 13;
-        case PACKET_CHAT:
+        case CLIENT_PACKET_CHAT:
             return 4096;
-        case PACKET_UPDATE_ENTITY_METADATA:
+        case CLIENT_PACKET_UPDATE_ENTITY_METADATA:
             return 68;
         default:
-            return -1;
+            return 0;
     }
 }
 
@@ -85,23 +86,24 @@ void connectionSend(I8* buffer, I16 size) {
 #if defined(_WIN32) || defined(_WIN64)
     void connectionReadWIN32() {
         if (sockfd == INVALID_SOCKET) return;
-        I8 idBuffer[1];
-        if (recv(sockfd, idBuffer, 1, 0) <= 0) {
+        I8 packetId;
+        if (recv(sockfd, &packetId, 1, 0) <= 0) {
             println("Data read failed");
             closeConnection();
             return;
         }
 
-        I16 size = getPacketSize(idBuffer[0]);
+        U16 size = getPacketSize(packetId);
         if (size <= 0) {
             printf("Invalid packet size: %i\n", size);
             return;
         }
 
-        I8 buffer[MAX_BUFFER_SIZE];
-        I32 totalBytesRead = 0;
+        U8 dataBuffer[MAX_BUFFER_SIZE];
+        U8* bufferPtr = dataBuffer;
+        U32 totalBytesRead = 0;
         while (totalBytesRead < size) {
-            I32 bytesRead = recv(sockfd, buffer + totalBytesRead, size - totalBytesRead, 0);
+            I32 bytesRead = recv(sockfd, (I8*)(dataBuffer + totalBytesRead), size - totalBytesRead, 0);
             if (bytesRead <= 0) {
                 println("Data read failed");
                 closeConnection();
@@ -109,27 +111,38 @@ void connectionSend(I8* buffer, I16 size) {
             }
             totalBytesRead += bytesRead;
         }
-        
+        // TODO: move this shit away
+        if(packetId == CLIENT_PACKET_UPDATE_ENTITY) {
+            U32 entityId = getU32((U8**)&bufferPtr);
+            F32 x = getF32((U8**)&bufferPtr);
+            F32 y = getF32((U8**)&bufferPtr);
+            F32 z = getF32((U8**)&bufferPtr);
+            F32 yaw = getF32((U8**)&bufferPtr);
+            F32 pitch = getF32((U8**)&bufferPtr);
+
+            printf("id: %i, x: %f, y: %f, z: %f, yaw: %f, pitch: %f\n", entityId, x, y, z, yaw, pitch);
+        }
     }
 #else
     void connectionReadPOSIX() {
         if (sockfd < 0) return;
-        I8 idBuffer[1];
-        if (recv(sockfd, idBuffer, 1, 0) <= 0) {
+        I8 packetId;
+        if (recv(sockfd, &packetId, 1, 0) <= 0) {
             println("Data read failed");
             closeConnection();
             return;
         }
-        I16 size = getPacketSize(idBuffer[0]);
+        U16 size = getPacketSize(packetId);
         if (size <= 0) {
             printf("Invalid packet size: %i\n", size);
             return;
         }
 
-        I8 buffer[MAX_BUFFER_SIZE];
-        I32 totalBytesRead = 0;
+        U8 dataBuffer[MAX_BUFFER_SIZE];
+        U8* bufferPtr = dataBuffer;
+        U32 totalBytesRead = 0;
         while (totalBytesRead < size) {
-            I32 bytesRead = recv(sockfd, buffer + totalBytesRead, size - totalBytesRead, 0);
+            I32 bytesRead = recv(sockfd, dataBuffer + totalBytesRead, size - totalBytesRead, 0);
             totalBytesRead += bytesRead;
 
             if (bytesRead <= 0) {
@@ -252,6 +265,7 @@ void connectionRead() {
 #endif
 
 void openConnection(I8* ip, I16 port) {
+    
     #if defined(_WIN32) || defined(_WIN64)
         openConnectionWIN32(ip, port);
     #else

@@ -26,7 +26,7 @@
 void update(GLFWwindow* window) {
     int* position = malloc(sizeof(int) * 3);
     char* blocks = malloc(sizeof(char) * CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE);
-    for (int i = 0; i < CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE; i++) blocks[i] = 2;
+    for (int i = 0; i < CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE; i++) blocks[i] = 3;
 
     CHUNK* chunk = createChunk(position, blocks);
     int* mesh = generateChunkMesh(chunk);

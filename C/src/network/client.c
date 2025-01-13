@@ -96,7 +96,6 @@ void connectionSend(char* buffer, short size) {
             printf("Invalid packet size: %i\n", size);
             return;
         }
-        printf("Packet size: %i\n", size);
 
         char buffer[MAX_BUFFER_SIZE];
         int totalBytesRead = 0;
@@ -109,6 +108,7 @@ void connectionSend(char* buffer, short size) {
             }
             totalBytesRead += bytesRead;
         }
+        
     }
 #else
     void connectionReadPOSIX() {
@@ -124,7 +124,6 @@ void connectionSend(char* buffer, short size) {
             printf("Invalid packet size: %i\n", size);
             return;
         }
-        printf("Packet size: %i\n", size);
 
         char buffer[MAX_BUFFER_SIZE];
         int totalBytesRead = 0;
@@ -138,6 +137,7 @@ void connectionSend(char* buffer, short size) {
                 return;
             }
         }
+        
     }
 #endif
 

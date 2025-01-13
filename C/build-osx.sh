@@ -4,4 +4,5 @@ src/*.c \
 src/graphics/*.c \
 src/window/*.c \
 src/world/*.c \
--Iincludes -L/opt/homebrew/lib -lglfw -framework Cocoa -framework OpenGL -framework IOKit -Wno-deprecated-declarations -W -Wall -Wextra
+src/network/*.c \
+-Iincludes -L/opt/homebrew/lib -pthread -lglfw -framework Cocoa -framework OpenGL -framework IOKit -Wno-deprecated-declarations -W -Wall -Wextra -Wno-unused-parameter

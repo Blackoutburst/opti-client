@@ -12,6 +12,7 @@
 #include "graphics/textureArray.h"
 #include "world/chunk.h"
 #include "world/world.h"
+#include "network/client.h"
 
 #if defined(__APPLE__)
     #include <OpenGL/gl3.h>
@@ -26,7 +27,7 @@ void update(GLFWwindow* window) {
     int* position = malloc(sizeof(int) * 3);
     char* blocks = malloc(sizeof(char) * CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE);
     for (int i = 0; i < CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE; i++) blocks[i] = 2;
-    
+
     CHUNK* chunk = createChunk(position, blocks);
     int* mesh = generateChunkMesh(chunk);
     generateChunkVAO(chunk, mesh);
@@ -72,7 +73,7 @@ void update(GLFWwindow* window) {
     glUseProgram(shaderProgram);
 
     setUniform1i(shaderProgram, "diffuseMap", 0);
-    
+
     setUniformMat4(shaderProgram, "model", modelMatrix);
     setUniformMat4(shaderProgram, "view", viewMatrix);
     setUniformMat4(shaderProgram, "projection", projectionMatrix);
@@ -81,7 +82,7 @@ void update(GLFWwindow* window) {
     setUniform3f(shaderProgram, "viewPos", 0.0f, 0.0f, 0.0f);
     setUniform3f(shaderProgram, "lightPos", 2.0f, 2.0f, 0.0f);
     setUniform4f(shaderProgram, "color", 1.0f, 1.0f, 1.0f, 1.0f);
-    
+
     /////////////
 
     float x = -8;
@@ -98,7 +99,7 @@ void update(GLFWwindow* window) {
     double yawOffset = 0;
     float speed = 0.1f;
     float sensitivity = 0.1f;
-    
+
     while (!glfwWindowShouldClose(window) && !glfwGetKey(window, GLFW_KEY_ESCAPE)) {
         clearWindow();
 
@@ -114,10 +115,10 @@ void update(GLFWwindow* window) {
 
         pitchOffset *= sensitivity;
         yawOffset *= sensitivity;
-        
+
         prevMouseX = mouseX;
         prevMouseY = mouseY;
-        
+
         pitch += pitchOffset;
         yaw += yawOffset;
         if (yaw > 89) yaw = 89;
@@ -168,7 +169,10 @@ void update(GLFWwindow* window) {
 int main(void) {
     GLFWwindow* window = createWindow();
 
+    openConnection("162.19.137.231", 15000);
     update(window);
+
+    closeConnection();
 
     return 0;
 }

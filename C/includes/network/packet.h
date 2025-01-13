@@ -21,7 +21,7 @@ struct C01PacketAddEntity {
     F32 z;
     F32 yaw;
     F32 pitch;
-    U8[64] name;
+    I8[64] name;
 };
 
 struct C02RemoveEntity {
@@ -41,21 +41,21 @@ struct C04SendChunk {
     I32 x;
     I32 y;
     I32 z;
-    U8[4096] blocks;
+    I8[4096] blocks;
 };
 
 struct C05SendMonotypeChunk {
     I32 x;
     I32 y;
     I32 z;
-    U8 type;
+    I8 type;
 };
 
 struct C06Chat {
-    U8[4096] message;
+    I8[4096] message;
 };
 
 struct C07UpdateEntityMetadata {
     U32 entityId;
-    U8[64] name;
+    I8[64] name;
 };

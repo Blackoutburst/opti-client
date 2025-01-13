@@ -1,3 +1,4 @@
+#pragma once
 int compileShader(const char* source, unsigned int type);
 int createShaderProgram(int vertexshader, int fragmentShader);
 void setUniform1i(int id, char* name, int x);

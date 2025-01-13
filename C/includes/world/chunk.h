@@ -1,3 +1,4 @@
+#pragma once
 typedef struct chunk CHUNK;
 
 struct chunk {

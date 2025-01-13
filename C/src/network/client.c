@@ -4,16 +4,10 @@
 #include "network/client.h"
 
 #if defined(_WIN32) || defined(_WIN64)
-    #include <windows.h>
+    static SOCKET sockfd = INVALID_SOCKET;
 #else
-    #include <pthread.h>
-    #include <unistd.h>
-    #include <arpa/inet.h>
+    static int sockfd = -1;
 #endif
-
-#define MAX_BUFFER_SIZE 5000
-
-static int sockfd = -1;
 
 short getPacketSize(char packetID) {
     switch (packetID) {
@@ -38,87 +32,228 @@ short getPacketSize(char packetID) {
     }
 }
 
-void closeConnection() {
-    if (sockfd < 0) return;
-    close(sockfd);
-    sockfd = -1;
-}
+///// CLOSE /////
 
-void connectionSend(char* buffer, short size) {
-    if (sockfd < 0) return;
-    send(sockfd, buffer, size, 0);
-}
-
-void connectionRead() {
-    if (sockfd < 0) return;
-    char idBuffer[1];
-    if (recv(sockfd, idBuffer, 1, 0) <= 0) {
-        println("Data read failed");
+#if defined(_WIN32) || defined(_WIN64)
+    void closeConnectionWIN32() {
+        if (sockfd == INVALID_SOCKET) return;
+        closesocket(sockfd);
+        sockfd = INVALID_SOCKET;
+        WSACleanup();
+    }
+#else
+    void closeConnectionPOSIX() {
+        if (sockfd < 0) return;
         close(sockfd);
         sockfd = -1;
-        return;
     }
-    short size = getPacketSize(idBuffer[0]);
-    if (size <= 0) {
-        printf("Invalid packet size: %i\n", size);
-        return;
+#endif
+
+void closeConnection() {
+    #if defined(_WIN32) || defined(_WIN64)
+        closeConnectionWIN32();
+    #else
+        closeConnectionPOSIX();
+    #endif
+}
+
+///// SEND /////
+
+#if defined(_WIN32) || defined(_WIN64)
+    void connectionSendWIN32(char* buffer, short size) {
+        if (sockfd == INVALID_SOCKET) return;
+        send(sockfd, buffer, size, 0);
     }
-    printf("Packet size: %i\n", size);
+#else
+    void connectionSendPOSIX(char* buffer, short size) {
+        if (sockfd < 0) return;
+        send(sockfd, buffer, size, 0);
+    }
+#endif
 
-    char buffer[MAX_BUFFER_SIZE];
-    int totalBytesRead = 0;
-    while (totalBytesRead < size) {
-        int bytesRead = recv(sockfd, buffer + totalBytesRead, size - totalBytesRead, 0);
-        totalBytesRead += bytesRead;
+void connectionSend(char* buffer, short size) {
+    #if defined(_WIN32) || defined(_WIN64)
+        connectionSendWIN32(buffer, size);
+    #else
+        connectionSendPOSIX(buffer, size);
+    #endif
+}
 
-        if (bytesRead <= 0) {
+///// READ /////
+
+#if defined(_WIN32) || defined(_WIN64)
+    void connectionReadWIN32() {
+        if (sockfd == INVALID_SOCKET) return;
+        char idBuffer[1];
+        if (recv(sockfd, idBuffer, 1, 0) <= 0) {
             println("Data read failed");
-            close(sockfd);
-            sockfd = -1;
+            closeConnection();
+            return;
+        }
+
+        short size = getPacketSize(idBuffer[0]);
+        if (size <= 0) {
+            printf("Invalid packet size: %i\n", size);
+            return;
+        }
+        printf("Packet size: %i\n", size);
+
+        char buffer[MAX_BUFFER_SIZE];
+        int totalBytesRead = 0;
+        while (totalBytesRead < size) {
+            int bytesRead = recv(sockfd, buffer + totalBytesRead, size - totalBytesRead, 0);
+            if (bytesRead <= 0) {
+                println("Data read failed");
+                closeConnection();
+                return;
+            }
+            totalBytesRead += bytesRead;
+        }
+    }
+#else
+    void connectionReadPOSIX() {
+        if (sockfd < 0) return;
+        char idBuffer[1];
+        if (recv(sockfd, idBuffer, 1, 0) <= 0) {
+            println("Data read failed");
+            closeConnection();
+            return;
+        }
+        short size = getPacketSize(idBuffer[0]);
+        if (size <= 0) {
+            printf("Invalid packet size: %i\n", size);
+            return;
+        }
+        printf("Packet size: %i\n", size);
+
+        char buffer[MAX_BUFFER_SIZE];
+        int totalBytesRead = 0;
+        while (totalBytesRead < size) {
+            int bytesRead = recv(sockfd, buffer + totalBytesRead, size - totalBytesRead, 0);
+            totalBytesRead += bytesRead;
+
+            if (bytesRead <= 0) {
+                println("Data read failed");
+                closeConnection();
+                return;
+            }
+        }
+    }
+#endif
+
+void connectionRead() {
+    #if defined(_WIN32) || defined(_WIN64)
+        connectionReadWIN32();
+    #else
+        connectionReadPOSIX();
+    #endif
+}
+
+///// READ LOOP /////
+
+#if defined(_WIN32) || defined(_WIN64)
+    DWORD WINAPI connectionReadLoopWIN32(LPVOID arg) {
+        while (sockfd != INVALID_SOCKET) {
+            connectionRead();
+        }
+
+        return 0;
+    }
+#else
+    void* connectionReadLoopPOSIX(void* arg) {
+        while (sockfd >= 0) {
+            connectionRead();
+        }
+
+        return NULL;
+    }
+#endif
+
+///// OPEN /////
+
+#if defined(_WIN32) || defined(_WIN64)
+    void openConnectionWIN32(char* ip, short port) {
+        struct sockaddr_in server_addr;
+        
+        WSADATA wsaData;
+        int result = WSAStartup(MAKEWORD(2, 2), &wsaData);
+        if (result != 0) {
+            println("WSA startup failed");
+            return;
+        }
+
+        sockfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+        if (sockfd == INVALID_SOCKET) {
+            printf("Socket creation failed, error code: %d\n", WSAGetLastError());
+            WSACleanup();
+            return;
+        }
+
+        memset(&server_addr, 0, sizeof(server_addr));
+        server_addr.sin_family      = AF_INET;
+        server_addr.sin_port        = htons(port);
+
+        if (inet_pton(AF_INET, ip, &server_addr.sin_addr) <= 0) {
+            println("Invalid server address");
+            closeConnection();
+            return;
+        }
+
+        if (connect(sockfd, (struct sockaddr *)&server_addr, sizeof(server_addr)) == SOCKET_ERROR) {
+            println("Connection failed");
+            closeConnection();
+            return;
+        }
+        
+        println("Connected successfully!");
+
+        HANDLE thread = CreateThread(NULL, 0, connectionReadLoopWIN32, NULL, 0, NULL);
+        if (thread == NULL) {
+            println("Network thread creation failed");
+            return;
+        }
+
+        CloseHandle(thread);
+    }
+#else
+    void openConnectionPOSIX(char* ip, short port) {
+        struct sockaddr_in server_addr;
+
+        sockfd = socket(AF_INET, SOCK_STREAM, 0);
+        if (sockfd < 0) {
+            println("Socket creation failed");
+            return;
+        }
+
+        memset(&server_addr, 0, sizeof(server_addr));
+        server_addr.sin_family = AF_INET;
+        server_addr.sin_port = htons(port);
+
+        if (inet_pton(AF_INET, ip, &server_addr.sin_addr) <= 0) {
+            println("Invalid server address");
+            closeConnection();
+            return;
+        }
+
+        if (connect(sockfd, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0) {
+            println("Connection failed");
+            closeConnection();
+            return;
+        }
+        println("Connected successfully!");
+
+        pthread_t thread;
+        if (pthread_create(&thread, NULL, connectionReadLoopPOSIX, NULL)) {
+            println("Network thread creation failed");
             return;
         }
     }
-}
-
-void* connectionReadLoop(void* arg) {
-    while (sockfd >= 0) {
-        connectionRead();
-    }
-
-    return NULL;
-}
+#endif
 
 void openConnection(char* ip, short port) {
-    struct sockaddr_in server_addr;
-
-    sockfd = socket(AF_INET, SOCK_STREAM, 0);
-    if (sockfd < 0) {
-        println("Socket creation failed");
-        return;
-    }
-
-    memset(&server_addr, 0, sizeof(server_addr));
-    server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(port);
-
-    if (inet_pton(AF_INET, ip, &server_addr.sin_addr) <= 0) {
-        println("Invalid server address");
-        close(sockfd);
-        sockfd = -1;
-        return;
-    }
-
-    if (connect(sockfd, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0) {
-        println("Connection failed");
-        close(sockfd);
-        sockfd = -1;
-        return;
-    }
-    println("Connected successfully!");
-
-    pthread_t thread;
-    if (pthread_create(&thread, NULL, connectionReadLoop, NULL)) {
-        println("Network thread creation failed");
-        return;
-    }
+    #if defined(_WIN32) || defined(_WIN64)
+        openConnectionWIN32(ip, port);
+    #else
+        openConnectionPOSIX(ip, port);
+    #endif
 }

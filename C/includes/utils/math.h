@@ -1,3 +1,4 @@
+#pragma once
 #include <math.h>
 
 #define VX 0x00

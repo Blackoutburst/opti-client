@@ -1,3 +1,4 @@
+#pragma once
 enum BlockType {
   ERROR = -1,
   AIR = 0,

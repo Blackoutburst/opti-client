@@ -1,3 +1,4 @@
+#pragma once
 #define M00 0x00
 #define M01 0x01
 #define M02 0x02

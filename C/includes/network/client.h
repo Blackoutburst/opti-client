@@ -1,7 +1,30 @@
+#pragma once
+#define MAX_BUFFER_SIZE 5000
+
+#if defined(_WIN32) || defined(_WIN64)
+    #include <winsock2.h>
+    #include <ws2tcpip.h>
+    
+    void closeConnectionWIN32();
+    void connectionSendWIN32(char* buffer, short size);
+    void connectionReadWIN32();
+    DWORD WINAPI connectionReadLoopWIN32(LPVOID arg);
+    void openConnectionWIN32(char* ip, short port);
+#else
+    #include <pthread.h>
+    #include <unistd.h>
+    #include <arpa/inet.h>
+
+    void closeConnectionPOSIX();
+    void connectionSendPOSIX(char* buffer, short size);
+    void connectionReadPOSIX();
+    void* connectionReadLoopPOSIX(void* arg);
+    void openConnectionPOSIX(char* ip, short port);
+#endif
+
 void closeConnection();
 void connectionSend(char* buffer, short size);
 void connectionRead();
-void* connectionReadLoop(void* arg);
 void openConnection(char* ip, short port);
 short getPacketSize(char packetID);
 

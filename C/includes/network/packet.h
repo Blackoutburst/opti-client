@@ -21,7 +21,7 @@ enum ClientPackets {
     CLIENT_PACKET_UPDATE_ENTITY_METADATA,
 };
 
-void printBufferHex(const I8 *title, const U8 *buf, size_t buf_len);
+void printBufferHex(const I8 *title, const U8 *buf, U32 buf_len);
 
 I8 getI8(U8** buffer);
 U8 getU8(U8** buffer);

@@ -139,7 +139,7 @@ void connectionSend(I8* buffer, I16 size) {
         }
 
         U8 dataBuffer[MAX_BUFFER_SIZE];
-        U8* bufferPtr = dataBuffer;
+        //U8* bufferPtr = dataBuffer;
         U32 totalBytesRead = 0;
         while (totalBytesRead < size) {
             I32 bytesRead = recv(sockfd, dataBuffer + totalBytesRead, size - totalBytesRead, 0);
@@ -151,7 +151,7 @@ void connectionSend(I8* buffer, I16 size) {
                 return;
             }
         }
-        
+
     }
 #endif
 
@@ -188,7 +188,7 @@ void connectionRead() {
 #if defined(_WIN32) || defined(_WIN64)
     void openConnectionWIN32(I8* ip, I16 port) {
         struct sockaddr_in server_addr;
-        
+
         WSADATA wsaData;
         I32 result = WSAStartup(MAKEWORD(2, 2), &wsaData);
         if (result != 0) {
@@ -218,7 +218,7 @@ void connectionRead() {
             closeConnection();
             return;
         }
-        
+
         println("Connected successfully!");
 
         HANDLE thread = CreateThread(NULL, 0, connectionReadLoopWIN32, NULL, 0, NULL);
@@ -265,7 +265,7 @@ void connectionRead() {
 #endif
 
 void openConnection(I8* ip, I16 port) {
-    
+
     #if defined(_WIN32) || defined(_WIN64)
         openConnectionWIN32(ip, port);
     #else

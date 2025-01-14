@@ -2,10 +2,10 @@
 #include "network/packet.h"
 #include <stdio.h>
 
-void printBufferHex(const I8 *title, const U8 *buf, size_t buf_len)
+void printBufferHex(const I8 *title, const U8 *buf, U32 buf_len)
 {
     printf("%s [ ", title);
-    for (size_t i = 0 ; i < buf_len ; ++i) {
+    for (U32 i = 0 ; i < buf_len ; ++i) {
         printf("%02X%s", buf[i], ( i + 1 ) % 16 == 0 ? "\r\n" : " " );
     }
     printf("]\n");
@@ -14,14 +14,14 @@ void printBufferHex(const I8 *title, const U8 *buf, size_t buf_len)
 I8 getI8(U8** buffer)  {
     I8 data = (I8)**buffer;
     (*buffer)++;
-    
+
     return data;
 }
 
 U8 getU8(U8** buffer) {
     U8 data = (U8)**buffer;
     (*buffer)++;
-    
+
     return data;
 }
 
@@ -31,7 +31,7 @@ I16 getI16(U8** buffer) {
         ((*buffer)[1])
     );
     (*buffer) += 2;
-    
+
     return data;
 }
 
@@ -41,7 +41,7 @@ U16 getU16(U8** buffer) {
         ((*buffer)[1])
     );
     (*buffer) += 2;
-    
+
     return data;
 }
 
@@ -53,7 +53,7 @@ I32 getI32(U8** buffer) {
         ((*buffer)[3]      )
     );
     (*buffer) += 4;
-    
+
     return data;
 }
 
@@ -65,7 +65,7 @@ U32 getU32(U8** buffer) {
         ((*buffer)[3]      )
     );
     (*buffer) += 4;
-    
+
     return data;
 }
 
@@ -81,7 +81,7 @@ I64 getI64(U8** buffer) {
         ((I64)((*buffer)[7])      )
     );
     (*buffer) += 8;
-    
+
     return data;
 }
 
@@ -97,7 +97,7 @@ U64 getU64(U8** buffer) {
         ((U64)((*buffer)[7])      )
     );
     (*buffer) += 8;
-    
+
     return data;
 }
 

@@ -38,7 +38,7 @@ void cleanChunkMesh(I32* vertices) {
     free(vertices);
 }
 
-I8 isChunkMonotype(CHUNK* chunk) {
+U8 isChunkMonotype(CHUNK* chunk) {
     I32 previous = chunk->blocks[0];
     for (I32 i = BLOCK_COUNT - 1; i; i--) {
         if (previous != chunk->blocks[i])
@@ -49,7 +49,14 @@ I8 isChunkMonotype(CHUNK* chunk) {
     return 1;
 }
 
-I32 blockTextureFace(I32 blockType, I32 face) {
+U8 isBlockTransparent(U8 blockType) {
+    switch (blockType) {
+        case AIR: case OAK_LEAVES: case GLASS: return 1;
+        default: return 0;
+    }
+}
+
+U8 blockTextureFace(U8 blockType, U8 face) {
     switch (blockType) {
         case GRASS: {
             switch (face) {
@@ -151,7 +158,7 @@ I32* generateChunkMesh(CHUNK* chunk) {
 
         // TOP
         U32 topIndex = xyzToIndexOobCheck(blockPos[VX], blockPos[VY] + 1, blockPos[VZ]);
-        if (topIndex >= BLOCK_COUNT || !chunk->blocks[topIndex]) {
+        if (topIndex >= BLOCK_COUNT || isBlockTransparent(chunk->blocks[topIndex])) {
             vertices[vertexIndex++] = packVertexData(blockPos[VX] + 1, blockPos[VY] + 1, blockPos[VZ]    , 1, 0, 0, blockTextureFace(blockType, 0));
             vertices[vertexIndex++] = packVertexData(blockPos[VX]    , blockPos[VY] + 1, blockPos[VZ]    , 0, 0, 0, blockTextureFace(blockType, 0));
             vertices[vertexIndex++] = packVertexData(blockPos[VX] + 1, blockPos[VY] + 1, blockPos[VZ] + 1, 1, 1, 0, blockTextureFace(blockType, 0));
@@ -163,7 +170,7 @@ I32* generateChunkMesh(CHUNK* chunk) {
 
         // FRONT
         U32 frontIndex = xyzToIndexOobCheck(blockPos[VX], blockPos[VY], blockPos[VZ] - 1);
-        if (frontIndex > BLOCK_COUNT || !chunk->blocks[frontIndex]) {
+        if (frontIndex > BLOCK_COUNT || isBlockTransparent(chunk->blocks[frontIndex])) {
             vertices[vertexIndex++] = packVertexData(blockPos[VX] + 1, blockPos[VY]    , blockPos[VZ]    , 0, 1, 1, blockTextureFace(blockType, 1));
             vertices[vertexIndex++] = packVertexData(blockPos[VX]    , blockPos[VY]    , blockPos[VZ]    , 1, 1, 1, blockTextureFace(blockType, 1));
             vertices[vertexIndex++] = packVertexData(blockPos[VX] + 1, blockPos[VY] + 1, blockPos[VZ]    , 0, 0, 1, blockTextureFace(blockType, 1));
@@ -175,7 +182,7 @@ I32* generateChunkMesh(CHUNK* chunk) {
 
         // BACK
         U32 backIndex = xyzToIndexOobCheck(blockPos[VX], blockPos[VY], blockPos[VZ] + 1);
-        if (backIndex >= BLOCK_COUNT || !chunk->blocks[backIndex]) {
+        if (backIndex >= BLOCK_COUNT || isBlockTransparent(chunk->blocks[backIndex])) {
             vertices[vertexIndex++] = packVertexData(blockPos[VX]    , blockPos[VY]    , blockPos[VZ] + 1, 0, 1, 2, blockTextureFace(blockType, 2));
             vertices[vertexIndex++] = packVertexData(blockPos[VX] + 1, blockPos[VY]    , blockPos[VZ] + 1, 1, 1, 2, blockTextureFace(blockType, 2));
             vertices[vertexIndex++] = packVertexData(blockPos[VX] + 1, blockPos[VY] + 1, blockPos[VZ] + 1, 1, 0, 2, blockTextureFace(blockType, 2));
@@ -187,7 +194,7 @@ I32* generateChunkMesh(CHUNK* chunk) {
 
         // LEFT
         U32 leftIndex = xyzToIndexOobCheck(blockPos[VX] - 1, blockPos[VY], blockPos[VZ]);
-        if (leftIndex >= BLOCK_COUNT || !chunk->blocks[leftIndex]) {
+        if (leftIndex >= BLOCK_COUNT || isBlockTransparent(chunk->blocks[leftIndex])) {
             vertices[vertexIndex++] = packVertexData(blockPos[VX]    , blockPos[VY] + 1, blockPos[VZ] + 1, 0, 0, 3, blockTextureFace(blockType, 3));
             vertices[vertexIndex++] = packVertexData(blockPos[VX]    , blockPos[VY] + 1, blockPos[VZ]    , 1, 0, 3, blockTextureFace(blockType, 3));
             vertices[vertexIndex++] = packVertexData(blockPos[VX]    , blockPos[VY]    , blockPos[VZ]    , 1, 1, 3, blockTextureFace(blockType, 3));
@@ -199,7 +206,7 @@ I32* generateChunkMesh(CHUNK* chunk) {
 
         // RIGHT
         U32 rightIndex = xyzToIndexOobCheck(blockPos[VX] + 1, blockPos[VY], blockPos[VZ]);
-        if (rightIndex >= BLOCK_COUNT || !chunk->blocks[rightIndex]) {
+        if (rightIndex >= BLOCK_COUNT || isBlockTransparent(chunk->blocks[rightIndex])) {
             vertices[vertexIndex++] = packVertexData(blockPos[VX] + 1, blockPos[VY]    , blockPos[VZ]    , 0, 1, 4, blockTextureFace(blockType, 4));
             vertices[vertexIndex++] = packVertexData(blockPos[VX] + 1, blockPos[VY] + 1, blockPos[VZ]    , 0, 0, 4, blockTextureFace(blockType, 4));
             vertices[vertexIndex++] = packVertexData(blockPos[VX] + 1, blockPos[VY] + 1, blockPos[VZ] + 1, 1, 0, 4, blockTextureFace(blockType, 4));
@@ -211,7 +218,7 @@ I32* generateChunkMesh(CHUNK* chunk) {
 
         // BOTTOM
         U32 bottomIndex = xyzToIndexOobCheck(blockPos[VX], blockPos[VY] - 1, blockPos[VZ]);
-        if (bottomIndex >= BLOCK_COUNT || !chunk->blocks[bottomIndex]) {
+        if (bottomIndex >= BLOCK_COUNT || isBlockTransparent(chunk->blocks[bottomIndex])) {
             vertices[vertexIndex++] = packVertexData(blockPos[VX]    , blockPos[VY]    , blockPos[VZ]    , 0, 1, 5, blockTextureFace(blockType, 5));
             vertices[vertexIndex++] = packVertexData(blockPos[VX] + 1, blockPos[VY]    , blockPos[VZ]    , 1, 1, 5, blockTextureFace(blockType, 5));
             vertices[vertexIndex++] = packVertexData(blockPos[VX] + 1, blockPos[VY]    , blockPos[VZ] + 1, 1, 0, 5, blockTextureFace(blockType, 5));

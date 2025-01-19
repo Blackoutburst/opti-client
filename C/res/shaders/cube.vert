@@ -6,6 +6,8 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
+uniform vec3 chunkPos;
+
 out vec3 FragPos;
 out vec2 uv;
 out vec3 norm;
@@ -33,7 +35,7 @@ void main() {
 	int N = (data >> 25) & 7;
 	int T = (data >> 28) & 15;
 
-	FragPos = vec3(X, Y, Z);
+	FragPos = vec3(X, Y, Z) + chunkPos;
 	norm = getNormal(int(N));
 	uv = vec2(U, V);
 	layer = T;

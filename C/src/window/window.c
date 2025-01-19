@@ -1,13 +1,13 @@
 #define GLFW_INCLUDE_NONE
 
-#include "GLFW/glfw3.h"
+#include "glfw/glfw3.h"
 #include "utils/types.h"
 #include <stdlib.h>
 
 #if defined(__APPLE__)
     #include <OpenGL/gl3.h>
 #elif defined(_WIN32) || defined(_WIN64)
-    #include "GL/glew.h"
+    #include "gl/glew.h"
     #include <GL/gl.h>
 #else
     #include <GL/gl.h>
@@ -36,7 +36,7 @@ GLFWwindow* createWindow() {
 
     glfwSwapInterval(1);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    
+
     glClearColor(0.1f, 0.1f, 0.1f, 0.1f);
 
     glEnable(GL_DEPTH_TEST);

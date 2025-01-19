@@ -3,6 +3,7 @@
 #include "utils/ioUtils.h"
 #include "network/client.h"
 #include "network/packet.h"
+#include "network/decoder.h"
 #include "utils/types.h"
 
 #if defined(_WIN32) || defined(_WIN64)
@@ -10,6 +11,90 @@
 #else
     static I32 sockfd = -1;
 #endif
+
+static NET_QUEUE* networkQueue = NULL;
+
+void networkQueueCleanElement(U16 index) {
+    if (networkQueue == NULL) return;
+    NET_QUEUE_ELEM* element = networkQueue->elements[index];
+    if (element == NULL) return;
+    free(element->buffer);
+    free(element);
+    networkQueue->elements[index] = NULL;
+}
+
+void networkQueuePush(void (*function)(U8*), U8* buffer) {
+    if (networkQueue == NULL) return;
+    if (networkQueue->elements[networkQueue->pushIndex] != NULL) {
+        networkQueueCleanElement(networkQueue->pushIndex);
+    }
+    networkQueue->elements[networkQueue->pushIndex] = malloc(sizeof(NET_QUEUE_ELEM));
+
+    networkQueue->elements[networkQueue->pushIndex]->function = function;
+    networkQueue->elements[networkQueue->pushIndex]->buffer = buffer;
+    networkQueue->elements[networkQueue->pushIndex]->id = networkQueue->pushIndex;
+
+    networkQueue->pushIndex++;
+    if (networkQueue->pushIndex >= networkQueue->size) {
+        networkQueue->pushIndex = 0;
+    }
+}
+
+U8 networkQueuePop(NET_QUEUE_ELEM** element) {
+    if (networkQueue == NULL) return 0;
+    NET_QUEUE_ELEM* elem = networkQueue->elements[networkQueue->popIndex];
+    if (elem == NULL) return 0;
+
+    networkQueue->popIndex++;
+    if (networkQueue->popIndex >= networkQueue->size) {
+        networkQueue->popIndex = 0;
+    }
+
+    *element = elem;
+    return 1;
+}
+
+void networkQueueInit() {
+    if (networkQueue != NULL) return;
+    NET_QUEUE* queue = malloc(sizeof(NET_QUEUE));
+    queue->size = QUEUE_SIZE;
+    queue->pushIndex = 0;
+    queue->popIndex = 0;
+    queue->elements = malloc(sizeof(NET_QUEUE_ELEM*) * QUEUE_SIZE);
+    for (int i = 0; i < QUEUE_SIZE; i++) queue->elements[i] = NULL;
+    networkQueue = queue;
+}
+
+void networkQueueClean() {
+    if (networkQueue == NULL) return;
+    for (int i = 0; i < QUEUE_SIZE; i++) networkQueueCleanElement(i);
+    free(networkQueue->elements);
+    free(networkQueue);
+    networkQueue = NULL;
+}
+
+void* getPacketfunction(I8 packetID) {
+    switch (packetID) {
+        case CLIENT_PACKET_IDENTIFICATION:
+            return &decodePacketIdentification;
+        case CLIENT_PACKET_ADD_ENTITY:
+            return &decodePacketAddEntity;
+        case CLIENT_PACKET_REMOVE_ENTITY:
+            return &decodePacketRemoveEntity;
+        case CLIENT_PACKET_UPDATE_ENTITY:
+            return &decodePacketUpdateEntity;
+        case CLIENT_PACKET_SEND_CHUNK:
+            return &decodePacketSendChunk;
+        case CLIENT_PACKET_SEND_MONOTYPE_CHUNK:
+            return &decodePacketSendMonotypeChunk;
+        case CLIENT_PACKET_CHAT:
+            return &decodePacketChat;
+        case CLIENT_PACKET_UPDATE_ENTITY_METADATA:
+            return &decodePacketUpdateEntityMetadata;
+        default:
+            return NULL;
+    }
+}
 
 U16 getPacketSize(I8 packetID) {
     switch (packetID) {
@@ -57,6 +142,7 @@ void closeConnection() {
     #else
         closeConnectionPOSIX();
     #endif
+    networkQueueClean();
 }
 
 ///// SEND /////
@@ -99,29 +185,21 @@ void connectionSend(I8* buffer, I16 size) {
             return;
         }
 
-        U8 dataBuffer[MAX_BUFFER_SIZE];
-        U8* bufferPtr = dataBuffer;
+        U8* dataBuffer = malloc(size);
         U32 totalBytesRead = 0;
         while (totalBytesRead < size) {
             I32 bytesRead = recv(sockfd, (I8*)(dataBuffer + totalBytesRead), size - totalBytesRead, 0);
+            totalBytesRead += bytesRead;
+
             if (bytesRead <= 0) {
                 println("Data read failed");
                 closeConnection();
                 return;
             }
-            totalBytesRead += bytesRead;
         }
-        // TODO: move this shit away
-        if(packetId == CLIENT_PACKET_UPDATE_ENTITY) {
-            U32 entityId = getU32((U8**)&bufferPtr);
-            F32 x = getF32((U8**)&bufferPtr);
-            F32 y = getF32((U8**)&bufferPtr);
-            F32 z = getF32((U8**)&bufferPtr);
-            F32 yaw = getF32((U8**)&bufferPtr);
-            F32 pitch = getF32((U8**)&bufferPtr);
 
-            printf("id: %i, x: %f, y: %f, z: %f, yaw: %f, pitch: %f\n", entityId, x, y, z, yaw, pitch);
-        }
+        void* func = getPacketfunction(packetId);
+        networkQueuePush(func, dataBuffer);
     }
 #else
     void connectionReadPOSIX() {
@@ -138,8 +216,7 @@ void connectionSend(I8* buffer, I16 size) {
             return;
         }
 
-        U8 dataBuffer[MAX_BUFFER_SIZE];
-        //U8* bufferPtr = dataBuffer;
+        U8* dataBuffer = malloc(size);
         U32 totalBytesRead = 0;
         while (totalBytesRead < size) {
             I32 bytesRead = recv(sockfd, dataBuffer + totalBytesRead, size - totalBytesRead, 0);
@@ -152,6 +229,8 @@ void connectionSend(I8* buffer, I16 size) {
             }
         }
 
+        void* func = getPacketfunction(packetId);
+        networkQueuePush(func, dataBuffer);
     }
 #endif
 
@@ -265,7 +344,7 @@ void connectionRead() {
 #endif
 
 void openConnection(I8* ip, I16 port) {
-
+    networkQueueInit();
     #if defined(_WIN32) || defined(_WIN64)
         openConnectionWIN32(ip, port);
     #else

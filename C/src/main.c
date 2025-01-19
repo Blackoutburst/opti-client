@@ -3,7 +3,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include "utils/types.h"
-#include "GLFW/glfw3.h"
+#include "glfw/glfw3.h"
 #include "graphics/shader.h"
 #include "window/window.h"
 #include "utils/ioUtils.h"
@@ -18,21 +18,13 @@
 #if defined(__APPLE__)
     #include <OpenGL/gl3.h>
 #elif defined(_WIN32) || defined(_WIN64)
-    #include "GL/glew.h"
+    #include "gl/glew.h"
     #include <GL/gl.h>
 #else
     #include <GL/gl.h>
 #endif
 
 void update(GLFWwindow* window) {
-    I32* position = malloc(sizeof(I32) * 3);
-    I8* blocks = malloc(sizeof(I8) * CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE);
-    for (I32 i = 0; i < CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE; i++) blocks[i] = 3;
-
-    CHUNK* chunk = createChunk(position, blocks);
-    I32* mesh = generateChunkMesh(chunk);
-    generateChunkVAO(chunk, mesh);
-    cleanChunkMesh(mesh);
 
     ////// TEXTURE ///////
 
@@ -101,7 +93,14 @@ void update(GLFWwindow* window) {
     F32 speed = 0.1f;
     F32 sensitivity = 0.1f;
 
+    NET_QUEUE_ELEM* queueElement = NULL;
+
     while (!glfwWindowShouldClose(window) && !glfwGetKey(window, GLFW_KEY_ESCAPE)) {
+        while (networkQueuePop(&queueElement)) {
+            queueElement->function(queueElement->buffer);
+            networkQueueCleanElement(queueElement->id);
+        }
+
         clearWindow();
 
         matrixSetIdentity(viewMatrix);
@@ -156,12 +155,12 @@ void update(GLFWwindow* window) {
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         }
 
-        renderChunk(chunk);
+        worldRender(shaderProgram);
 
         updateWindow(window);
     }
 
-    destroyChunk(chunk);
+    worldClean();
 
     glfwTerminate();
 }
@@ -170,6 +169,7 @@ void update(GLFWwindow* window) {
 I32 main(void) {
     GLFWwindow* window = createWindow();
 
+    worldInit();
     openConnection("162.19.137.231", 15000);
     update(window);
 

@@ -1,5 +1,4 @@
 #include "utils/types.h"
-#include "network/packet.h"
 #include <stdio.h>
 
 void printBufferHex(const I8 *title, const U8 *buf, U32 buf_len)
@@ -120,3 +119,5 @@ F64 getF64(U8** buffer) {
     u.i = getU64(buffer);
     return u.f;
 }
+
+

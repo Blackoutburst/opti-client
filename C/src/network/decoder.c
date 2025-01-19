@@ -30,9 +30,8 @@ void decodePacketSendChunk(U8* buffer) {
     U8* blocks = malloc(sizeof(U8) * CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE);
     for (I32 i = 0; i < CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE; i++) blocks[i] = getU8(bufferptr);
     CHUNK* chunk = createChunk(position, blocks);
-    I32* mesh = generateChunkMesh(chunk);
+    I32* mesh = generateChunkMesh(chunk, 0);
     generateChunkVAO(chunk, mesh);
-    cleanChunkMesh(mesh);
     worldAddChunk(chunk);
 }
 
@@ -46,9 +45,8 @@ void decodePacketSendMonotypeChunk(U8* buffer) {
     U8 blockType = getU8(bufferptr);
     for (I32 i = 0; i < CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE; i++) blocks[i] = blockType;
     CHUNK* chunk = createChunk(position, blocks);
-    I32* mesh = generateChunkMesh(chunk);
+    I32* mesh = generateChunkMesh(chunk, 1);
     generateChunkVAO(chunk, mesh);
-    cleanChunkMesh(mesh);
     worldAddChunk(chunk);
 }
 

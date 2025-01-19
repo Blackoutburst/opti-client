@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include "world/world.h"
+#include "world/chunk.h"
 #include "world/world.h"
 #include "utils/ioUtils.h"
 #include "graphics/shader.h"
@@ -40,12 +40,14 @@ void worldRender(I32 shaderProgram) {
 
 void worldClean() {
     if (chunks == NULL) return;
+    cleanChunkMemoryRegion();
     for (U32 i = 0; i < CHUNK_COUNT; i++) destroyChunk(chunks[i]);
     free(chunks);
 }
 
 void worldInit() {
     if (chunks != NULL) return;
+    initChunkMemoryRegion();
     chunks = malloc(sizeof(CHUNK*) * CHUNK_COUNT);
     for (U32 i = 0; i < CHUNK_COUNT; i++) chunks[i] = NULL;
 }

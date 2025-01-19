@@ -61,7 +61,7 @@ void update(GLFWwindow* window) {
     MATRIX* modelMatrix = identityMatrix();
     MATRIX* viewMatrix = identityMatrix();
     MATRIX* projectionMatrix = identityMatrix();
-    matrixProjection(projectionMatrix, 1280, 720, 90, 0.001, 1000);
+    matrixProjection(projectionMatrix, 1280, 720, 90, 0.1, 1000);
 
     glUseProgram(shaderProgram);
 

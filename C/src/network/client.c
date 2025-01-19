@@ -150,7 +150,7 @@ void closeConnection() {
 #if defined(_WIN32) || defined(_WIN64)
     void connectionSendWIN32(U8* buffer, I16 size) {
         if (sockfd == INVALID_SOCKET) return;
-        send(sockfd, buffer, size, 0);
+        send(sockfd, (I8*)buffer, size, 0);
     }
 #else
     void connectionSendPOSIX(U8* buffer, I16 size) {

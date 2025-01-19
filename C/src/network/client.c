@@ -148,18 +148,18 @@ void closeConnection() {
 ///// SEND /////
 
 #if defined(_WIN32) || defined(_WIN64)
-    void connectionSendWIN32(I8* buffer, I16 size) {
+    void connectionSendWIN32(U8* buffer, I16 size) {
         if (sockfd == INVALID_SOCKET) return;
         send(sockfd, buffer, size, 0);
     }
 #else
-    void connectionSendPOSIX(I8* buffer, I16 size) {
+    void connectionSendPOSIX(U8* buffer, I16 size) {
         if (sockfd < 0) return;
         send(sockfd, buffer, size, 0);
     }
 #endif
 
-void connectionSend(I8* buffer, I16 size) {
+void connectionSend(U8* buffer, I16 size) {
     #if defined(_WIN32) || defined(_WIN64)
         connectionSendWIN32(buffer, size);
     #else
@@ -228,7 +228,6 @@ void connectionSend(I8* buffer, I16 size) {
                 return;
             }
         }
-
         void* func = getPacketfunction(packetId);
         networkQueuePush(func, dataBuffer);
     }

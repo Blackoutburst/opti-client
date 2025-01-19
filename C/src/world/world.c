@@ -8,7 +8,7 @@ static CHUNK** chunks = NULL;
 
 void worldAddChunk(CHUNK* chunk) {
     if (chunks == NULL) return;
-    for (int i = 0; i < CHUNK_COUNT; i++) {
+    for (U32 i = 0; i < CHUNK_COUNT; i++) {
         if (chunks[i] == NULL) {
             chunks[i] = chunk;
             break;
@@ -18,7 +18,7 @@ void worldAddChunk(CHUNK* chunk) {
 
 void worldRemoveChunk(I32 x, I32 y, I32 z) {
     if (chunks == NULL) return;
-    for (int i = 0; i < CHUNK_COUNT; i++) {
+    for (U32 i = 0; i < CHUNK_COUNT; i++) {
         if (chunks[i] == NULL) continue;
         if (chunks[i]->position[0] == x &&
             chunks[i]->position[1] == y &&
@@ -31,7 +31,7 @@ void worldRemoveChunk(I32 x, I32 y, I32 z) {
 
 void worldRender(I32 shaderProgram) {
     if (chunks == NULL) return;
-    for (int i = 0; i < CHUNK_COUNT; i++) {
+    for (U32 i = 0; i < CHUNK_COUNT; i++) {
         if (chunks[i] == NULL) continue;
         setUniform3f(shaderProgram, "chunkPos", chunks[i]->position[0], chunks[i]->position[1], chunks[i]->position[2]);
         renderChunk(chunks[i]);
@@ -40,12 +40,12 @@ void worldRender(I32 shaderProgram) {
 
 void worldClean() {
     if (chunks == NULL) return;
-    for (int i = 0; i < CHUNK_COUNT; i++) destroyChunk(chunks[i]);
+    for (U32 i = 0; i < CHUNK_COUNT; i++) destroyChunk(chunks[i]);
     free(chunks);
 }
 
 void worldInit() {
     if (chunks != NULL) return;
     chunks = malloc(sizeof(CHUNK*) * CHUNK_COUNT);
-    for (int i = 0; i < CHUNK_COUNT; i++) chunks[i] = NULL;
+    for (U32 i = 0; i < CHUNK_COUNT; i++) chunks[i] = NULL;
 }

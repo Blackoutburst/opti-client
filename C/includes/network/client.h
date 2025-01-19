@@ -24,7 +24,7 @@ struct networkQueue {
     #include <ws2tcpip.h>
 
     void closeConnectionWIN32();
-    void connectionSendWIN32(I8* buffer, I16 size);
+    void connectionSendWIN32(U8* buffer, I16 size);
     void connectionReadWIN32();
     DWORD WINAPI connectionReadLoopWIN32(LPVOID arg);
     void openConnectionWIN32(I8* ip, I16 port);
@@ -34,7 +34,7 @@ struct networkQueue {
     #include <arpa/inet.h>
 
     void closeConnectionPOSIX();
-    void connectionSendPOSIX(I8* buffer, I16 size);
+    void connectionSendPOSIX(U8* buffer, I16 size);
     void connectionReadPOSIX();
     void* connectionReadLoopPOSIX(void* arg);
     void openConnectionPOSIX(I8* ip, I16 port);
@@ -47,7 +47,7 @@ void networkQueuePush(void (*function)(U8*), U8* buffer);
 U8 networkQueuePop(NET_QUEUE_ELEM** element);
 
 void closeConnection();
-void connectionSend(I8* buffer, I16 size);
+void connectionSend(U8* buffer, I16 size);
 void connectionRead();
 void openConnection(I8* ip, I16 port);
 

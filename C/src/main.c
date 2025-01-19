@@ -171,6 +171,13 @@ I32 main(void) {
 
     worldInit();
     openConnection("162.19.137.231", 15000);
+    U8 packet[66];
+    for (I32 i = 0; i < 66; i++) {
+        packet[i] = 0;
+    }
+    packet[0] = 0x04;
+    packet[1] = 16;
+    connectionSend(packet, 66);
     update(window);
 
     closeConnection();

@@ -144,7 +144,7 @@ I32* generateChunkMesh(CHUNK* chunk) {
     I8* blockPos = malloc(sizeof(I8) * 3);
 
     I32 vertexIndex = 0;
-    for (U16 i = BLOCK_COUNT; i; i--) {
+    for (U16 i = 0; i < BLOCK_COUNT; i++) {
         I32 blockType = chunk->blocks[i];
         if (!blockType) continue;
         indexToXYZ(blockPos, i);

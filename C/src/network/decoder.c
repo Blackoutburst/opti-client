@@ -27,7 +27,7 @@ void decodePacketSendChunk(U8* buffer) {
     position[0] = getI32(bufferptr);
     position[1] = getI32(bufferptr);
     position[2] = getI32(bufferptr);
-    U8* blocks = malloc(sizeof(I8) * CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE);
+    U8* blocks = malloc(sizeof(U8) * CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE);
     for (I32 i = 0; i < CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE; i++) blocks[i] = getU8(bufferptr);
 
     CHUNK* chunk = createChunk(position, blocks);
@@ -43,7 +43,7 @@ void decodePacketSendMonotypeChunk(U8* buffer) {
     position[0] = getI32(bufferptr);
     position[1] = getI32(bufferptr);
     position[2] = getI32(bufferptr);
-    U8* blocks = malloc(sizeof(I8) * CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE);
+    U8* blocks = malloc(sizeof(U8) * CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE);
     U8 blockType = getU8(bufferptr);
     for (I32 i = 0; i < CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE; i++) blocks[i] = blockType;
 

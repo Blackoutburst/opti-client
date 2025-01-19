@@ -45,8 +45,8 @@ fun main() {
     World
 
 
-    //Connection.open("162.19.137.231", 15000)
-    Connection.open("localhost", 15000)
+    Connection.open("162.19.137.231", 15000)
+    //Connection.open("localhost", 15000)
 
     // AL SHITPOST
 

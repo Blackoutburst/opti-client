@@ -49,24 +49,24 @@ object Window {
         get() = getFrameBufferSize().y
 
     init {
-        System.load(extractDll("native/DesktopWindow.dll"))
+        //System.load(extractDll("native/DesktopWindow.dll"))
 
         glfwInit()
-        glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE)
-        glfwWindowHint(GLFW_DECORATED, GLFW_FALSE)
+        //glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE)
+        //glfwWindowHint(GLFW_DECORATED, GLFW_FALSE)
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3)
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2)
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE)
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE)
 
-        id = glfwCreateWindow(1920, 1080, title, NULL, NULL)
+        id = glfwCreateWindow(1280, 720, title, NULL, NULL)
         if (id == -1L) exitProcess(-1)
 
-        val hwnd = GLFWNativeWin32.glfwGetWin32Window(id)
+        //val hwnd = GLFWNativeWin32.glfwGetWin32Window(id)
 
-        if (!attachToWorkerW(hwnd)) {
-            println("Failed to attach GLFW window to WorkerW")
-        }
+       // if (!attachToWorkerW(hwnd)) {
+        //    println("Failed to attach GLFW window to WorkerW")
+       // }
 
         glfwMakeContextCurrent(id)
         createCapabilities()

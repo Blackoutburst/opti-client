@@ -402,16 +402,14 @@ void wgCleanThreadPool() {
     if (queue2 != NULL) wgFreeQueue(queue2);
     if (queue3 != NULL) wgFreeQueue(queue3);
     if (queue4 != NULL) wgFreeQueue(queue4);
+
+    if (vaoQueue1 == NULL) wgFreeVAOQueue(vaoQueue1);
+    if (vaoQueue2 == NULL) wgFreeVAOQueue(vaoQueue2);
+    if (vaoQueue3 == NULL) wgFreeVAOQueue(vaoQueue3);
+    if (vaoQueue4 == NULL) wgFreeVAOQueue(vaoQueue4);
 }
 
 void wgInitThreadPool() {
-    running = 1;
-    #if defined(_WIN32) || defined(_WIN64)
-        wgInitThreadPoolWIN32();
-    #else
-        wgInitThreadPoolPOSIX();
-    #endif
-
     if (queue1 == NULL) wgInitQueue(&queue1);
     if (queue2 == NULL) wgInitQueue(&queue2);
     if (queue3 == NULL) wgInitQueue(&queue3);
@@ -421,4 +419,11 @@ void wgInitThreadPool() {
     if (vaoQueue2 == NULL) wgInitVAOQueue(&vaoQueue2);
     if (vaoQueue3 == NULL) wgInitVAOQueue(&vaoQueue3);
     if (vaoQueue4 == NULL) wgInitVAOQueue(&vaoQueue4);
+
+    running = 1;
+    #if defined(_WIN32) || defined(_WIN64)
+        wgInitThreadPoolWIN32();
+    #else
+        wgInitThreadPoolPOSIX();
+    #endif
 }

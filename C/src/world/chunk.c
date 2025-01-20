@@ -25,14 +25,16 @@ I32 packVertexData(I8 x, I8 y, I8 z, I8 u, I8 v, I8 n, I8 t) {
 }
 
 void generateChunkVAO(CHUNK* chunk, I32* vertices) {
-    if (!chunk->vertexCount) return;
+    if (!chunk->meshVertexCount) return;
     glBindVertexArray(chunk->vaoID);
 
     glBindBuffer(GL_ARRAY_BUFFER, chunk->vboID);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(I32) * chunk->vertexCount, vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(I32) * chunk->meshVertexCount, vertices, GL_STATIC_DRAW);
     glEnableVertexAttribArray(0);
     glVertexAttribIPointer(0, 1, GL_INT, 4, 0);
     free(vertices);
+
+    chunk->vertexCount = chunk->meshVertexCount;
 }
 
 U8 isChunkMonotype(CHUNK* chunk) {
@@ -185,7 +187,7 @@ I32* generateChunkMesh(CHUNK* chunk) {
         }
     }
 
-    chunk->vertexCount = vertexIndex;
+    chunk->meshVertexCount = vertexIndex;
     return vertices;
 }
 
@@ -196,6 +198,7 @@ CHUNK* createChunk(I32* position, U8* blocks) {
     glGenBuffers(1, &chunk->vboID);
     glGenBuffers(1, &chunk->eboID);
 
+    chunk->meshVertexCount = 0;
     chunk->vertexCount = 0;
     chunk->position = position;
     chunk->blocks = blocks;

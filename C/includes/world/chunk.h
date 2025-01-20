@@ -6,6 +6,7 @@ struct chunk {
     U32 vaoID;
     U32 vboID;
     U32 eboID;
+    U32 meshVertexCount;
     U32 vertexCount;
     I32* position;
     U8* blocks;

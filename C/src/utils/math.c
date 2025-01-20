@@ -1,5 +1,6 @@
 #include "world/world.h"
 #include "utils/types.h"
+#include "utils/math.h"
 
 #define PI 3.141592653589793
 
@@ -18,7 +19,7 @@ U32 xyzToIndex(I32 x, I32 y, I32 z) {
 }
 
 void indexToXYZ(I8* vector, I16 index) {
-    vector[0] = index % CHUNK_SIZE;
-    vector[1] = (index / CHUNK_SIZE) % CHUNK_SIZE;
-    vector[2] = (index / (CHUNK_SIZE * CHUNK_SIZE)) % CHUNK_SIZE;
+    vector[VX] = index % CHUNK_SIZE;
+    vector[VY] = (index / CHUNK_SIZE) % CHUNK_SIZE;
+    vector[VZ] = (index / (CHUNK_SIZE * CHUNK_SIZE)) % CHUNK_SIZE;
 }

@@ -13,16 +13,61 @@
 #include "graphics/textureArray.h"
 #include "world/chunk.h"
 #include "world/world.h"
+#include "world/worldGenerator.h"
 #include "network/client.h"
 
 #if defined(__APPLE__)
     #include <OpenGL/gl3.h>
 #elif defined(_WIN32) || defined(_WIN64)
+    //#include <windows.h>
     #include "gl/glew.h"
     #include <GL/gl.h>
 #else
     #include <GL/gl.h>
 #endif
+
+#if defined(_WIN32) || defined(_WIN64)
+void calculateFPS() {
+    static int frameCount = 0;
+    static double elapsedTime = 0.0;
+    static double lastTime = 0.0;
+    
+    LARGE_INTEGER frequency, currentTime;
+    QueryPerformanceFrequency(&frequency);
+    QueryPerformanceCounter(&currentTime);
+
+    double now = (double)currentTime.QuadPart / frequency.QuadPart;
+    elapsedTime += now - lastTime;
+    lastTime = now;
+
+    frameCount++;
+
+    if (elapsedTime >= 1.0) {
+        printf("FPS: %d\n", frameCount);
+        frameCount = 0;
+        elapsedTime = 0.0;
+    }
+}
+#endif
+
+void doVAO(WG_VAO_QUEUE_ELEM* vaoQueueElement) {
+    while (wgVAOQueue1Pop(&vaoQueueElement)) {
+        generateChunkVAO(vaoQueueElement->chunk, vaoQueueElement->mesh);
+        wgVAOQueue1CleanElement(vaoQueueElement->id);
+    }
+    while (wgVAOQueue2Pop(&vaoQueueElement)) {
+        generateChunkVAO(vaoQueueElement->chunk, vaoQueueElement->mesh);
+        wgVAOQueue2CleanElement(vaoQueueElement->id);
+    }
+    while (wgVAOQueue3Pop(&vaoQueueElement)) {
+        generateChunkVAO(vaoQueueElement->chunk, vaoQueueElement->mesh);
+        wgVAOQueue3CleanElement(vaoQueueElement->id);
+    }
+    while (wgVAOQueue4Pop(&vaoQueueElement)) {
+        generateChunkVAO(vaoQueueElement->chunk, vaoQueueElement->mesh);
+        wgVAOQueue4CleanElement(vaoQueueElement->id);
+    }
+}
 
 void update(GLFWwindow* window) {
 
@@ -94,12 +139,15 @@ void update(GLFWwindow* window) {
     F32 sensitivity = 0.1f;
 
     NET_QUEUE_ELEM* queueElement = NULL;
+    WG_VAO_QUEUE_ELEM* vaoQueueElement = NULL;
 
     while (!glfwWindowShouldClose(window) && !glfwGetKey(window, GLFW_KEY_ESCAPE)) {
+        //calculateFPS();
         while (networkQueuePop(&queueElement)) {
             queueElement->function(queueElement->buffer);
             networkQueueCleanElement(queueElement->id);
         }
+        doVAO(vaoQueueElement);
 
         clearWindow();
 
@@ -169,6 +217,7 @@ void update(GLFWwindow* window) {
 I32 main(void) {
     GLFWwindow* window = createWindow();
 
+    wgInitThreadPool();
     worldInit();
     openConnection("162.19.137.231", 15000);
     U8 packet[66];
@@ -180,6 +229,7 @@ I32 main(void) {
     connectionSend(packet, 66);
     update(window);
 
+    wgCleanThreadPool();
     closeConnection();
 
     return 0;

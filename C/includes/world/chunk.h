@@ -11,8 +11,6 @@ struct chunk {
     U8* blocks;
 };
 
-void initChunkMemoryRegion();
-void cleanChunkMemoryRegion();
 void printChunk(CHUNK* chunk);
 I32 packVertexData(I8 x, I8 y, I8 z, I8 u, I8 v, I8 n, I8 t);
 void generateChunkVAO(CHUNK * chunk, I32* mesh);

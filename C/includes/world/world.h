@@ -16,7 +16,6 @@ struct hashSlot {
     U8 used;
 };
 
-void worldReMeshAdjacentChunks(CHUNK* chunk);
 CHUNK* worldGetChunk(I32 x, I32 y, I32 z);
 U8 worldGetBlock(I32 x, I32 y, I32 z);
 void worldAddChunk(CHUNK* chunk);

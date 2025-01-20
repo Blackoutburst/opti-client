@@ -4,22 +4,23 @@
 #include "network/packet.h"
 #include "world/chunk.h"
 #include "world/world.h"
+#include "world/worldGenerator.h"
 #include <stdlib.h>
 
 void decodePacketIdentification(U8* buffer) {
-    println("Identification");
+    //println("Identification");
 }
 
 void decodePacketAddEntity(U8* buffer) {
-    println("Add Entity");
+    //println("Add Entity");
 }
 
 void decodePacketRemoveEntity(U8* buffer) {
-    println("Remove Entity");
+    //println("Remove Entity");
 }
 
 void decodePacketUpdateEntity(U8* buffer) {
-    println("Update Entity");
+    //println("Update Entity");
 }
 
 void decodePacketSendChunk(U8* buffer) {
@@ -31,11 +32,8 @@ void decodePacketSendChunk(U8* buffer) {
     U8* blocks = malloc(sizeof(U8) * CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE);
     for (I32 i = 0; i < CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE; i++) blocks[i] = getU8(bufferptr);
     CHUNK* chunk = createChunk(position, blocks);
-    I32* mesh = generateChunkMesh(chunk);
-    generateChunkVAO(chunk, mesh);
     worldAddChunk(chunk);
-    worldReMeshAdjacentChunks(chunk);
-    
+    wgQueuePush(chunk);
 }
 
 void decodePacketSendMonotypeChunk(U8* buffer) {
@@ -48,16 +46,14 @@ void decodePacketSendMonotypeChunk(U8* buffer) {
     U8 blockType = getU8(bufferptr);
     for (I32 i = 0; i < CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE; i++) blocks[i] = blockType;
     CHUNK* chunk = createChunk(position, blocks);
-    I32* mesh = generateChunkMesh(chunk);
-    generateChunkVAO(chunk, mesh);
     worldAddChunk(chunk);
-    worldReMeshAdjacentChunks(chunk);
+    wgQueuePush(chunk);
 }
 
 void decodePacketChat(U8* buffer) {
-    println("Chat");
+    //println("Chat");
 }
 
 void decodePacketUpdateEntityMetadata(U8* buffer) {
-    println("Update Entity Metadata");
+    //println("Update Entity Metadata");
 }

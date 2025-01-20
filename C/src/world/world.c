@@ -7,50 +7,6 @@
 
 static HASH* chunks = NULL;
 
-void worldReMeshAdjacentChunks(CHUNK* chunk) {
-    // TOP
-    CHUNK* top = worldGetChunk(chunk->position[VX], chunk->position[VY] + CHUNK_SIZE, chunk->position[VZ]);
-    if (top != NULL) {
-        I32* m = generateChunkMesh(top);
-        generateChunkVAO(top, m);
-    }
-
-    // FRONT
-    CHUNK* front = worldGetChunk(chunk->position[VX], chunk->position[VY], chunk->position[VZ] - CHUNK_SIZE);
-    if (front != NULL) {
-        I32* m = generateChunkMesh(front);
-        generateChunkVAO(front, m);
-    }
-
-    // BACK
-    CHUNK* back = worldGetChunk(chunk->position[VX], chunk->position[VY], chunk->position[VZ] + CHUNK_SIZE);
-    if (back != NULL) {
-        I32* m = generateChunkMesh(back);
-        generateChunkVAO(back, m);
-    }
-
-    // LEFT
-    CHUNK* left = worldGetChunk(chunk->position[VX] - CHUNK_SIZE, chunk->position[VY], chunk->position[VZ]);
-    if (left != NULL) {
-        I32* m = generateChunkMesh(left);
-        generateChunkVAO(left, m);
-    }
-
-    // RIGHT
-    CHUNK* right = worldGetChunk(chunk->position[VX] + CHUNK_SIZE, chunk->position[VY], chunk->position[VZ]);
-    if (right != NULL) {
-        I32* m = generateChunkMesh(right);
-        generateChunkVAO(right, m);
-    }
-
-    // BOTTOM
-    CHUNK* bottom = worldGetChunk(chunk->position[VX], chunk->position[VY] - CHUNK_SIZE, chunk->position[VZ]);
-    if (bottom != NULL) {
-        I32* m = generateChunkMesh(bottom);
-        generateChunkVAO(bottom, m);
-    }
-}
-
 CHUNK* worldGetChunk(I32 x, I32 y, I32 z) {
     if (chunks == NULL) return NULL;
 
@@ -131,7 +87,6 @@ void worldRender(I32 shaderProgram) {
 void worldClean() {
     if (chunks == NULL) return;
     
-    cleanChunkMemoryRegion();
     for (U32 i = 0; i < CHUNK_COUNT; i++) destroyChunk(chunks[i].chunk);
     free(chunks);
 }
@@ -139,7 +94,6 @@ void worldClean() {
 void worldInit() {
     if (chunks != NULL) return;
     
-    initChunkMemoryRegion();
     chunks = malloc(sizeof(HASH) * CHUNK_COUNT);
     for (U32 i = 0; i < CHUNK_COUNT; i++) {
         chunks[i].x = 0;

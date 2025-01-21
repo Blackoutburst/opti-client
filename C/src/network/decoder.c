@@ -34,6 +34,21 @@ void decodePacketSendChunk(U8* buffer) {
     CHUNK* chunk = createChunk(position, blocks);
     worldAddChunk(chunk);
     wgQueuePush(chunk);
+
+    I32 chunkPoses[6][3] = {
+        {position[VX] + CHUNK_SIZE, position[VY], position[VZ]},
+        {position[VX] - CHUNK_SIZE, position[VY], position[VZ]},
+        {position[VX], position[VY] + CHUNK_SIZE, position[VZ]},
+        {position[VX], position[VY] - CHUNK_SIZE, position[VZ]},
+        {position[VX], position[VY], position[VZ] + CHUNK_SIZE},
+        {position[VX], position[VY], position[VZ] - CHUNK_SIZE},
+    };
+
+    for (U8 i = 0; i < 6; i++) {
+        CHUNK* tmp = worldGetChunk(chunkPoses[i][VX], chunkPoses[i][VY], chunkPoses[i][VZ]);
+        if (tmp == NULL) continue;
+        wgQueuePush(tmp);
+    }
 }
 
 void decodePacketSendMonotypeChunk(U8* buffer) {
@@ -48,6 +63,21 @@ void decodePacketSendMonotypeChunk(U8* buffer) {
     CHUNK* chunk = createChunk(position, blocks);
     worldAddChunk(chunk);
     wgQueuePush(chunk);
+
+    I32 chunkPoses[6][3] = {
+        {position[VX] + CHUNK_SIZE, position[VY], position[VZ]},
+        {position[VX] - CHUNK_SIZE, position[VY], position[VZ]},
+        {position[VX], position[VY] + CHUNK_SIZE, position[VZ]},
+        {position[VX], position[VY] - CHUNK_SIZE, position[VZ]},
+        {position[VX], position[VY], position[VZ] + CHUNK_SIZE},
+        {position[VX], position[VY], position[VZ] - CHUNK_SIZE},
+    };
+
+    for (U8 i = 0; i < 6; i++) {
+        CHUNK* tmp = worldGetChunk(chunkPoses[i][VX], chunkPoses[i][VY], chunkPoses[i][VZ]);
+        if (tmp == NULL) continue;
+        wgQueuePush(tmp);
+    }
 }
 
 void decodePacketChat(U8* buffer) {

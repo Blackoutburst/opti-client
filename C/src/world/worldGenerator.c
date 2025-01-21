@@ -10,6 +10,18 @@ static U8 running = 0;
 static WG_QUEUE* queue = NULL;
 static WG_VAO_QUEUE* vaoQueue = NULL;
 
+#if defined(_WIN32) || defined(_WIN64)
+    CRITICAL_SECTION wgVAOQueueMutex;
+#else
+    pthread_mutex_t wgVAOQueueMutex;
+#endif
+
+#if defined(_WIN32) || defined(_WIN64)
+    CRITICAL_SECTION wgQueueMutex;
+#else
+    pthread_mutex_t wgQueueMutex;
+#endif
+
 void wgVAOQueueCleanElement(U16 index) {
     if (vaoQueue == NULL) return;
     WG_VAO_QUEUE_ELEM* element = vaoQueue->elements[index];
@@ -21,6 +33,13 @@ void wgVAOQueueCleanElement(U16 index) {
 
 void wgVAOQueuePush(CHUNK* chunk, I32* mesh) {
     if (vaoQueue == NULL) return;
+
+    #if defined(_WIN32) || defined(_WIN64)
+        EnterCriticalSection(&wgVAOQueueMutex);
+    #else
+        pthread_mutex_lock(&wgVAOQueueMutex);
+    #endif
+    
     if (vaoQueue->elements[vaoQueue->pushIndex]->used) {
         wgVAOQueueCleanElement(vaoQueue->pushIndex);
     }
@@ -33,18 +52,44 @@ void wgVAOQueuePush(CHUNK* chunk, I32* mesh) {
     if (vaoQueue->pushIndex >= vaoQueue->size) {
         vaoQueue->pushIndex = 0;
     }
+
+    #if defined(_WIN32) || defined(_WIN64)
+        LeaveCriticalSection(&wgVAOQueueMutex);
+    #else
+        pthread_mutex_unlock(&wgVAOQueueMutex);
+    #endif
 }
 
 U8 wgVAOQueuePop(WG_VAO_QUEUE_ELEM** element) {
     if (vaoQueue == NULL) return 0;
+
+    #if defined(_WIN32) || defined(_WIN64)
+        EnterCriticalSection(&wgVAOQueueMutex);
+    #else
+        pthread_mutex_lock(&wgVAOQueueMutex);
+    #endif
+    
     WG_VAO_QUEUE_ELEM* elem = vaoQueue->elements[vaoQueue->popIndex];
     *element = elem;
-    if (elem == NULL || !elem->used) return 0;
+    if (elem == NULL || !elem->used) {
+        #if defined(_WIN32) || defined(_WIN64)
+            LeaveCriticalSection(&wgVAOQueueMutex);
+        #else
+            pthread_mutex_unlock(&wgVAOQueueMutex);
+        #endif
+        return 0;
+    }
 
     vaoQueue->popIndex++;
     if (vaoQueue->popIndex >= vaoQueue->size) {
         vaoQueue->popIndex = 0;
     }
+
+    #if defined(_WIN32) || defined(_WIN64)
+        LeaveCriticalSection(&wgVAOQueueMutex);
+    #else
+        pthread_mutex_unlock(&wgVAOQueueMutex);
+    #endif
 
     return 1;
 }
@@ -57,6 +102,12 @@ void wgFreeVAOQueue() {
     free(vaoQueue->elements);
     free(vaoQueue);
     vaoQueue = NULL;
+
+    #if defined(_WIN32) || defined(_WIN64)
+        DeleteCriticalSection(&wgVAOQueueMutex);
+    #else
+        pthread_mutex_destroy(&wgVAOQueueMutex);
+    #endif
 }
 
 void wgInitVAOQueue() {
@@ -73,54 +124,17 @@ void wgInitVAOQueue() {
         q->elements[i]->used = 0;
     }
     vaoQueue = q;
+
+    #if defined(_WIN32) || defined(_WIN64)
+        InitializeCriticalSection(&wgVAOQueueMutex);
+    #else
+        pthread_mutex_init(&wgVAOQueueMutex, NULL);
+    #endif
 }
 
 void wgThreadMethod(WG_QUEUE_ELEM* element) {
-    // CENTER
     I32* mesh = generateChunkMesh(element->chunk);
     wgVAOQueuePush(element->chunk, mesh);
-    // TOP
-    CHUNK* top = worldGetChunk(element->chunk->position[VX], element->chunk->position[VY] + CHUNK_SIZE, element->chunk->position[VZ]);
-    if (top != NULL) {
-        I32* m = generateChunkMesh(top);
-        wgVAOQueuePush(top, m);
-    }
-
-    // FRONT
-    CHUNK* front = worldGetChunk(element->chunk->position[VX], element->chunk->position[VY], element->chunk->position[VZ] - CHUNK_SIZE);
-    if (front != NULL) {
-        I32* m = generateChunkMesh(front);
-        wgVAOQueuePush(front, m);
-    }
-
-    // BACK
-    CHUNK* back = worldGetChunk(element->chunk->position[VX], element->chunk->position[VY], element->chunk->position[VZ] + CHUNK_SIZE);
-    if (back != NULL) {
-        I32* m = generateChunkMesh(back);
-        wgVAOQueuePush(back, m);
-    }
-
-    // LEFT
-    CHUNK* left = worldGetChunk(element->chunk->position[VX] - CHUNK_SIZE, element->chunk->position[VY], element->chunk->position[VZ]);
-    if (left != NULL) {
-        I32* m = generateChunkMesh(left);
-        wgVAOQueuePush(left, m);
-    }
-
-    // RIGHT
-    CHUNK* right = worldGetChunk(element->chunk->position[VX] + CHUNK_SIZE, element->chunk->position[VY], element->chunk->position[VZ]);
-    if (right != NULL) {
-        I32* m = generateChunkMesh(right);
-        wgVAOQueuePush(right, m);
-    }
-
-    // BOTTOM
-    CHUNK* bottom = worldGetChunk(element->chunk->position[VX], element->chunk->position[VY] - CHUNK_SIZE, element->chunk->position[VZ]);
-    if (bottom != NULL) {
-        I32* m = generateChunkMesh(bottom);
-        wgVAOQueuePush(bottom, m);
-    }
-    
     wgQueueCleanElement(element->id);
 }
 
@@ -131,6 +145,7 @@ void wgThreadMethod(WG_QUEUE_ELEM* element) {
             while(wgQueuePop(&element)) {
                 wgThreadMethod(element);
             }
+            Sleep(1);
         }
 
         return 0;
@@ -142,6 +157,7 @@ void wgThreadMethod(WG_QUEUE_ELEM* element) {
             while(wgQueuePop(&element)) {
                 wgThreadMethod(element);
             }
+            usleep(1000);
         }
         
         return NULL;
@@ -150,19 +166,23 @@ void wgThreadMethod(WG_QUEUE_ELEM* element) {
 
 #if defined(_WIN32) || defined(_WIN64)
     void wgInitThreadPoolWIN32() {
-        HANDLE thread = CreateThread(NULL, 0, wgThreadWIN32, NULL, 0, NULL);
-        if (thread == NULL) {
-            println("World gen thread creation failed");
-            return;
+        for (U8 i = 0; i < WG_THREAD_COUNT; i++) {
+            HANDLE thread = CreateThread(NULL, 0, wgThreadWIN32, NULL, 0, NULL);
+            if (thread == NULL) {
+                printf("World gen thread %i creation failed\n", i);
+                return;
+            }
+            CloseHandle(thread);
         }
-        CloseHandle(thread);
     }
 #else
     void wgInitThreadPoolPOSIX() {
-        pthread_t thread;
-        if (pthread_create(&thread, NULL, wgThreadPOSIX, NULL)) {
-            println("World gen thread creation failed");
-            return;
+        for (U8 i = 0; i < WG_THREAD_COUNT; i++) {
+            pthread_t thread;
+            if (pthread_create(&thread, NULL, wgThreadPOSIX, NULL)) {
+                printf("World gen thread %i creation failed\n", i);
+                return;
+            }
         }
     }
 #endif
@@ -177,6 +197,13 @@ void wgQueueCleanElement(U16 index) {
 
 void wgQueuePush(CHUNK* chunk) {
     if (queue == NULL) return;
+
+    #if defined(_WIN32) || defined(_WIN64)
+        EnterCriticalSection(&wgQueueMutex);
+    #else
+        pthread_mutex_lock(&wgQueueMutex);
+    #endif
+    
     if (queue->elements[queue->pushIndex]->used) {
         wgQueueCleanElement(queue->pushIndex);
     }
@@ -188,18 +215,44 @@ void wgQueuePush(CHUNK* chunk) {
     if (queue->pushIndex >= queue->size) {
         queue->pushIndex = 0;
     }
+
+    #if defined(_WIN32) || defined(_WIN64)
+        LeaveCriticalSection(&wgQueueMutex);
+    #else
+        pthread_mutex_unlock(&wgQueueMutex);
+    #endif
 }
 
 U8 wgQueuePop(WG_QUEUE_ELEM** element) {
     if (queue == NULL) return 0;
+
+    #if defined(_WIN32) || defined(_WIN64)
+        EnterCriticalSection(&wgQueueMutex);
+    #else
+        pthread_mutex_lock(&wgQueueMutex);
+    #endif
+    
     WG_QUEUE_ELEM* elem = queue->elements[queue->popIndex];
     *element = elem;
-    if (elem == NULL || !elem->used) return 0;
+    if (elem == NULL || !elem->used) {
+        #if defined(_WIN32) || defined(_WIN64)
+            LeaveCriticalSection(&wgQueueMutex);
+        #else
+            pthread_mutex_unlock(&wgQueueMutex);
+        #endif
+        return 0;
+    }
 
     queue->popIndex++;
     if (queue->popIndex >= queue->size) {
         queue->popIndex = 0;
     }
+
+    #if defined(_WIN32) || defined(_WIN64)
+        LeaveCriticalSection(&wgQueueMutex);
+    #else
+        pthread_mutex_unlock(&wgQueueMutex);
+    #endif
     return 1;
 }
 
@@ -211,6 +264,12 @@ void wgFreeQueue() {
     free(queue->elements);
     free(queue);
     queue = NULL;
+
+    #if defined(_WIN32) || defined(_WIN64)
+        DeleteCriticalSection(&wgQueueMutex);
+    #else
+        pthread_mutex_destroy(&wgQueueMutex);
+    #endif
 }
 
 void wgInitQueue() {
@@ -226,6 +285,12 @@ void wgInitQueue() {
         q->elements[i]->used = 0;
     }
     queue = q;
+
+    #if defined(_WIN32) || defined(_WIN64)
+        InitializeCriticalSection(&wgQueueMutex);
+    #else
+        pthread_mutex_init(&wgQueueMutex, NULL);
+    #endif
 }
 
 void wgCleanThreadPool() {

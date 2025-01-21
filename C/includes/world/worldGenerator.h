@@ -2,8 +2,16 @@
 #include "world/chunk.h"
 #include "utils/types.h"
 
-#define WG_QUEUE_SIZE 4096
+#if defined(_WIN32) || defined(_WIN64)
+    #include <winsock2.h>
+#else
+    #include <unistd.h>
+    #include <pthread.h>
+#endif
+
+#define WG_QUEUE_SIZE 4096 * 2
 #define WG_VAO_QUEUE_SIZE 4096
+#define WG_THREAD_COUNT 4
 
 typedef struct worldGenQueue WG_QUEUE;
 typedef struct worldGenQueueElement WG_QUEUE_ELEM;

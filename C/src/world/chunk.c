@@ -11,7 +11,9 @@
     #include "gl/glew.h"
     #include <GL/gl.h>
 #else
+    #define GL_GLEXT_PROTOTYPES
     #include <GL/gl.h>
+    #include <GL/glext.h>
 #endif
 
 #define BLOCK_COUNT CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE
@@ -25,7 +27,10 @@ I32 packVertexData(I8 x, I8 y, I8 z, I8 u, I8 v, I8 n, I8 t) {
 }
 
 void generateChunkVAO(CHUNK* chunk, I32* vertices) {
-    if (!chunk->meshVertexCount) return;
+    if (!chunk->meshVertexCount) {
+        free(vertices);
+        return;
+    }
     glBindVertexArray(chunk->vaoID);
 
     glBindBuffer(GL_ARRAY_BUFFER, chunk->vboID);

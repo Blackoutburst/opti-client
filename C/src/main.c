@@ -19,11 +19,12 @@
 #if defined(__APPLE__)
     #include <OpenGL/gl3.h>
 #elif defined(_WIN32) || defined(_WIN64)
-    //#include <windows.h>
     #include "gl/glew.h"
     #include <GL/gl.h>
 #else
+    #define GL_GLEXT_PROTOTYPES
     #include <GL/gl.h>
+    #include <GL/glext.h>
 #endif
 
 #if defined(_WIN32) || defined(_WIN64)
@@ -49,25 +50,6 @@ void calculateFPS() {
     }
 }
 #endif
-
-void doVAO(WG_VAO_QUEUE_ELEM* vaoQueueElement) {
-    while (wgVAOQueue1Pop(&vaoQueueElement)) {
-        generateChunkVAO(vaoQueueElement->chunk, vaoQueueElement->mesh);
-        wgVAOQueue1CleanElement(vaoQueueElement->id);
-    }
-    while (wgVAOQueue2Pop(&vaoQueueElement)) {
-        generateChunkVAO(vaoQueueElement->chunk, vaoQueueElement->mesh);
-        wgVAOQueue2CleanElement(vaoQueueElement->id);
-    }
-    while (wgVAOQueue3Pop(&vaoQueueElement)) {
-        generateChunkVAO(vaoQueueElement->chunk, vaoQueueElement->mesh);
-        wgVAOQueue3CleanElement(vaoQueueElement->id);
-    }
-    while (wgVAOQueue4Pop(&vaoQueueElement)) {
-        generateChunkVAO(vaoQueueElement->chunk, vaoQueueElement->mesh);
-        wgVAOQueue4CleanElement(vaoQueueElement->id);
-    }
-}
 
 void update(GLFWwindow* window) {
 
@@ -147,7 +129,11 @@ void update(GLFWwindow* window) {
             queueElement->function(queueElement->buffer);
             networkQueueCleanElement(queueElement->id);
         }
-        doVAO(vaoQueueElement);
+        
+        while (wgVAOQueuePop(&vaoQueueElement)) {
+            generateChunkVAO(vaoQueueElement->chunk, vaoQueueElement->mesh);
+            wgVAOQueueCleanElement(vaoQueueElement->id);
+        }
 
         clearWindow();
 
@@ -211,15 +197,20 @@ void update(GLFWwindow* window) {
     worldClean();
 
     glfwTerminate();
+
+    free(modelMatrix);
+    free(viewMatrix);
+    free(projectionMatrix);
 }
 
 
 I32 main(void) {
-    GLFWwindow* window = createWindow();
-
-    wgInitThreadPool();
     worldInit();
+    wgInitThreadPool();
     openConnection("162.19.137.231", 15000);
+    
+    GLFWwindow* window = createWindow();
+    
     U8 packet[66];
     for (I32 i = 0; i < 66; i++) {
         packet[i] = 0;

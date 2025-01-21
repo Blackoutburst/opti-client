@@ -10,7 +10,9 @@
     #include "gl/glew.h"
     #include <GL/gl.h>
 #else
+    #define GL_GLEXT_PROTOTYPES
     #include <GL/gl.h>
+    #include <GL/glext.h>
 #endif
 
 GLFWwindow* createWindow() {

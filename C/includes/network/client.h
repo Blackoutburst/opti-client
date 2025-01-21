@@ -7,6 +7,7 @@ typedef struct networkQueue NET_QUEUE;
 typedef struct networkQueueElement NET_QUEUE_ELEM;
 
 struct networkQueueElement {
+    U8 used;
     U16 id;
     void (*function)(U8*);
     U8* buffer;

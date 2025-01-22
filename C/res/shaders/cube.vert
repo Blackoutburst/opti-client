@@ -30,10 +30,10 @@ void main() {
 	int X = data & 31;
 	int Y = (data >> 5) & 31;
 	int Z = (data >> 10) & 31;
-	int U = (data >> 15) & 31;
-	int V = (data >> 20) & 31;
-	int N = (data >> 25) & 7;
-	int T = (data >> 28) & 15;
+	int U = (data >> 15) & 1;
+	int V = (data >> 16) & 1;
+	int N = (data >> 17) & 7;
+	int T = (data >> 20) & 31;
 
 	FragPos = vec3(X, Y, Z) + chunkPos;
 	norm = getNormal(int(N));

@@ -16,6 +16,8 @@
 #include "world/worldGenerator.h"
 #include "network/client.h"
 #include "network/networkQueue.h"
+#include "network/packet.h"
+#include "network/encoder.h"
 #include "world/vaoQueue.h"
 
 #if defined(__APPLE__)
@@ -70,9 +72,19 @@ void update(GLFWwindow* window) {
         "./res/blocks/water.png",
         "./res/blocks/sand.png",
         "./res/blocks/snow.png",
+        "./res/blocks/planks_oak.png",
+        "./res/blocks/stonebrick.png",
+        "./res/blocks/netherrack.png",
+        "./res/blocks/gold_block.png",
+        "./res/blocks/ice_packed.png",
+        "./res/blocks/lava.png",
+        "./res/blocks/barrel_top.png",
+        "./res/blocks/barrel_side.png",
+        "./res/blocks/barrel_bottom.png",
+        "./res/blocks/bookshelf.png",
     };
 
-    I32 diffuseMap = createTextureArray(textureFiles, 12, 16);
+    I32 diffuseMap = createTextureArray(textureFiles, 22, 16);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D_ARRAY, diffuseMap);
 
@@ -212,14 +224,9 @@ I32 main(void) {
     openConnection("162.19.137.231", 15000);
     
     GLFWwindow* window = windowCreate();
+
+    packetSendClientMetadata(16, (const U8*)"Blackoutburst");
     
-    U8 packet[66];
-    for (I32 i = 0; i < 66; i++) {
-        packet[i] = 0;
-    }
-    packet[0] = 0x04;
-    packet[1] = 16;
-    connectionSend(packet, 66);
     update(window);
 
     wgCleanThreadPool();

@@ -12,7 +12,7 @@ void chunkPrint(CHUNK* chunk) {
 }
 
 I32 chunkPackVertexData(I8 x, I8 y, I8 z, I8 u, I8 v, I8 n, I8 t) {
-    return (x & 31) | (y & 31) << 5 | (z & 31) << 10 | (u & 31) << 15 | (v & 31) << 20 | (n & 7) << 25 | (t & 15) << 28;
+    return (x & 31) | (y & 31) << 5 | (z & 31) << 10 | (u & 1) << 15 | (v & 1) << 16 | (n & 7) << 17 | (t & 31) << 20;
 }
 
 void chunkGenerateVAO(CHUNK* chunk, I32* vertices) {

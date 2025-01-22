@@ -73,7 +73,7 @@ void connectionSend(U8* buffer, I16 size) {
             return;
         }
 
-        U16 size = getPacketSize(packetId);
+        U16 size = getClientPacketSize(packetId);
         if (size <= 0) {
             printf("Invalid packet size: %i\n", size);
             return;
@@ -92,7 +92,7 @@ void connectionSend(U8* buffer, I16 size) {
             }
         }
 
-        void* func = getPacketfunction(packetId);
+        void* func = getClientPacketfunction(packetId);
         networkQueuePush(func, dataBuffer);
     }
 #else
@@ -104,7 +104,7 @@ void connectionSend(U8* buffer, I16 size) {
             closeConnection();
             return;
         }
-        U16 size = getPacketSize(packetId);
+        U16 size = getClientPacketSize(packetId);
         if (size <= 0) {
             printf("Invalid packet size: %i\n", size);
             return;
@@ -122,7 +122,7 @@ void connectionSend(U8* buffer, I16 size) {
                 return;
             }
         }
-        void* func = getPacketfunction(packetId);
+        void* func = getClientPacketfunction(packetId);
         networkQueuePush(func, dataBuffer);
     }
 #endif

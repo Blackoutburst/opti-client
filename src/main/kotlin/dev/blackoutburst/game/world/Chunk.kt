@@ -36,10 +36,10 @@ class Chunk(
     ): Int = (x and 31) or
             ((y and 31) shl 5) or
             ((z and 31) shl 10) or
-            ((u and 31) shl 15) or
-            ((v and 31) shl 20) or
-            ((n and 7) shl 25) or
-            ((t and 15) shl 28)
+            ((u and 1) shl 15) or
+            ((v and 1) shl 16) or
+            ((n and 7) shl 17) or
+            ((t and 31) shl 20)
 
     init {
         World.chunkUpdate.incrementAndGet()
@@ -91,97 +91,6 @@ class Chunk(
     }
 
     private fun genMesh() {
-        if (isMonoType()) {
-            val blockType = BlockType.getByID(blocks[0])
-            val t1 = blockType.textures[0]
-            val t2 = blockType.textures[1]
-            val t3 = blockType.textures[2]
-            val t4 = blockType.textures[3]
-            val t5 = blockType.textures[4]
-            val t6 = blockType.textures[5]
-
-            // TOP
-            vertices.add(packData(0, 16, 0, 0, 0, 0, t1))
-            vertices.add(packData(16, 16, 0, 16, 0, 0, t1))
-            vertices.add(packData(16, 16, 16, 16, 16, 0, t1))
-            vertices.add(packData(0, 16, 16, 0, 16, 0, t1))
-
-            indices.add(0)
-            indices.add(2)
-            indices.add(1)
-            indices.add(0)
-            indices.add(3)
-            indices.add(2)
-
-            // FRONT
-            vertices.add(packData(0, 0, 0, 16, 16, 1, t2))
-            vertices.add(packData(16, 0, 0, 0, 16, 1, t2))
-            vertices.add(packData(16, 16, 0, 0, 0, 1, t2))
-            vertices.add(packData(0, 16, 0, 16, 0, 1, t2))
-
-            indices.add(4)
-            indices.add(6)
-            indices.add(5)
-            indices.add(4)
-            indices.add(7)
-            indices.add(6)
-
-            // BACK
-            vertices.add(packData(0, 0, 16, 0, 16, 2, t3))
-            vertices.add(packData(16, 0, 16, 16, 16, 2, t3))
-            vertices.add(packData(16, 16, 16, 16, 0, 2, t3))
-            vertices.add(packData(0, 16, 16, 0, 0, 2, t3))
-
-            indices.add(9)
-            indices.add(10)
-            indices.add(8)
-            indices.add(10)
-            indices.add(11)
-            indices.add(8)
-
-            // LEFT
-            vertices.add(packData(0, 0, 0, 16, 16, 3, t4))
-            vertices.add(packData(0, 16, 0, 16, 0, 3, t4))
-            vertices.add(packData(0, 16, 16, 0, 0, 3, t4))
-            vertices.add(packData(0, 0, 16, 0, 16, 3, t4))
-
-            indices.add(12)
-            indices.add(14)
-            indices.add(13)
-            indices.add(12)
-            indices.add(15)
-            indices.add(14)
-
-            // RIGHT
-            vertices.add(packData(16, 0, 0, 0, 16, 4, t5))
-            vertices.add(packData(16, 16, 0, 0, 0, 4, t5))
-            vertices.add(packData(16, 16, 16, 16, 0, 4, t5))
-            vertices.add(packData(16, 0, 16, 16, 16, 4, t5))
-
-            indices.add(17)
-            indices.add(18)
-            indices.add(16)
-            indices.add(18)
-            indices.add(19)
-            indices.add(16)
-
-            // BOTTOM
-            vertices.add(packData(0, 0, 0, 0, 16, 5, t6))
-            vertices.add(packData(16, 0, 0, 16, 16, 5, t6))
-            vertices.add(packData(16, 0, 16, 16, 0, 5, t6))
-            vertices.add(packData(0, 0, 16, 0, 0, 5, t6))
-
-            indices.add(21)
-            indices.add(22)
-            indices.add(20)
-            indices.add(22)
-            indices.add(23)
-            indices.add(20)
-
-            indexCount = indices.size
-            return
-        }
-
         var offset = 0
         block@for (i in 0 until 4096) {
             val block = blocks[i]

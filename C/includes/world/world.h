@@ -3,7 +3,7 @@
 #include "utils/types.h"
 #include "world/chunk.h"
 
-#define CHUNK_COUNT 4096
+#define CHUNK_COUNT 32768
 
 typedef struct hashSlot HASH;
 
@@ -19,6 +19,7 @@ CHUNK* worldGetChunk(I32 x, I32 y, I32 z);
 U8 worldGetBlock(I32 x, I32 y, I32 z);
 void worldAddChunk(CHUNK* chunk);
 void worldRemoveChunk(I32 x, I32 y, I32 z);
+void worldRemoveChunkOutOfRenderDistance(U8 renderDistance, I32 x, I32 y, I32 z);
 void worldRender(I32 shaderProgram);
 void worldClean();
 void worldInit();

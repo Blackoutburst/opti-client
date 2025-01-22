@@ -84,6 +84,19 @@ void worldAddChunk(CHUNK* chunk) {
             
             mutexUnlock(&chunkHashMutex);
             return;
+        } else if (chunks[index].used &&
+                   chunks[index].x == chunk->position[VX] &&
+                   chunks[index].y == chunk->position[VY] &&
+                   chunks[index].z == chunk->position[VZ])
+        {
+            worldRemoveChunk(chunk->position[VX], chunk->position[VY], chunk->position[VZ]);
+            chunks[index].x = chunk->position[VX];
+            chunks[index].y = chunk->position[VY];
+            chunks[index].z = chunk->position[VZ];
+            chunks[index].chunk = chunk;
+            chunks[index].used = 1;
+            mutexUnlock(&chunkHashMutex);
+            return;  
         }
         
         index = (index + 1) % CHUNK_COUNT;
@@ -98,21 +111,60 @@ void worldAddChunk(CHUNK* chunk) {
 void worldRemoveChunk(I32 x, I32 y, I32 z) {
     mutexLock(&chunkHashMutex);
     
+    U32 index = chunkHash(x, y, z) % CHUNK_COUNT;
+    U32 start = index;
+
+    while (1) {
+        if (chunks[index].used &&
+            chunks[index].x == x &&
+            chunks[index].y == y &&
+            chunks[index].z == z)
+        {
+            chunkDrestroy(chunks[index].chunk);
+        
+            chunks[index].x = 0;
+            chunks[index].y = 0;
+            chunks[index].z = 0;
+            chunks[index].chunk = NULL;
+            chunks[index].used = 0;
+
+            mutexUnlock(&chunkHashMutex);
+            return;
+        }
+        
+        index = (index + 1) % CHUNK_COUNT;
+        
+        if (index == start) {
+            mutexUnlock(&chunkHashMutex);
+            return;
+        }
+    }
+}
+
+void worldRemoveChunkOutOfRenderDistance(U8 renderDistance, I32 x, I32 y, I32 z) {
+    mutexLock(&chunkHashMutex);
+
     if (chunks == NULL) {
         mutexUnlock(&chunkHashMutex);
         return;
     }
-    
-    for (U32 i = 0; i < CHUNK_COUNT; i++) {
-        if (chunks[i].chunk == NULL) continue;
-        if (chunks[i].chunk->position[VX] == x &&
-            chunks[i].chunk->position[VY] == y &&
-            chunks[i].chunk->position[VZ] == z
-        ) {
-            chunkDrestroy(chunks[i].chunk);
-            chunks[i].chunk = NULL;
-            chunks[i].used = 0;
-            break;
+
+    I32 px = x / CHUNK_SIZE;
+    I32 py = y / CHUNK_SIZE;
+    I32 pz = z / CHUNK_SIZE;
+
+    for (U16 i = 0; i < CHUNK_COUNT; i++) {
+        if (!chunks[i].used) continue;
+
+        I32 cx = chunks[i].x / CHUNK_SIZE;
+        I32 cy = chunks[i].y / CHUNK_SIZE;
+        I32 cz = chunks[i].z / CHUNK_SIZE;
+
+        if (abs(cx - px) > renderDistance ||
+            abs(cy - py) > renderDistance ||
+            abs(cz - pz) > renderDistance)
+        {
+            worldRemoveChunk(chunks[i].x, chunks[i].y, chunks[i].z);
         }
     }
 

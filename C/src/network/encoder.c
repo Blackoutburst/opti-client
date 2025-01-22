@@ -8,6 +8,13 @@ U8* encodePacketUpdateEntity(S00UPDATE_ENTITY* packet) {
 
     U16 index = 0;
 
+    putU8(&index, packet->id, buffer);
+    putF32(&index, packet->x, buffer);
+    putF32(&index, packet->y, buffer);
+    putF32(&index, packet->z, buffer);
+    putF32(&index, packet->yaw, buffer);
+    putF32(&index, packet->pitch, buffer);
+
     return buffer;
 }
 

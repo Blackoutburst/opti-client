@@ -119,9 +119,9 @@ void update(GLFWwindow* window) {
 
     /////////////
 
-    F32 x = 8;
+    F32 x = 0;
     F32 y = 8;
-    F32 z = 30;
+    F32 z = 0;
     F64 mouseX = 0;
     F64 mouseY = 0;
     glfwGetCursorPos(window, &mouseX, &mouseY);
@@ -139,6 +139,9 @@ void update(GLFWwindow* window) {
 
     while (!glfwWindowShouldClose(window) && !glfwGetKey(window, GLFW_KEY_ESCAPE)) {
         //calculateFPS();
+
+        worldRemoveChunkOutOfRenderDistance(16, x, y, z);
+        
         while (networkQueuePop(&queueElement)) {
             queueElement->function(queueElement->buffer);
             networkQueueCleanElement(queueElement->id);
@@ -148,6 +151,8 @@ void update(GLFWwindow* window) {
             chunkGenerateVAO(vaoQueueElement->chunk, vaoQueueElement->mesh);
             vaoQueueCleanElement(vaoQueueElement->id);
         }
+
+        packetSendUpdateEntity(x, y, z, yaw, pitch);
 
         windowClear();
 

@@ -301,14 +301,13 @@ U16 getServerPacketSize(I8 packetID) {
 void packetSendUpdateEntity(I32 x, I32 y, I32 z, F32 yaw, F32 pitch) {
     S00UPDATE_ENTITY* packet = malloc(sizeof(S00UPDATE_ENTITY));
     packet->id = SERVER_PACKET_UPDATE_ENTITY;
-    packet->type = type;
     packet->x = x;
     packet->y = y;
     packet->z = z;
     packet->yaw = yaw;
     packet->pitch = pitch;
 
-    U8* buffer = encodePacketChat(packet);
+    U8* buffer = encodePacketUpdateEntity(packet);
 
     connectionSend(buffer, sizeof(S00UPDATE_ENTITY));
     
@@ -324,7 +323,7 @@ void packetSendUpdateBlock(U8 type, I32 x, I32 y, I32 z) {
     packet->y = y;
     packet->z = z;
 
-    U8* buffer = encodePacketChat(packet);
+    U8* buffer = encodePacketUpdateBlock(packet);
 
     connectionSend(buffer, sizeof(S01UPDATE_BLOCK));
     

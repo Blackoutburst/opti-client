@@ -6,6 +6,7 @@
 #include "world/blocks.h"
 #include "world/world.h"
 #include "world/chunk.h"
+#include "world/meshQueue.h"
 
 void chunkPrint(CHUNK* chunk) {
     printf("vao: %i, vbo: %i, ebo: %i, vertex count: %u position: %p blocks: %p\n", chunk->vaoID, chunk->vboID, chunk->eboID, chunk->vertexCount, chunk->position, chunk->blocks);

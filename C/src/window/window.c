@@ -1,21 +1,9 @@
-#define GLFW_INCLUDE_NONE
-
+#include <stdlib.h>
+#include "graphics/opengl.h"
 #include "glfw/glfw3.h"
 #include "utils/types.h"
-#include <stdlib.h>
 
-#if defined(__APPLE__)
-    #include <OpenGL/gl3.h>
-#elif defined(_WIN32) || defined(_WIN64)
-    #include "gl/glew.h"
-    #include <GL/gl.h>
-#else
-    #define GL_GLEXT_PROTOTYPES
-    #include <GL/gl.h>
-    #include <GL/glext.h>
-#endif
-
-GLFWwindow* createWindow() {
+GLFWwindow* windowCreate() {
     GLFWwindow* window;
 
     if (!glfwInit())
@@ -49,11 +37,11 @@ GLFWwindow* createWindow() {
     return window;
 }
 
-void clearWindow() {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-}
-
-void updateWindow(GLFWwindow* window) {
+void windowUpdate(GLFWwindow* window) {
     glfwSwapBuffers(window);
     glfwPollEvents();
+}
+
+void windowClear() {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }

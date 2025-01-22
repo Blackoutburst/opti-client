@@ -1,4 +1,7 @@
 #pragma once
-GLFWwindow* createWindow();
-void updateWindow(GLFWwindow* window);
-void clearWindow();
+
+#include "glfw/glfw3.h"
+
+GLFWwindow* windowCreate();
+void windowUpdate(GLFWwindow* window);
+void windowClear();

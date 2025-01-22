@@ -31,9 +31,9 @@ void decodePacketSendChunk(U8* buffer) {
     position[VZ] = getI32(bufferptr);
     U8* blocks = malloc(sizeof(U8) * CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE);
     for (I32 i = 0; i < CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE; i++) blocks[i] = getU8(bufferptr);
-    CHUNK* chunk = createChunk(position, blocks);
+    CHUNK* chunk = chunkCreate(position, blocks);
     worldAddChunk(chunk);
-    wgQueuePush(chunk);
+    meshQueuePush(chunk);
 
     I32 chunkPoses[6][3] = {
         {position[VX] + CHUNK_SIZE, position[VY], position[VZ]},
@@ -47,7 +47,7 @@ void decodePacketSendChunk(U8* buffer) {
     for (U8 i = 0; i < 6; i++) {
         CHUNK* tmp = worldGetChunk(chunkPoses[i][VX], chunkPoses[i][VY], chunkPoses[i][VZ]);
         if (tmp == NULL) continue;
-        wgQueuePush(tmp);
+        meshQueuePush(tmp);
     }
 }
 
@@ -60,9 +60,9 @@ void decodePacketSendMonotypeChunk(U8* buffer) {
     U8* blocks = malloc(sizeof(U8) * CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE);
     U8 blockType = getU8(bufferptr);
     for (I32 i = 0; i < CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE; i++) blocks[i] = blockType;
-    CHUNK* chunk = createChunk(position, blocks);
+    CHUNK* chunk = chunkCreate(position, blocks);
     worldAddChunk(chunk);
-    wgQueuePush(chunk);
+    meshQueuePush(chunk);
 
     I32 chunkPoses[6][3] = {
         {position[VX] + CHUNK_SIZE, position[VY], position[VZ]},
@@ -76,7 +76,7 @@ void decodePacketSendMonotypeChunk(U8* buffer) {
     for (U8 i = 0; i < 6; i++) {
         CHUNK* tmp = worldGetChunk(chunkPoses[i][VX], chunkPoses[i][VY], chunkPoses[i][VZ]);
         if (tmp == NULL) continue;
-        wgQueuePush(tmp);
+        meshQueuePush(tmp);
     }
 }
 

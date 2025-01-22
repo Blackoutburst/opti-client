@@ -1,32 +1,25 @@
-#include <stdlib.h>
-#include "world/chunk.h"
-#include "world/world.h"
-#include "world/worldGenerator.h"
-#include "utils/ioUtils.h"
+
 #include "graphics/shader.h"
 #include "utils/math.h"
+#include "utils/types.h"
+#include "utils/mutex.h"
+#include "world/chunk.h"
+#include "world/blocks.h"
+#include "world/world.h"
 
 static HASH* chunks = NULL;
 
 #if defined(_WIN32) || defined(_WIN64)
-    CRITICAL_SECTION chunkHashMutex;
+    static CRITICAL_SECTION chunkHashMutex;
 #else
-    pthread_mutex_t chunkHashMutex;
+    static pthread_mutex_t chunkHashMutex;
 #endif
 
 CHUNK* worldGetChunk(I32 x, I32 y, I32 z) {
-    #if defined(_WIN32) || defined(_WIN64)
-        EnterCriticalSection(&chunkHashMutex);
-    #else
-        pthread_mutex_lock(&chunkHashMutex);
-    #endif
+    mutexLock(&chunkHashMutex);
 
     if (chunks == NULL) {
-        #if defined(_WIN32) || defined(_WIN64)
-            LeaveCriticalSection(&chunkHashMutex);
-        #else
-            pthread_mutex_unlock(&chunkHashMutex);
-        #endif
+        mutexUnlock(&chunkHashMutex);
         return NULL;
     }
 
@@ -35,29 +28,19 @@ CHUNK* worldGetChunk(I32 x, I32 y, I32 z) {
 
     while (1) {
         if (!chunks[index].used) {
-            #if defined(_WIN32) || defined(_WIN64)
-                LeaveCriticalSection(&chunkHashMutex);
-            #else
-                pthread_mutex_unlock(&chunkHashMutex);
-            #endif
+            mutexUnlock(&chunkHashMutex);
             return NULL;
         }
+        
         if (chunks[index].x == x && chunks[index].y == y && chunks[index].z == z) {
-            #if defined(_WIN32) || defined(_WIN64)
-                LeaveCriticalSection(&chunkHashMutex);
-            #else
-                pthread_mutex_unlock(&chunkHashMutex);
-            #endif
+            mutexUnlock(&chunkHashMutex);
             return chunks[index].chunk;
         }
 
         index = (index + 1) % CHUNK_COUNT;
+        
         if (index == start) {
-            #if defined(_WIN32) || defined(_WIN64)
-                LeaveCriticalSection(&chunkHashMutex);
-            #else
-                pthread_mutex_unlock(&chunkHashMutex);
-            #endif
+            mutexUnlock(&chunkHashMutex);
             return NULL;
         }
     }
@@ -67,29 +50,24 @@ U8 worldGetBlock(I32 x, I32 y, I32 z) {
     I32 cx = (x < 0 ? (x + 1) / CHUNK_SIZE - 1 : x / CHUNK_SIZE) * CHUNK_SIZE;
     I32 cy = (y < 0 ? (y + 1) / CHUNK_SIZE - 1 : y / CHUNK_SIZE) * CHUNK_SIZE;
     I32 cz = (z < 0 ? (z + 1) / CHUNK_SIZE - 1 : z / CHUNK_SIZE) * CHUNK_SIZE;
+    
     CHUNK* chunk = worldGetChunk(cx, cy, cz);
     if (chunk == NULL) return 0;
     
     I32 bx = ((x - cx) % CHUNK_SIZE + CHUNK_SIZE) % CHUNK_SIZE;
     I32 by = ((y - cy) % CHUNK_SIZE + CHUNK_SIZE) % CHUNK_SIZE;
     I32 bz = ((z - cz) % CHUNK_SIZE + CHUNK_SIZE) % CHUNK_SIZE;
+    
     U32 index = xyzToIndex(bx, by, bz);
     
     return chunk->blocks[index];
 }
 
 void worldAddChunk(CHUNK* chunk) {
-    #if defined(_WIN32) || defined(_WIN64)
-        EnterCriticalSection(&chunkHashMutex);
-    #else
-        pthread_mutex_lock(&chunkHashMutex);
-    #endif
+    mutexLock(&chunkHashMutex);
+    
     if (chunks == NULL && chunk != NULL) {
-        #if defined(_WIN32) || defined(_WIN64)
-            LeaveCriticalSection(&chunkHashMutex);
-        #else
-            pthread_mutex_unlock(&chunkHashMutex);
-        #endif
+        mutexUnlock(&chunkHashMutex);
         return;
     }
 
@@ -103,37 +81,25 @@ void worldAddChunk(CHUNK* chunk) {
             chunks[index].z = chunk->position[VZ];
             chunks[index].chunk = chunk;
             chunks[index].used = 1;
-            #if defined(_WIN32) || defined(_WIN64)
-                LeaveCriticalSection(&chunkHashMutex);
-            #else
-                pthread_mutex_unlock(&chunkHashMutex);
-            #endif
+            
+            mutexUnlock(&chunkHashMutex);
             return;
         }
+        
         index = (index + 1) % CHUNK_COUNT;
+        
         if (index == start) {
-            #if defined(_WIN32) || defined(_WIN64)
-                LeaveCriticalSection(&chunkHashMutex);
-            #else
-                pthread_mutex_unlock(&chunkHashMutex);
-            #endif
+            mutexUnlock(&chunkHashMutex);
             return;
         }
     }
 }
 
 void worldRemoveChunk(I32 x, I32 y, I32 z) {
-    #if defined(_WIN32) || defined(_WIN64)
-        EnterCriticalSection(&chunkHashMutex);
-    #else
-        pthread_mutex_lock(&chunkHashMutex);
-    #endif
+    mutexLock(&chunkHashMutex);
+    
     if (chunks == NULL) {
-        #if defined(_WIN32) || defined(_WIN64)
-            LeaveCriticalSection(&chunkHashMutex);
-        #else
-            pthread_mutex_unlock(&chunkHashMutex);
-        #endif
+        mutexUnlock(&chunkHashMutex);
         return;
     }
     
@@ -143,18 +109,14 @@ void worldRemoveChunk(I32 x, I32 y, I32 z) {
             chunks[i].chunk->position[VY] == y &&
             chunks[i].chunk->position[VZ] == z
         ) {
-            destroyChunk(chunks[i].chunk);
+            chunkDrestroy(chunks[i].chunk);
             chunks[i].chunk = NULL;
             chunks[i].used = 0;
             break;
         }
     }
 
-    #if defined(_WIN32) || defined(_WIN64)
-        LeaveCriticalSection(&chunkHashMutex);
-    #else
-        pthread_mutex_unlock(&chunkHashMutex);
-    #endif
+    mutexUnlock(&chunkHashMutex);
 }
 
 void worldRender(I32 shaderProgram) {
@@ -163,21 +125,17 @@ void worldRender(I32 shaderProgram) {
     for (U32 i = 0; i < CHUNK_COUNT; i++) {
         if (chunks[i].chunk == NULL) continue;
         setUniform3f(shaderProgram, "chunkPos", chunks[i].chunk->position[VX], chunks[i].chunk->position[VY], chunks[i].chunk->position[VZ]);
-        renderChunk(chunks[i].chunk);
+        chunkRender(chunks[i].chunk);
     }
 }
 
 void worldClean() {
     if (chunks == NULL) return;
     
-    for (U32 i = 0; i < CHUNK_COUNT; i++) destroyChunk(chunks[i].chunk);
+    for (U32 i = 0; i < CHUNK_COUNT; i++) chunkDrestroy(chunks[i].chunk);
     free(chunks);
 
-    #if defined(_WIN32) || defined(_WIN64)
-        DeleteCriticalSection(&chunkHashMutex);
-    #else
-        pthread_mutex_destroy(&chunkHashMutex);
-    #endif
+    mutexDestroy(&chunkHashMutex);
 }
 
 void worldInit() {
@@ -192,9 +150,5 @@ void worldInit() {
         chunks[i].used = 0;
     }
 
-    #if defined(_WIN32) || defined(_WIN64)
-        InitializeCriticalSection(&chunkHashMutex);
-    #else
-        pthread_mutex_init(&chunkHashMutex, NULL);
-    #endif
+    mutexCreate(&chunkHashMutex);
 }

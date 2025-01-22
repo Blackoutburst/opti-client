@@ -3,7 +3,6 @@
 #include "utils/types.h"
 #include "world/chunk.h"
 
-#define CHUNK_SIZE 16
 #define CHUNK_COUNT 4096
 
 typedef struct hashSlot HASH;

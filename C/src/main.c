@@ -15,6 +15,8 @@
 #include "world/world.h"
 #include "world/worldGenerator.h"
 #include "network/client.h"
+#include "network/networkQueue.h"
+#include "world/vaoQueue.h"
 
 #if defined(__APPLE__)
     #include <OpenGL/gl3.h>
@@ -78,8 +80,8 @@ void update(GLFWwindow* window) {
 
     ////// SHADER ///////
 
-    const I8* vertexShaderSource = readFile("./res/shaders/cube.vert");
-    const I8* fragmentShaderSource = readFile("./res/shaders/cube.frag");
+    I8* vertexShaderSource = readFile("./res/shaders/cube.vert");
+    I8* fragmentShaderSource = readFile("./res/shaders/cube.frag");
 
     I32 vertexShader = compileShader(vertexShaderSource, GL_VERTEX_SHADER);
     I32 fragmentShader = compileShader(fragmentShaderSource, GL_FRAGMENT_SHADER);
@@ -121,7 +123,7 @@ void update(GLFWwindow* window) {
     F32 sensitivity = 0.1f;
 
     NET_QUEUE_ELEM* queueElement = NULL;
-    WG_VAO_QUEUE_ELEM* vaoQueueElement = NULL;
+    VAO_QUEUE_ELEM* vaoQueueElement = NULL;
 
     while (!glfwWindowShouldClose(window) && !glfwGetKey(window, GLFW_KEY_ESCAPE)) {
         //calculateFPS();
@@ -130,12 +132,12 @@ void update(GLFWwindow* window) {
             networkQueueCleanElement(queueElement->id);
         }
         
-        while (wgVAOQueuePop(&vaoQueueElement)) {
-            generateChunkVAO(vaoQueueElement->chunk, vaoQueueElement->mesh);
-            wgVAOQueueCleanElement(vaoQueueElement->id);
+        while (vaoQueuePop(&vaoQueueElement)) {
+            chunkGenerateVAO(vaoQueueElement->chunk, vaoQueueElement->mesh);
+            vaoQueueCleanElement(vaoQueueElement->id);
         }
 
-        clearWindow();
+        windowClear();
 
         matrixSetIdentity(viewMatrix);
         matrixRotate(viewMatrix, rad(yaw), 1, 0, 0);
@@ -191,7 +193,7 @@ void update(GLFWwindow* window) {
 
         worldRender(shaderProgram);
 
-        updateWindow(window);
+        windowUpdate(window);
     }
 
     worldClean();
@@ -209,7 +211,7 @@ I32 main(void) {
     wgInitThreadPool();
     openConnection("162.19.137.231", 15000);
     
-    GLFWwindow* window = createWindow();
+    GLFWwindow* window = windowCreate();
     
     U8 packet[66];
     for (I32 i = 0; i < 66; i++) {

@@ -1,5 +1,7 @@
-#include "utils/types.h"
 #include <stdio.h>
+#include "utils/types.h"
+#include "network/packet.h"
+#include "network/decoder.h"
 
 void printBufferHex(const I8 *title, const U8 *buf, U32 buf_len)
 {
@@ -120,4 +122,49 @@ F64 getF64(U8** buffer) {
     return u.f;
 }
 
+void* getPacketfunction(I8 packetID) {
+    switch (packetID) {
+        case CLIENT_PACKET_IDENTIFICATION:
+            return &decodePacketIdentification;
+        case CLIENT_PACKET_ADD_ENTITY:
+            return &decodePacketAddEntity;
+        case CLIENT_PACKET_REMOVE_ENTITY:
+            return &decodePacketRemoveEntity;
+        case CLIENT_PACKET_UPDATE_ENTITY:
+            return &decodePacketUpdateEntity;
+        case CLIENT_PACKET_SEND_CHUNK:
+            return &decodePacketSendChunk;
+        case CLIENT_PACKET_SEND_MONOTYPE_CHUNK:
+            return &decodePacketSendMonotypeChunk;
+        case CLIENT_PACKET_CHAT:
+            return &decodePacketChat;
+        case CLIENT_PACKET_UPDATE_ENTITY_METADATA:
+            return &decodePacketUpdateEntityMetadata;
+        default:
+            return NULL;
+    }
+}
+
+U16 getPacketSize(I8 packetID) {
+    switch (packetID) {
+        case CLIENT_PACKET_IDENTIFICATION:
+            return 4;
+        case CLIENT_PACKET_ADD_ENTITY:
+            return 88;
+        case CLIENT_PACKET_REMOVE_ENTITY:
+            return 4;
+        case CLIENT_PACKET_UPDATE_ENTITY:
+            return 24;
+        case CLIENT_PACKET_SEND_CHUNK:
+            return 4108;
+        case CLIENT_PACKET_SEND_MONOTYPE_CHUNK:
+            return 13;
+        case CLIENT_PACKET_CHAT:
+            return 4096;
+        case CLIENT_PACKET_UPDATE_ENTITY_METADATA:
+            return 68;
+        default:
+            return 0;
+    }
+}
 

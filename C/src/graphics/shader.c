@@ -1,30 +1,13 @@
-#define GLFW_INCLUDE_NONE
+#include "graphics/shader.h"
 
-#include <stdlib.h>
-#include "utils/types.h"
-#include "glfw/glfw3.h"
-#include "utils/ioUtils.h"
-#include "utils/math.h"
-
-#if defined(__APPLE__)
-    #include <OpenGL/gl3.h>
-#elif defined(_WIN32) || defined(_WIN64)
-    #include "gl/glew.h"
-    #include <GL/gl.h>
-#else
-    #define GL_GLEXT_PROTOTYPES
-    #include <GL/gl.h>
-    #include <GL/glext.h>
-#endif
-
-int createShaderProgram(int vertexShader, int fragmentShader) {
-    unsigned int shaderProgram = glCreateProgram();
+I32 createShaderProgram(I32 vertexShader, I32 fragmentShader) {
+    U32 shaderProgram = glCreateProgram();
     glAttachShader(shaderProgram, vertexShader);
     glAttachShader(shaderProgram, fragmentShader);
     glLinkProgram(shaderProgram);
 
-    int success;
-    char infoLog[512];
+    I32 success;
+    I8 infoLog[512];
     glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
 
     if (!success) {
@@ -39,14 +22,14 @@ int createShaderProgram(int vertexShader, int fragmentShader) {
     return shaderProgram;
 }
 
-int compileShader(char* source, unsigned int type) {
-    unsigned int shader = glCreateShader(type);
+I32 compileShader(I8* source, U32 type) {
+    U32 shader = glCreateShader(type);
 
-    glShaderSource(shader, 1, (const char**)&source, NULL);
+    glShaderSource(shader, 1, (const I8**)&source, NULL);
     glCompileShader(shader);
 
-    int success;
-    char infoLog[512];
+    I32 success;
+    I8 infoLog[512];
     glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
 
     if (!success) {
@@ -59,63 +42,63 @@ int compileShader(char* source, unsigned int type) {
     return shader;
 }
 
-void setUniform1i(int id, char* name, int x) {
+void setUniform1i(I32 id, I8* name, I32 x) {
     glProgramUniform1i(id, glGetUniformLocation(id, name), x);
 }
 
-void setUniform2i(int id, char* name, int x, int y) {
+void setUniform2i(I32 id, I8* name, I32 x, I32 y) {
     glProgramUniform2i(id, glGetUniformLocation(id, name), x, y);
 }
 
-void setUniform2iP(int id, char* name, int* x) {
+void setUniform2iP(I32 id, I8* name, I32* x) {
     glProgramUniform2i(id, glGetUniformLocation(id, name), x[VX], x[VY]);
 }
 
-void setUniform3i(int id, char* name, int x, int y, int z) {
+void setUniform3i(I32 id, I8* name, I32 x, I32 y, I32 z) {
     glProgramUniform3i(id, glGetUniformLocation(id, name), x, y, z);
 }
 
-void setUniform3iP(int id, char* name, int* x) {
+void setUniform3iP(I32 id, I8* name, I32* x) {
     glProgramUniform3i(id, glGetUniformLocation(id, name), x[VX], x[VY], x[VZ]);
 }
 
-void setUniform4i(int id, char* name, int x, int y, int z, int w) {
+void setUniform4i(I32 id, I8* name, I32 x, I32 y, I32 z, I32 w) {
     glProgramUniform4i(id, glGetUniformLocation(id, name), x, y, z, w);
 }
 
-void setUniform4iP(int id, char* name, int* x) {
+void setUniform4iP(I32 id, I8* name, I32* x) {
     glProgramUniform4i(id, glGetUniformLocation(id, name), x[VX], x[VY], x[VZ], x[VW]);
 }
 
-void setUniform1f(int id, char* name, float x) {
+void setUniform1f(I32 id, I8* name, F32 x) {
     glProgramUniform1f(id, glGetUniformLocation(id, name), x);
 }
 
-void setUniform2f(int id, char* name, float x, float y) {
+void setUniform2f(I32 id, I8* name, F32 x, F32 y) {
     glProgramUniform2f(id, glGetUniformLocation(id, name), x, y);
 }
 
-void setUniform2fP(int id, char* name, float* x) {
+void setUniform2fP(I32 id, I8* name, F32* x) {
     glProgramUniform2f(id, glGetUniformLocation(id, name), x[VX], x[VY]);
 }
 
-void setUniform3f(int id, char* name, float x, float y, float z) {
+void setUniform3f(I32 id, I8* name, F32 x, F32 y, F32 z) {
     glProgramUniform3f(id, glGetUniformLocation(id, name), x, y, z);
 }
 
-void setUniform3fP(int id, char* name, float* x) {
+void setUniform3fP(I32 id, I8* name, F32* x) {
     glProgramUniform3f(id, glGetUniformLocation(id, name), x[VX], x[VY], x[VZ]);
 }
 
-void setUniform4f(int id, char* name, float x, float y, float z, float w) {
+void setUniform4f(I32 id, I8* name, F32 x, F32 y, F32 z, F32 w) {
     glProgramUniform4f(id, glGetUniformLocation(id, name), x, y, z, w);
 }
 
-void setUniform4fP(int id, char* name, float* x) {
+void setUniform4fP(I32 id, I8* name, F32* x) {
     glProgramUniform4f(id, glGetUniformLocation(id, name), x[VX], x[VY], x[VZ], x[VW]);
 }
 
-void setUniformMat4(int id, char* name, const float* matrix) {
+void setUniformMat4(I32 id, I8* name, const F32* matrix) {
     glProgramUniformMatrix4fv(id, glGetUniformLocation(id, name), 1, GL_FALSE, matrix);
 }
 

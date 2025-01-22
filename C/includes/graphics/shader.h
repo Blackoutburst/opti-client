@@ -1,6 +1,14 @@
 #pragma once
-I32 compileShader(const I8* source, U32 type);
+
+#include <stdlib.h>
+
+#include "graphics/opengl.h"
+#include "utils/types.h"
+#include "utils/math.h"
+#include "utils/ioUtils.h"
+
 I32 createShaderProgram(I32 vertexshader, I32 fragmentShader);
+I32 compileShader(I8* source, U32 type);
 void setUniform1i(I32 id, I8* name, I32 x);
 void setUniform1i(I32 id, I8* name, I32 x);
 void setUniform2i(I32 id, I8* name, I32 x, I32 y);

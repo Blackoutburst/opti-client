@@ -1,6 +1,9 @@
 #pragma once
+
+#include "utils/types.h"
+
 enum BlockType {
-  ERROR = -1,
+  UNKNOWN = -1,
   AIR = 0,
   GRASS = 1,
   DIRT = 2,
@@ -28,3 +31,5 @@ enum BlockTextures {
   TEXTURE_SNOW,
 };
 
+U8 blocksIsTransparent(U8 blockType);
+U8 blocksTextureFace(U8 blockType, U8 face);

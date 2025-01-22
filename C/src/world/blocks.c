@@ -1,5 +1,5 @@
-#include "world/blocks.h"
 #include "utils/types.h"
+#include "world/blocks.h"
 
 U8 blocksIsTransparent(U8 blockType) {
     switch (blockType) {

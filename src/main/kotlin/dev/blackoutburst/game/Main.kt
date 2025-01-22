@@ -87,22 +87,21 @@ fun main() {
         Window.clear()
 
         if (Keyboard.isKeyPressed(GLFW_KEY_0))
-            blockType = BlockType.ERROR
-
+            blockType = if (Keyboard.isKeyDown(GLFW_KEY_LEFT_ALT)) BlockType.OAK_PLANKS else BlockType.ERROR
         if (Keyboard.isKeyPressed(GLFW_KEY_1))
-            blockType = BlockType.GRASS
+            blockType = if (Keyboard.isKeyDown(GLFW_KEY_LEFT_ALT)) BlockType.STONE_BRICKS else BlockType.GRASS
         if (Keyboard.isKeyPressed(GLFW_KEY_2))
-            blockType = BlockType.DIRT
+            blockType = if (Keyboard.isKeyDown(GLFW_KEY_LEFT_ALT)) BlockType.NETHERRACK else BlockType.DIRT
         if (Keyboard.isKeyPressed(GLFW_KEY_3))
-            blockType = BlockType.STONE
+            blockType = if (Keyboard.isKeyDown(GLFW_KEY_LEFT_ALT)) BlockType.GOLD_BLOCK else BlockType.STONE
         if (Keyboard.isKeyPressed(GLFW_KEY_4))
-            blockType = BlockType.OAK_LOG
+            blockType = if (Keyboard.isKeyDown(GLFW_KEY_LEFT_ALT)) BlockType.PACKED_ICE else BlockType.OAK_LOG
         if (Keyboard.isKeyPressed(GLFW_KEY_5))
-            blockType = BlockType.OAK_LEAVES
+            blockType = if (Keyboard.isKeyDown(GLFW_KEY_LEFT_ALT)) BlockType.LAVA else BlockType.OAK_LEAVES
         if (Keyboard.isKeyPressed(GLFW_KEY_6))
-            blockType = BlockType.GLASS
+            blockType = if (Keyboard.isKeyDown(GLFW_KEY_LEFT_ALT)) BlockType.BARREL else BlockType.GLASS
         if (Keyboard.isKeyPressed(GLFW_KEY_7))
-            blockType = BlockType.WATER
+            blockType = if (Keyboard.isKeyDown(GLFW_KEY_LEFT_ALT)) BlockType.BOOKSHELF else BlockType.WATER
         if (Keyboard.isKeyPressed(GLFW_KEY_8))
             blockType = BlockType.SAND
         if (Keyboard.isKeyPressed(GLFW_KEY_9))

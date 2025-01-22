@@ -6,12 +6,14 @@
 typedef struct meshQueue MESH_QUEUE;
 typedef struct meshQueueElement MESH_QUEUE_ELEM;
 
-#define MESH_QUEUE_SIZE 4096 * 2
+#define MESH_QUEUE_SIZE 32768
 
 struct meshQueueElement {
     U8 used;
     U16 id;
-    CHUNK* chunk;
+    U8 neighbor;
+    I32* position;
+    U8* blocks;
 };
 
 struct meshQueue {
@@ -22,7 +24,7 @@ struct meshQueue {
 };
 
 void meshQueueCleanElement(U16 index);
-void meshQueuePush(CHUNK* chunk);
+void meshQueuePush(I32* position, U8* blocks, U8 neighbor);
 U8 meshQueuePop(MESH_QUEUE_ELEM** element);
 void meshQueueFree();
 void meshQueueInit();

@@ -6,13 +6,15 @@
 typedef struct vaoQueue VAO_QUEUE;
 typedef struct vaoQueueElement VAO_QUEUE_ELEM;
 
-#define VAO_QUEUE_SIZE 4096
+#define VAO_QUEUE_SIZE 32768
 
 struct vaoQueueElement {
     U8 used;
     U16 id;
-    CHUNK* chunk;
-    I32* mesh;
+    U8 neighbor;
+    I32* position;
+    U8* blocks;
+    CHUNK_MESH* mesh;
 };
 
 struct vaoQueue {
@@ -23,7 +25,7 @@ struct vaoQueue {
 };
 
 void vaoQueueCleanElement(U16 index);
-void vaoQueuePush(CHUNK* chunk, I32* mesh);
+void vaoQueuePush(I32* position, U8* blocks, CHUNK_MESH* mesh, U8 neighbor);
 U8 vaoQueuePop(VAO_QUEUE_ELEM** element);
 void vaoQueueFree();
 void vaoQueueInit();

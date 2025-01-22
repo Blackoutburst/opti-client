@@ -19,10 +19,12 @@ void meshQueueCleanElement(U16 index) {
     if (element == NULL) return;
     
     queue->elements[index]->used = 0;
-    queue->elements[index]->chunk = NULL;
+    queue->elements[index]->neighbor = 0;
+    queue->elements[index]->position = NULL;
+    queue->elements[index]->blocks = NULL;
 }
 
-void meshQueuePush(CHUNK* chunk) {
+void meshQueuePush(I32* position, U8* blocks, U8 neighbor) {
     if (queue == NULL) return;
 
     mutexLock(&mutex);
@@ -31,9 +33,11 @@ void meshQueuePush(CHUNK* chunk) {
         meshQueueCleanElement(queue->pushIndex);
     }
     
-    queue->elements[queue->pushIndex]->chunk = chunk;
+    queue->elements[queue->pushIndex]->position = position;
+    queue->elements[queue->pushIndex]->blocks = blocks;
     queue->elements[queue->pushIndex]->id = queue->pushIndex;
     queue->elements[queue->pushIndex]->used = 1;
+    queue->elements[queue->pushIndex]->neighbor = neighbor;
 
     queue->pushIndex++;
     
@@ -91,9 +95,11 @@ void meshQueueInit() {
     q->elements = malloc(sizeof(MESH_QUEUE_ELEM*) * MESH_QUEUE_SIZE);
     for (int i = 0; i < MESH_QUEUE_SIZE; i++) {
         q->elements[i] = malloc(sizeof(MESH_QUEUE_ELEM));
-        q->elements[i]->chunk = NULL;
+        q->elements[i]->position = NULL;
+        q->elements[i]->blocks = NULL;
         q->elements[i]->id = 0;
         q->elements[i]->used = 0;
+        q->elements[i]->neighbor = 0;
     }
     queue = q;
 

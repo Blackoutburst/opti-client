@@ -10,8 +10,8 @@
 static U8 running = 0;
 
 void wgThreadMethod(MESH_QUEUE_ELEM* element) {
-    I32* mesh = chunkGenerateMesh(element->chunk);
-    vaoQueuePush(element->chunk, mesh);
+    CHUNK_MESH* mesh = chunkGenerateMesh(element->position, element->blocks);
+    vaoQueuePush(element->position, element->blocks, mesh, element->neighbor);
     meshQueueCleanElement(element->id);
 }
 

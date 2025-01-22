@@ -16,21 +16,23 @@ I32 chunkPackVertexData(I8 x, I8 y, I8 z, I8 u, I8 v, I8 n, I8 t) {
     return (x & 31) | (y & 31) << 5 | (z & 31) << 10 | (u & 1) << 15 | (v & 1) << 16 | (n & 7) << 17 | (t & 31) << 20;
 }
 
-void chunkGenerateVAO(CHUNK* chunk, I32* vertices) {
-    if (!chunk->meshVertexCount) {
-        free(vertices);
+void chunkGenerateVAO(CHUNK* chunk, CHUNK_MESH* mesh) {
+    if (!mesh->vertexCount) {
+        free(mesh->vertices);
+        free(mesh);
         return;
     }
     
     glBindVertexArray(chunk->vaoID);
 
     glBindBuffer(GL_ARRAY_BUFFER, chunk->vboID);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(I32) * chunk->meshVertexCount, vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(I32) * mesh->vertexCount, mesh->vertices, GL_STATIC_DRAW);
     glEnableVertexAttribArray(0);
     glVertexAttribIPointer(0, 1, GL_INT, 4, 0);
-    free(vertices);
+    free(mesh->vertices);
+    free(mesh);
 
-    chunk->vertexCount = chunk->meshVertexCount;
+    chunk->vertexCount = mesh->vertexCount;
 }
 
 U8 chunkIsMonotype(CHUNK* chunk) {
@@ -45,13 +47,14 @@ U8 chunkIsMonotype(CHUNK* chunk) {
     return 1;
 }
 
-I32* chunkGenerateMesh(CHUNK* chunk) {
+CHUNK_MESH* chunkGenerateMesh(I32* position, U8* blocks) {
+    CHUNK_MESH* mesh = malloc(sizeof(CHUNK_MESH));
     I32* vertices = malloc(sizeof(I32) * BLOCK_COUNT * 36);
     I8* blockPos = malloc(sizeof(I8) * 3);
     I32 vertexIndex = 0;
     
     for (U16 i = 0; i < BLOCK_COUNT; i++) {
-        I32 blockType = chunk->blocks[i];
+        I32 blockType = blocks[i];
         if (!blockType) continue;
         
         indexToXYZ(blockPos, i);
@@ -59,8 +62,8 @@ I32* chunkGenerateMesh(CHUNK* chunk) {
         // TOP
         U32 topIndex = xyzToIndexOobCheck(blockPos[VX], blockPos[VY] + 1, blockPos[VZ]);
         if (
-            (topIndex >= BLOCK_COUNT && blocksIsTransparent(worldGetBlock(chunk->position[VX] + blockPos[VX], chunk->position[VY] + blockPos[VY] + 1, chunk->position[VZ] + blockPos[VZ]))) || 
-            (topIndex < BLOCK_COUNT && blocksIsTransparent(chunk->blocks[topIndex]))
+            (topIndex >= BLOCK_COUNT && blocksIsTransparent(worldGetBlock(position[VX] + blockPos[VX], position[VY] + blockPos[VY] + 1, position[VZ] + blockPos[VZ]))) || 
+            (topIndex < BLOCK_COUNT && blocksIsTransparent(blocks[topIndex]))
         ) {
             vertices[vertexIndex  ] = chunkPackVertexData(blockPos[VX] + 1, blockPos[VY] + 1, blockPos[VZ]    , 1, 0, 0, blocksTextureFace(blockType, 0));
             vertices[vertexIndex+1] = chunkPackVertexData(blockPos[VX]    , blockPos[VY] + 1, blockPos[VZ]    , 0, 0, 0, blocksTextureFace(blockType, 0));
@@ -75,8 +78,8 @@ I32* chunkGenerateMesh(CHUNK* chunk) {
         // FRONT
         U32 frontIndex = xyzToIndexOobCheck(blockPos[VX], blockPos[VY], blockPos[VZ] - 1);
         if (
-            (frontIndex >= BLOCK_COUNT && blocksIsTransparent(worldGetBlock(chunk->position[VX] + blockPos[VX], chunk->position[VY] + blockPos[VY], chunk->position[VZ] + blockPos[VZ] - 1))) || 
-            (frontIndex < BLOCK_COUNT && blocksIsTransparent(chunk->blocks[frontIndex]))
+            (frontIndex >= BLOCK_COUNT && blocksIsTransparent(worldGetBlock(position[VX] + blockPos[VX], position[VY] + blockPos[VY], position[VZ] + blockPos[VZ] - 1))) || 
+            (frontIndex < BLOCK_COUNT && blocksIsTransparent(blocks[frontIndex]))
         ) {
             vertices[vertexIndex  ] = chunkPackVertexData(blockPos[VX] + 1, blockPos[VY]    , blockPos[VZ]    , 0, 1, 1, blocksTextureFace(blockType, 1));
             vertices[vertexIndex+1] = chunkPackVertexData(blockPos[VX]    , blockPos[VY]    , blockPos[VZ]    , 1, 1, 1, blocksTextureFace(blockType, 1));
@@ -91,8 +94,8 @@ I32* chunkGenerateMesh(CHUNK* chunk) {
         // BACK
         U32 backIndex = xyzToIndexOobCheck(blockPos[VX], blockPos[VY], blockPos[VZ] + 1);
         if (
-            (backIndex >= BLOCK_COUNT && blocksIsTransparent(worldGetBlock(chunk->position[VX] + blockPos[VX], chunk->position[VY] + blockPos[VY], chunk->position[VZ] + blockPos[VZ] + 1))) || 
-            (backIndex < BLOCK_COUNT && blocksIsTransparent(chunk->blocks[backIndex]))
+            (backIndex >= BLOCK_COUNT && blocksIsTransparent(worldGetBlock(position[VX] + blockPos[VX], position[VY] + blockPos[VY], position[VZ] + blockPos[VZ] + 1))) || 
+            (backIndex < BLOCK_COUNT && blocksIsTransparent(blocks[backIndex]))
         ) {
             vertices[vertexIndex  ] = chunkPackVertexData(blockPos[VX]    , blockPos[VY]    , blockPos[VZ] + 1, 0, 1, 2, blocksTextureFace(blockType, 2));
             vertices[vertexIndex+1] = chunkPackVertexData(blockPos[VX] + 1, blockPos[VY]    , blockPos[VZ] + 1, 1, 1, 2, blocksTextureFace(blockType, 2));
@@ -107,8 +110,8 @@ I32* chunkGenerateMesh(CHUNK* chunk) {
         // LEFT
         U32 leftIndex = xyzToIndexOobCheck(blockPos[VX] - 1, blockPos[VY], blockPos[VZ]);
         if (
-            (leftIndex >= BLOCK_COUNT && blocksIsTransparent(worldGetBlock(chunk->position[VX] + blockPos[VX] - 1, chunk->position[VY] + blockPos[VY], chunk->position[VZ] + blockPos[VZ]))) || 
-            (leftIndex < BLOCK_COUNT && blocksIsTransparent(chunk->blocks[leftIndex]))
+            (leftIndex >= BLOCK_COUNT && blocksIsTransparent(worldGetBlock(position[VX] + blockPos[VX] - 1, position[VY] + blockPos[VY], position[VZ] + blockPos[VZ]))) || 
+            (leftIndex < BLOCK_COUNT && blocksIsTransparent(blocks[leftIndex]))
         ) {
             vertices[vertexIndex  ] = chunkPackVertexData(blockPos[VX]    , blockPos[VY] + 1, blockPos[VZ] + 1, 0, 0, 3, blocksTextureFace(blockType, 3));
             vertices[vertexIndex+1] = chunkPackVertexData(blockPos[VX]    , blockPos[VY] + 1, blockPos[VZ]    , 1, 0, 3, blocksTextureFace(blockType, 3));
@@ -123,8 +126,8 @@ I32* chunkGenerateMesh(CHUNK* chunk) {
         // RIGHT
         U32 rightIndex = xyzToIndexOobCheck(blockPos[VX] + 1, blockPos[VY], blockPos[VZ]);
         if (
-            (rightIndex >= BLOCK_COUNT && blocksIsTransparent(worldGetBlock(chunk->position[VX] + blockPos[VX] + 1, chunk->position[VY] + blockPos[VY], chunk->position[VZ] + blockPos[VZ]))) || 
-            (rightIndex < BLOCK_COUNT && blocksIsTransparent(chunk->blocks[rightIndex]))
+            (rightIndex >= BLOCK_COUNT && blocksIsTransparent(worldGetBlock(position[VX] + blockPos[VX] + 1, position[VY] + blockPos[VY], position[VZ] + blockPos[VZ]))) || 
+            (rightIndex < BLOCK_COUNT && blocksIsTransparent(blocks[rightIndex]))
         ) {
             vertices[vertexIndex  ] = chunkPackVertexData(blockPos[VX] + 1, blockPos[VY]    , blockPos[VZ]    , 0, 1, 4, blocksTextureFace(blockType, 4));
             vertices[vertexIndex+1] = chunkPackVertexData(blockPos[VX] + 1, blockPos[VY] + 1, blockPos[VZ]    , 0, 0, 4, blocksTextureFace(blockType, 4));
@@ -139,8 +142,8 @@ I32* chunkGenerateMesh(CHUNK* chunk) {
         // BOTTOM
         U32 bottomIndex = xyzToIndexOobCheck(blockPos[VX], blockPos[VY] - 1, blockPos[VZ]);
         if (
-            (bottomIndex >= BLOCK_COUNT && blocksIsTransparent(worldGetBlock(chunk->position[VX] + blockPos[VX], chunk->position[VY] + blockPos[VY] - 1, chunk->position[VZ] + blockPos[VZ]))) || 
-            (bottomIndex < BLOCK_COUNT && blocksIsTransparent(chunk->blocks[bottomIndex]))
+            (bottomIndex >= BLOCK_COUNT && blocksIsTransparent(worldGetBlock(position[VX] + blockPos[VX], position[VY] + blockPos[VY] - 1, position[VZ] + blockPos[VZ]))) || 
+            (bottomIndex < BLOCK_COUNT && blocksIsTransparent(blocks[bottomIndex]))
         ) {
             vertices[vertexIndex  ] = chunkPackVertexData(blockPos[VX]    , blockPos[VY]    , blockPos[VZ]    , 0, 1, 5, blocksTextureFace(blockType, 5));
             vertices[vertexIndex+1] = chunkPackVertexData(blockPos[VX] + 1, blockPos[VY]    , blockPos[VZ]    , 1, 1, 5, blocksTextureFace(blockType, 5));
@@ -154,8 +157,10 @@ I32* chunkGenerateMesh(CHUNK* chunk) {
     }
 
     free(blockPos);
-    chunk->meshVertexCount = vertexIndex;
-    return vertices;
+
+    mesh->vertices = vertices;
+    mesh->vertexCount = vertexIndex;
+    return mesh;
 }
 
 CHUNK* chunkCreate(I32* position, U8* blocks) {
@@ -165,7 +170,6 @@ CHUNK* chunkCreate(I32* position, U8* blocks) {
     glGenBuffers(1, &chunk->vboID);
     glGenBuffers(1, &chunk->eboID);
 
-    chunk->meshVertexCount = 0;
     chunk->vertexCount = 0;
     chunk->position = position;
     chunk->blocks = blocks;

@@ -140,6 +140,8 @@ void update(GLFWwindow* window) {
 
     while (!glfwWindowShouldClose(window) && !glfwGetKey(window, GLFW_KEY_ESCAPE)) {
         //calculateFPS();
+
+        worldRemoveChunkOutOfRenderDistance(16, x, y, z);
         
         while (networkQueuePop(&queueElement)) {
             queueElement->function(queueElement->buffer);
@@ -147,31 +149,38 @@ void update(GLFWwindow* window) {
         }
         
         while (vaoQueuePop(&vaoQueueElement)) {
-            worldRemoveChunkOutOfRenderDistance(16, x, y, z);
-            chunkGenerateVAO(vaoQueueElement->chunk, vaoQueueElement->mesh);
+            if (vaoQueueElement->neighbor) {
+                CHUNK* chunk = chunkCreate(vaoQueueElement->position, vaoQueueElement->blocks);
+                chunkGenerateVAO(chunk, vaoQueueElement->mesh);
 
-            worldAddChunk(vaoQueueElement->chunk);
+                worldAddChunk(chunk);
 
-            /*
-            I32 chunkPoses[6][3] = {
-                {vaoQueueElement->chunk->position[VX] + CHUNK_SIZE, vaoQueueElement->chunk->position[VY], vaoQueueElement->chunk->position[VZ]},
-                {vaoQueueElement->chunk->position[VX] - CHUNK_SIZE, vaoQueueElement->chunk->position[VY], vaoQueueElement->chunk->position[VZ]},
-                {vaoQueueElement->chunk->position[VX], vaoQueueElement->chunk->position[VY] + CHUNK_SIZE, vaoQueueElement->chunk->position[VZ]},
-                {vaoQueueElement->chunk->position[VX], vaoQueueElement->chunk->position[VY] - CHUNK_SIZE, vaoQueueElement->chunk->position[VZ]},
-                {vaoQueueElement->chunk->position[VX], vaoQueueElement->chunk->position[VY], vaoQueueElement->chunk->position[VZ] + CHUNK_SIZE},
-                {vaoQueueElement->chunk->position[VX], vaoQueueElement->chunk->position[VY], vaoQueueElement->chunk->position[VZ] - CHUNK_SIZE},
-            };
+                vaoQueueCleanElement(vaoQueueElement->id);
+            } else {
+                CHUNK* chunk = chunkCreate(vaoQueueElement->position, vaoQueueElement->blocks);
+                chunkGenerateVAO(chunk, vaoQueueElement->mesh);
+                worldAddChunk(chunk);
 
-            for (U8 i = 0; i < 6; i++) {
-                CHUNK* tmp = worldGetChunk(chunkPoses[i][VX], chunkPoses[i][VY], chunkPoses[i][VZ]);
-                if (tmp == NULL) continue;
-                CHUNK* dest = malloc(sizeof(CHUNK));
-                memcpy(dest, tmp, sizeof(CHUNK));
-                meshQueuePush(dest);
+                I32 chunkPoses[6][3] = {
+                    {vaoQueueElement->position[VX] + CHUNK_SIZE, vaoQueueElement->position[VY], vaoQueueElement->position[VZ]},
+                    {vaoQueueElement->position[VX] - CHUNK_SIZE, vaoQueueElement->position[VY], vaoQueueElement->position[VZ]},
+                    {vaoQueueElement->position[VX], vaoQueueElement->position[VY] + CHUNK_SIZE, vaoQueueElement->position[VZ]},
+                    {vaoQueueElement->position[VX], vaoQueueElement->position[VY] - CHUNK_SIZE, vaoQueueElement->position[VZ]},
+                    {vaoQueueElement->position[VX], vaoQueueElement->position[VY], vaoQueueElement->position[VZ] + CHUNK_SIZE},
+                    {vaoQueueElement->position[VX], vaoQueueElement->position[VY], vaoQueueElement->position[VZ] - CHUNK_SIZE},
+                };
+
+                for (U8 i = 0; i < 6; i++) {
+                    CHUNK* tmp = worldGetChunk(chunkPoses[i][VX], chunkPoses[i][VY], chunkPoses[i][VZ]);
+                    if (tmp == NULL) continue;
+                    I32* position = malloc(sizeof(I32) * 3);
+                    U8* blocks = malloc(sizeof(U8) * CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE);
+                    memcpy(position, tmp->position, sizeof(I32) * 3);
+                    memcpy(blocks, tmp->blocks, sizeof(U8) * CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE);
+                    meshQueuePush(position, blocks, 1);
+                }
+                vaoQueueCleanElement(vaoQueueElement->id);
             }
-            */
-
-            vaoQueueCleanElement(vaoQueueElement->id);
         }
 
         packetSendUpdateEntity(x, y, z, yaw, pitch);

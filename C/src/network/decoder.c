@@ -31,8 +31,7 @@ void decodePacketSendChunk(U8* buffer) {
     position[VZ] = getI32(bufferptr);
     U8* blocks = malloc(sizeof(U8) * CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE);
     for (I32 i = 0; i < CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE; i++) blocks[i] = getU8(bufferptr);
-    CHUNK* chunk = chunkCreate(position, blocks);
-    meshQueuePush(chunk);
+    meshQueuePush(position, blocks, 0);
 }
 
 void decodePacketSendMonotypeChunk(U8* buffer) {
@@ -44,8 +43,7 @@ void decodePacketSendMonotypeChunk(U8* buffer) {
     U8* blocks = malloc(sizeof(U8) * CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE);
     U8 blockType = getU8(bufferptr);
     for (I32 i = 0; i < CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE; i++) blocks[i] = blockType;
-    CHUNK* chunk = chunkCreate(position, blocks);
-    meshQueuePush(chunk);
+    meshQueuePush(position, blocks, 0);
 }
 
 void decodePacketChat(U8* buffer) {

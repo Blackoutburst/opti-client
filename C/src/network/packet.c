@@ -298,20 +298,73 @@ U16 getServerPacketSize(I8 packetID) {
     }
 }
 
+void packetSendUpdateEntity(I32 x, I32 y, I32 z, F32 yaw, F32 pitch) {
+    S00UPDATE_ENTITY* packet = malloc(sizeof(S00UPDATE_ENTITY));
+    packet->id = SERVER_PACKET_UPDATE_ENTITY;
+    packet->type = type;
+    packet->x = x;
+    packet->y = y;
+    packet->z = z;
+    packet->yaw = yaw;
+    packet->pitch = pitch;
+
+    U8* buffer = encodePacketChat(packet);
+
+    connectionSend(buffer, sizeof(S00UPDATE_ENTITY));
+    
+    free(buffer);
+    free(packet);
+}
+
+void packetSendUpdateBlock(U8 type, I32 x, I32 y, I32 z) {
+    S01UPDATE_BLOCK* packet = malloc(sizeof(S01UPDATE_BLOCK));
+    packet->id = SERVER_PACKET_UPDATE_BLOCK;
+    packet->type = type;
+    packet->x = x;
+    packet->y = y;
+    packet->z = z;
+
+    U8* buffer = encodePacketChat(packet);
+
+    connectionSend(buffer, sizeof(S01UPDATE_BLOCK));
+    
+    free(buffer);
+    free(packet);
+}
+
+void packetSendBlockBulkEdit(U32 blockCount, BLOCK_BULK_EDIT* blocks) {
+    // TODO
+}
+
+void packetSendChat(const U8* message) {
+    U8* encodedString = encodeString(message, 4096);
+
+    S03CHAT* packet = malloc(sizeof(S03CHAT));
+    packet->id = SERVER_PACKET_CHAT;
+    memcpy(packet->message, encodedString, 4096);
+
+    U8* buffer = encodePacketChat(packet);
+
+    connectionSend(buffer, sizeof(S03CHAT));
+    
+    free(buffer);
+    free(encodedString);
+    free(packet);
+}
 
 void packetSendClientMetadata(U8 renderDistance, const U8* name) {
     U8* encodedString = encodeString(name, 64);
     
-    S04CLIENT_METADATA* metadataPacket = malloc(sizeof(S04CLIENT_METADATA));
-    metadataPacket->id = SERVER_PACKET_CLIENT_METADATA;
-    metadataPacket->renderDistance = renderDistance;
-    memcpy(metadataPacket->name, encodedString, 64);
+    S04CLIENT_METADATA* packet = malloc(sizeof(S04CLIENT_METADATA));
+    packet->id = SERVER_PACKET_CLIENT_METADATA;
+    packet->renderDistance = renderDistance;
+    memcpy(packet->name, encodedString, 64);
     
-    U8* buffer = encodePacketClientMetadata(metadataPacket);
+    U8* buffer = encodePacketClientMetadata(packet);
     
-    connectionSend(buffer, 66);
+    connectionSend(buffer, sizeof(S04CLIENT_METADATA));
     
     free(buffer);
     free(encodedString);
-    free(metadataPacket);
+    free(packet);
 }

@@ -161,4 +161,8 @@ void* getClientPacketfunction(I8 packetID);
 U16 getClientPacketSize(I8 packetID);
 U16 getServerPacketSize(I8 packetID);
 
+void packetSendUpdateEntity(I32 x, I32 y, I32 z, F32 yaw, F32 pitch);
+void packetSendUpdateBlock(U8 type, I32 x, I32 y, I32 z);
+void packetSendBlockBulkEdit(U32 blockCount, BLOCK_BULK_EDIT* blocks);
+void packetSendChat(const U8* message);
 void packetSendClientMetadata(U8 renderDistance, const U8* name);

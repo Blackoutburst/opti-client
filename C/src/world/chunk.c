@@ -29,10 +29,12 @@ void chunkGenerateVAO(CHUNK* chunk, CHUNK_MESH* mesh) {
     glBufferData(GL_ARRAY_BUFFER, sizeof(I32) * mesh->vertexCount, mesh->vertices, GL_STATIC_DRAW);
     glEnableVertexAttribArray(0);
     glVertexAttribIPointer(0, 1, GL_INT, 4, 0);
+    
+    chunk->vertexCount = mesh->vertexCount;
+    
     free(mesh->vertices);
     free(mesh);
 
-    chunk->vertexCount = mesh->vertexCount;
 }
 
 U8 chunkIsMonotype(CHUNK* chunk) {

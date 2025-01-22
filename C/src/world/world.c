@@ -1,4 +1,3 @@
-
 #include "graphics/shader.h"
 #include "utils/math.h"
 #include "utils/types.h"
@@ -10,16 +9,16 @@
 static HASH* chunks = NULL;
 
 #if defined(_WIN32) || defined(_WIN64)
-    static CRITICAL_SECTION chunkHashMutex;
+    static CRITICAL_SECTION mutex;
 #else
-    static pthread_mutex_t chunkHashMutex;
+    static pthread_mutex_t mutex;
 #endif
 
 CHUNK* worldGetChunk(I32 x, I32 y, I32 z) {
-    mutexLock(&chunkHashMutex);
+    mutexLock(&mutex);
 
     if (chunks == NULL) {
-        mutexUnlock(&chunkHashMutex);
+        mutexUnlock(&mutex);
         return NULL;
     }
 
@@ -28,19 +27,19 @@ CHUNK* worldGetChunk(I32 x, I32 y, I32 z) {
 
     while (1) {
         if (!chunks[index].used) {
-            mutexUnlock(&chunkHashMutex);
+            mutexUnlock(&mutex);
             return NULL;
         }
         
         if (chunks[index].x == x && chunks[index].y == y && chunks[index].z == z) {
-            mutexUnlock(&chunkHashMutex);
+            mutexUnlock(&mutex);
             return chunks[index].chunk;
         }
 
         index = (index + 1) % CHUNK_COUNT;
         
         if (index == start) {
-            mutexUnlock(&chunkHashMutex);
+            mutexUnlock(&mutex);
             return NULL;
         }
     }
@@ -64,10 +63,10 @@ U8 worldGetBlock(I32 x, I32 y, I32 z) {
 }
 
 void worldAddChunk(CHUNK* chunk) {
-    mutexLock(&chunkHashMutex);
+    mutexLock(&mutex);
     
     if (chunks == NULL && chunk != NULL) {
-        mutexUnlock(&chunkHashMutex);
+        mutexUnlock(&mutex);
         return;
     }
 
@@ -82,34 +81,30 @@ void worldAddChunk(CHUNK* chunk) {
             chunks[index].chunk = chunk;
             chunks[index].used = 1;
             
-            mutexUnlock(&chunkHashMutex);
+            mutexUnlock(&mutex);
             return;
         } else if (chunks[index].used &&
                    chunks[index].x == chunk->position[VX] &&
                    chunks[index].y == chunk->position[VY] &&
                    chunks[index].z == chunk->position[VZ])
         {
-            worldRemoveChunk(chunk->position[VX], chunk->position[VY], chunk->position[VZ]);
-            chunks[index].x = chunk->position[VX];
-            chunks[index].y = chunk->position[VY];
-            chunks[index].z = chunk->position[VZ];
+            chunkDrestroy(chunks[index].chunk);
             chunks[index].chunk = chunk;
-            chunks[index].used = 1;
-            mutexUnlock(&chunkHashMutex);
+            mutexUnlock(&mutex);
             return;  
         }
         
         index = (index + 1) % CHUNK_COUNT;
         
         if (index == start) {
-            mutexUnlock(&chunkHashMutex);
+            mutexUnlock(&mutex);
             return;
         }
     }
 }
 
 void worldRemoveChunk(I32 x, I32 y, I32 z) {
-    mutexLock(&chunkHashMutex);
+    mutexLock(&mutex);
     
     U32 index = chunkHash(x, y, z) % CHUNK_COUNT;
     U32 start = index;
@@ -128,47 +123,72 @@ void worldRemoveChunk(I32 x, I32 y, I32 z) {
             chunks[index].chunk = NULL;
             chunks[index].used = 0;
 
-            mutexUnlock(&chunkHashMutex);
+            mutexUnlock(&mutex);
             return;
         }
         
         index = (index + 1) % CHUNK_COUNT;
         
         if (index == start) {
-            mutexUnlock(&chunkHashMutex);
+            mutexUnlock(&mutex);
+            return;
+        }
+    }
+}
+
+void _worldRemoveChunk(I32 x, I32 y, I32 z) {
+    U32 index = chunkHash(x, y, z) % CHUNK_COUNT;
+    U32 start = index;
+
+    while (1) {
+        if (chunks[index].used &&
+            chunks[index].x == x &&
+            chunks[index].y == y &&
+            chunks[index].z == z)
+        {
+            chunkDrestroy(chunks[index].chunk);
+        
+            chunks[index].x = 0;
+            chunks[index].y = 0;
+            chunks[index].z = 0;
+            chunks[index].chunk = NULL;
+            chunks[index].used = 0;
+
+            return;
+        }
+        
+        index = (index + 1) % CHUNK_COUNT;
+        
+        if (index == start) {
             return;
         }
     }
 }
 
 void worldRemoveChunkOutOfRenderDistance(U8 renderDistance, I32 x, I32 y, I32 z) {
-    mutexLock(&chunkHashMutex);
+    mutexLock(&mutex);
 
     if (chunks == NULL) {
-        mutexUnlock(&chunkHashMutex);
+        mutexUnlock(&mutex);
         return;
     }
 
-    I32 px = x / CHUNK_SIZE;
-    I32 py = y / CHUNK_SIZE;
-    I32 pz = z / CHUNK_SIZE;
+    I32 px = (x < 0 ? (x + 1) / CHUNK_SIZE - 1 : x / CHUNK_SIZE) * CHUNK_SIZE;
+    I32 py = (y < 0 ? (y + 1) / CHUNK_SIZE - 1 : y / CHUNK_SIZE) * CHUNK_SIZE;
+    I32 pz = (z < 0 ? (z + 1) / CHUNK_SIZE - 1 : z / CHUNK_SIZE) * CHUNK_SIZE;
 
     for (U16 i = 0; i < CHUNK_COUNT; i++) {
         if (!chunks[i].used) continue;
 
-        I32 cx = chunks[i].x / CHUNK_SIZE;
-        I32 cy = chunks[i].y / CHUNK_SIZE;
-        I32 cz = chunks[i].z / CHUNK_SIZE;
-
-        if (abs(cx - px) > renderDistance ||
-            abs(cy - py) > renderDistance ||
-            abs(cz - pz) > renderDistance)
+        if (abs(chunks[i].x - px) > (renderDistance * CHUNK_SIZE) ||
+            abs(chunks[i].y - py) > (renderDistance * CHUNK_SIZE) ||
+            abs(chunks[i].z - pz) > (renderDistance * CHUNK_SIZE))
         {
-            worldRemoveChunk(chunks[i].x, chunks[i].y, chunks[i].z);
+            _worldRemoveChunk(chunks[i].x, chunks[i].y, chunks[i].z);
         }
     }
 
-    mutexUnlock(&chunkHashMutex);
+    mutexUnlock(&mutex);
 }
 
 void worldRender(I32 shaderProgram) {
@@ -187,7 +207,7 @@ void worldClean() {
     for (U32 i = 0; i < CHUNK_COUNT; i++) chunkDrestroy(chunks[i].chunk);
     free(chunks);
 
-    mutexDestroy(&chunkHashMutex);
+    mutexDestroy(&mutex);
 }
 
 void worldInit() {
@@ -202,5 +222,5 @@ void worldInit() {
         chunks[i].used = 0;
     }
 
-    mutexCreate(&chunkHashMutex);
+    mutexCreate(&mutex);
 }

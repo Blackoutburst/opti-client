@@ -2,6 +2,7 @@
 
 #include <math.h>
 #include <stdlib.h>
+#include <string.h>
 #include "utils/types.h"
 #include "glfw/glfw3.h"
 #include "graphics/shader.h"
@@ -131,7 +132,7 @@ void update(GLFWwindow* window) {
     F64 yaw = 0;
     F64 pitchOffset = 0;
     F64 yawOffset = 0;
-    F32 speed = 0.1f;
+    F32 speed = 0.5f;
     F32 sensitivity = 0.1f;
 
     NET_QUEUE_ELEM* queueElement = NULL;
@@ -139,8 +140,6 @@ void update(GLFWwindow* window) {
 
     while (!glfwWindowShouldClose(window) && !glfwGetKey(window, GLFW_KEY_ESCAPE)) {
         //calculateFPS();
-
-        worldRemoveChunkOutOfRenderDistance(16, x, y, z);
         
         while (networkQueuePop(&queueElement)) {
             queueElement->function(queueElement->buffer);
@@ -148,7 +147,30 @@ void update(GLFWwindow* window) {
         }
         
         while (vaoQueuePop(&vaoQueueElement)) {
+            worldRemoveChunkOutOfRenderDistance(16, x, y, z);
             chunkGenerateVAO(vaoQueueElement->chunk, vaoQueueElement->mesh);
+
+            worldAddChunk(vaoQueueElement->chunk);
+
+            /*
+            I32 chunkPoses[6][3] = {
+                {vaoQueueElement->chunk->position[VX] + CHUNK_SIZE, vaoQueueElement->chunk->position[VY], vaoQueueElement->chunk->position[VZ]},
+                {vaoQueueElement->chunk->position[VX] - CHUNK_SIZE, vaoQueueElement->chunk->position[VY], vaoQueueElement->chunk->position[VZ]},
+                {vaoQueueElement->chunk->position[VX], vaoQueueElement->chunk->position[VY] + CHUNK_SIZE, vaoQueueElement->chunk->position[VZ]},
+                {vaoQueueElement->chunk->position[VX], vaoQueueElement->chunk->position[VY] - CHUNK_SIZE, vaoQueueElement->chunk->position[VZ]},
+                {vaoQueueElement->chunk->position[VX], vaoQueueElement->chunk->position[VY], vaoQueueElement->chunk->position[VZ] + CHUNK_SIZE},
+                {vaoQueueElement->chunk->position[VX], vaoQueueElement->chunk->position[VY], vaoQueueElement->chunk->position[VZ] - CHUNK_SIZE},
+            };
+
+            for (U8 i = 0; i < 6; i++) {
+                CHUNK* tmp = worldGetChunk(chunkPoses[i][VX], chunkPoses[i][VY], chunkPoses[i][VZ]);
+                if (tmp == NULL) continue;
+                CHUNK* dest = malloc(sizeof(CHUNK));
+                memcpy(dest, tmp, sizeof(CHUNK));
+                meshQueuePush(dest);
+            }
+            */
+
             vaoQueueCleanElement(vaoQueueElement->id);
         }
 
@@ -207,7 +229,7 @@ void update(GLFWwindow* window) {
         if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) {
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         }
-
+    
         worldRender(shaderProgram);
 
         windowUpdate(window);

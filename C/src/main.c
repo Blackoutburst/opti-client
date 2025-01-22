@@ -152,9 +152,7 @@ void update(GLFWwindow* window) {
             if (vaoQueueElement->neighbor) {
                 CHUNK* chunk = chunkCreate(vaoQueueElement->position, vaoQueueElement->blocks);
                 chunkGenerateVAO(chunk, vaoQueueElement->mesh);
-
                 worldAddChunk(chunk);
-
                 vaoQueueCleanElement(vaoQueueElement->id);
             } else {
                 CHUNK* chunk = chunkCreate(vaoQueueElement->position, vaoQueueElement->blocks);

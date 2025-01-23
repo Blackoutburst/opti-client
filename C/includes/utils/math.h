@@ -13,3 +13,6 @@ U32 xyzToIndexOobCheck(I32 x, I32 y, I32 z);
 U32 xyzToIndex(I32 x, I32 y, I32 z);
 void indexToXYZ(I8* vector, I16 index);
 F32 rad(F32 angle);
+I8 sign(I32 value);
+I8 fsign(F32 value);
+F32 fsignf(F32 value);

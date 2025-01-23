@@ -22,9 +22,13 @@ U8* encodePacketUpdateBlock(S01UPDATE_BLOCK* packet) {
     U8* buffer = malloc(sizeof(S01UPDATE_BLOCK));
     for (U16 i = 0; i < sizeof(S00UPDATE_ENTITY); i++) buffer[i] = 0;
 
-    //U16 index = 0;
+    U16 index = 0;
 
-    //TODO
+    putU8(&index, packet->id, buffer);
+    putU8(&index, packet->type, buffer);
+    putI32(&index, packet->x, buffer);
+    putI32(&index, packet->y, buffer);
+    putI32(&index, packet->z, buffer);
 
     return buffer;
 }

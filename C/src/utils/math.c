@@ -23,3 +23,24 @@ void indexToXYZ(I8* vector, I16 index) {
     vector[VY] = (index / CHUNK_SIZE) % CHUNK_SIZE;
     vector[VZ] = (index / (CHUNK_SIZE * CHUNK_SIZE)) % CHUNK_SIZE;
 }
+
+I8 sign(I32 value) {
+    if (value == 0) return 0;
+    if (value < 0) return -1;
+    
+    return 1;
+}
+
+I8 fsign(F32 value) {
+    if (value == 0.0) return 0;
+    if (value < 0.0) return -1;
+    
+    return 1;
+}
+
+F32 fsignf(F32 value) {
+    if (value == 0.0) return 0;
+    if (value < 0.0) return -1;
+    
+    return 1;
+}

@@ -22,6 +22,7 @@
 #include "network/encoder.h"
 #include "world/vaoQueue.h"
 #include "core/camera.h"
+#include "core/dda.h"
 #include "utils/framerate.h"
 
 #if defined(_WIN32) || defined(_WIN64)
@@ -128,8 +129,13 @@ void update(GLFWwindow* window) {
 
     /////////////
 
+    ddaInit();
+
     NET_QUEUE_ELEM* queueElement = NULL;
     VAO_QUEUE_ELEM* vaoQueueElement = NULL;
+
+    U8 ld = 0;
+    U8 rd = 0;
 
     while (!glfwWindowShouldClose(window) && !glfwGetKey(window, GLFW_KEY_ESCAPE)) {
         //calculateFPS();
@@ -182,6 +188,18 @@ void update(GLFWwindow* window) {
 
         setUniformMat4(shaderProgram, "view", camera->matrix);
 
+        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS && !ld) {
+            DDA_RESULT* ddaResult = dda(camera->x, camera->y, camera->z, camera->direction, 20);
+            packetSendUpdateBlock(0, ddaResult->position[VX], ddaResult->position[VY], ddaResult->position[VZ]);
+        }
+        ld = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
+
+        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS && !rd) {
+            DDA_RESULT* ddaResult = dda(camera->x, camera->y, camera->z, camera->direction, 20);
+            packetSendUpdateBlock(3, ddaResult->position[VX] + ddaResult->mask[VX], ddaResult->position[VY] + ddaResult->mask[VY], ddaResult->position[VZ] + ddaResult->mask[VZ]);
+        }
+        rd = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS;
+
         if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS) {
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         }
@@ -196,6 +214,8 @@ void update(GLFWwindow* window) {
     }
 
     worldClean();
+
+    ddaClean();
 
     cameraClean(camera);
 

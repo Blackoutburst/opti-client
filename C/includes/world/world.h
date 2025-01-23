@@ -15,11 +15,12 @@ struct hashSlot {
     U8 used;
 };
 
+CHUNK* _worldGetChunk(I32 x, I32 y, I32 z);
 CHUNK* worldGetChunk(I32 x, I32 y, I32 z);
 U8 worldGetBlock(I32 x, I32 y, I32 z);
 void worldAddChunk(CHUNK* chunk);
-void worldRemoveChunk(I32 x, I32 y, I32 z);
 void _worldRemoveChunk(I32 x, I32 y, I32 z);
+void worldRemoveChunk(I32 x, I32 y, I32 z);
 void worldRemoveChunkOutOfRenderDistance(U8 renderDistance, I32 x, I32 y, I32 z);
 void worldRender(I32 shaderProgram);
 void worldClean();

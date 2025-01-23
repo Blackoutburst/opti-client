@@ -22,7 +22,9 @@ U8* encodePacketUpdateBlock(S01UPDATE_BLOCK* packet) {
     U8* buffer = malloc(sizeof(S01UPDATE_BLOCK));
     for (U16 i = 0; i < sizeof(S00UPDATE_ENTITY); i++) buffer[i] = 0;
 
-    U16 index = 0;
+    //U16 index = 0;
+
+    //TODO
 
     return buffer;
 }
@@ -31,7 +33,9 @@ U8* encodePacketBlockBulkEdit(S02BLOCK_BULK_EDIT* packet) {
     U8* buffer = malloc(sizeof(S02BLOCK_BULK_EDIT));
     for (U16 i = 0; i < sizeof(S00UPDATE_ENTITY); i++) buffer[i] = 0;
 
-    U16 index = 0;
+    //U16 index = 0;
+
+    //TODO
 
     return buffer;
 }
@@ -40,7 +44,9 @@ U8* encodePacketChat(S03CHAT* packet) {
     U8* buffer = malloc(sizeof(S03CHAT));
     for (U16 i = 0; i < sizeof(S00UPDATE_ENTITY); i++) buffer[i] = 0;
 
-    U16 index = 0;
+    //U16 index = 0;
+    
+    //TODO
 
     return buffer;
 }

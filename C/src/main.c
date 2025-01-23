@@ -6,12 +6,13 @@
 #include "utils/types.h"
 #include "glfw/glfw3.h"
 #include "graphics/shader.h"
+#include "graphics/shader.h"
+#include "graphics/textureArray.h"
+#include "graphics/opengl.h"
 #include "window/window.h"
 #include "utils/ioUtils.h"
 #include "utils/matrix.h"
 #include "utils/math.h"
-#include "graphics/shader.h"
-#include "graphics/textureArray.h"
 #include "world/chunk.h"
 #include "world/world.h"
 #include "world/worldGenerator.h"
@@ -21,28 +22,17 @@
 #include "network/encoder.h"
 #include "world/vaoQueue.h"
 
-#if defined(__APPLE__)
-    #include <OpenGL/gl3.h>
-#elif defined(_WIN32) || defined(_WIN64)
-    #include "gl/glew.h"
-    #include <GL/gl.h>
-#else
-    #define GL_GLEXT_PROTOTYPES
-    #include <GL/gl.h>
-    #include <GL/glext.h>
-#endif
-
 #if defined(_WIN32) || defined(_WIN64)
 void calculateFPS() {
-    static int frameCount = 0;
-    static double elapsedTime = 0.0;
-    static double lastTime = 0.0;
+    static I32 frameCount = 0;
+    static F64 elapsedTime = 0.0;
+    static F64 lastTime = 0.0;
     
     LARGE_INTEGER frequency, currentTime;
     QueryPerformanceFrequency(&frequency);
     QueryPerformanceCounter(&currentTime);
 
-    double now = (double)currentTime.QuadPart / frequency.QuadPart;
+    F64 now = (F64)currentTime.QuadPart / frequency.QuadPart;
     elapsedTime += now - lastTime;
     lastTime = now;
 
@@ -51,6 +41,68 @@ void calculateFPS() {
     if (elapsedTime >= 1.0) {
         printf("FPS: %d\n", frameCount);
         frameCount = 0;
+        elapsedTime = 0.0;
+    }
+}
+#else
+void calculateFPS() {
+    static I32 frameCount = 0;
+    static F64 elapsedTime = 0.0;
+    static struct timespec lastTime = {0, 0};
+
+    struct timespec currentTime;
+    clock_gettime(CLOCK_MONOTONIC, &currentTime);
+
+    F64 now = currentTime.tv_sec + (currentTime.tv_nsec / 1e9);
+    F64 last = lastTime.tv_sec + (lastTime.tv_nsec / 1e9);
+    elapsedTime += now - last;
+    lastTime = currentTime;
+
+    frameCount++;
+
+    if (elapsedTime >= 1.0) {
+        printf("FPS: %d\n", frameCount);
+        frameCount = 0;
+        elapsedTime = 0.0;
+    }
+}
+#endif
+
+
+#if defined(_WIN32) || defined(_WIN64)
+void sendPosition(F32 x, F32 y, F32 z, F32 yaw, F32 pitch) {
+    static F64 elapsedTime = 0.0;
+    static F64 lastTime = 0.0;
+    
+    LARGE_INTEGER frequency;
+    LARGE_INTEGER currentTime;
+    QueryPerformanceFrequency(&frequency);
+    QueryPerformanceCounter(&currentTime);
+
+    F64 now = (F64)currentTime.QuadPart / frequency.QuadPart;
+    elapsedTime += now - lastTime;
+    lastTime = now;
+
+    if (elapsedTime >= 0.05) {
+        packetSendUpdateEntity(x, y, z, yaw, pitch);
+        elapsedTime = 0.0;
+    }
+}
+#else
+void sendPosition(F32 x, F32 y, F32 z, F32 yaw, F32 pitch) {
+    static F64 elapsedTime = 0.0;
+    static struct timespec lastTime = {0, 0};
+
+    struct timespec currentTime;
+    clock_gettime(CLOCK_MONOTONIC, &currentTime);
+
+    F64 now = currentTime.tv_sec + (currentTime.tv_nsec / 1e9);
+    F64 last = lastTime.tv_sec + (lastTime.tv_nsec / 1e9);
+    elapsedTime += now - last;
+    lastTime = currentTime;
+
+    if (elapsedTime >= 0.05) {
+        packetSendUpdateEntity(x, y, z, yaw, pitch);
         elapsedTime = 0.0;
     }
 }
@@ -141,7 +193,7 @@ void update(GLFWwindow* window) {
     while (!glfwWindowShouldClose(window) && !glfwGetKey(window, GLFW_KEY_ESCAPE)) {
         //calculateFPS();
 
-        worldRemoveChunkOutOfRenderDistance(16, x, y, z);
+        worldRemoveChunkOutOfRenderDistance(20, x, y, z);
         
         while (networkQueuePop(&queueElement)) {
             queueElement->function(queueElement->buffer);
@@ -181,7 +233,7 @@ void update(GLFWwindow* window) {
             }
         }
 
-        packetSendUpdateEntity(x, y, z, yaw, pitch);
+        sendPosition(x, y, z, yaw, pitch);
 
         windowClear();
 

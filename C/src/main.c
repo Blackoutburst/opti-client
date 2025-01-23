@@ -21,6 +21,7 @@
 #include "network/packet.h"
 #include "network/encoder.h"
 #include "world/vaoQueue.h"
+#include "core/camera.h"
 
 #if defined(_WIN32) || defined(_WIN64)
 void calculateFPS() {
@@ -145,6 +146,8 @@ void update(GLFWwindow* window) {
 
     ////// SHADER ///////
 
+    CAMERA* camera = cameraInit(window);
+
     I8* vertexShaderSource = readFile("./res/shaders/cube.vert");
     I8* fragmentShaderSource = readFile("./res/shaders/cube.frag");
 
@@ -153,7 +156,6 @@ void update(GLFWwindow* window) {
     I32 shaderProgram = createShaderProgram(vertexShader, fragmentShader);
 
     MATRIX* modelMatrix = identityMatrix();
-    MATRIX* viewMatrix = identityMatrix();
     MATRIX* projectionMatrix = identityMatrix();
     matrixProjection(projectionMatrix, 1280, 720, 90, 0.1, 1000);
 
@@ -162,7 +164,7 @@ void update(GLFWwindow* window) {
     setUniform1i(shaderProgram, "diffuseMap", 0);
 
     setUniformMat4(shaderProgram, "model", modelMatrix);
-    setUniformMat4(shaderProgram, "view", viewMatrix);
+    setUniformMat4(shaderProgram, "view", camera->matrix);
     setUniformMat4(shaderProgram, "projection", projectionMatrix);
 
     setUniform3f(shaderProgram, "lightColor", 1.0f, 1.0f, 1.0f);
@@ -172,28 +174,13 @@ void update(GLFWwindow* window) {
 
     /////////////
 
-    F32 x = 0;
-    F32 y = 8;
-    F32 z = 0;
-    F64 mouseX = 0;
-    F64 mouseY = 0;
-    glfwGetCursorPos(window, &mouseX, &mouseY);
-    F64 prevMouseX = mouseX;
-    F64 prevMouseY = mouseY;
-    F64 pitch = 0;
-    F64 yaw = 0;
-    F64 pitchOffset = 0;
-    F64 yawOffset = 0;
-    F32 speed = 0.5f;
-    F32 sensitivity = 0.1f;
-
     NET_QUEUE_ELEM* queueElement = NULL;
     VAO_QUEUE_ELEM* vaoQueueElement = NULL;
 
     while (!glfwWindowShouldClose(window) && !glfwGetKey(window, GLFW_KEY_ESCAPE)) {
         //calculateFPS();
 
-        worldRemoveChunkOutOfRenderDistance(20, x, y, z);
+        worldRemoveChunkOutOfRenderDistance(20, camera->x, camera->y, camera->z);
         
         while (networkQueuePop(&queueElement)) {
             queueElement->function(queueElement->buffer);
@@ -233,53 +220,13 @@ void update(GLFWwindow* window) {
             }
         }
 
-        sendPosition(x, y, z, yaw, pitch);
+        sendPosition(camera->x, camera->y, camera->z, camera->yaw, camera->pitch);
 
         windowClear();
 
-        matrixSetIdentity(viewMatrix);
-        matrixRotate(viewMatrix, rad(yaw), 1, 0, 0);
-        matrixRotate(viewMatrix, rad(pitch), 0, 1, 0);
-        matrixTranslate3d(viewMatrix, -x, -y, -z);
-        setUniformMat4(shaderProgram, "view", viewMatrix);
+        cameraUpdate(camera);
 
-        glfwGetCursorPos(window, &mouseX, &mouseY);
-        pitchOffset = mouseX - prevMouseX;
-        yawOffset = mouseY - prevMouseY;
-
-        pitchOffset *= sensitivity;
-        yawOffset *= sensitivity;
-
-        prevMouseX = mouseX;
-        prevMouseY = mouseY;
-
-        pitch += pitchOffset;
-        yaw += yawOffset;
-        if (yaw > 89) yaw = 89;
-        if (yaw < -89) yaw = -89;
-
-        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-            x -= sin(rad(-pitch)) * speed;
-            z -= cos(rad(-pitch)) * speed;
-        }
-        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-            x += sin(rad(-pitch)) * speed;
-            z += cos(rad(-pitch)) * speed;
-        }
-        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-            x += sin(rad(-pitch - 90)) * speed;
-            z += cos(rad(-pitch - 90)) * speed;
-        }
-        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-            x += sin(rad(-pitch + 90)) * speed;
-            z += cos(rad(-pitch + 90)) * speed;
-        }
-        if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
-            y -= 1 * speed;
-        }
-        if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-            y += 1 * speed;
-        }
+        setUniformMat4(shaderProgram, "view", camera->matrix);
 
         if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS) {
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -296,10 +243,11 @@ void update(GLFWwindow* window) {
 
     worldClean();
 
+    cameraClean(camera);
+
     glfwTerminate();
 
     free(modelMatrix);
-    free(viewMatrix);
     free(projectionMatrix);
 }
 

@@ -5,5 +5,6 @@ src/graphics/*.c \
 src/window/*.c \
 src/world/*.c \
 src/network/*.c \
+src/core/*.c \
 -Iincludes -L/usr/lib -pthread -lglfw -lGL -Wno-deprecated-declarations -W -Wall -Wextra -Wno-unused-parameter -g3 -fno-omit-frame-pointer -fsanitize=address
 

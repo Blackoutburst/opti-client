@@ -13,7 +13,7 @@ void chunkPrint(CHUNK* chunk) {
 }
 
 I32 chunkPackVertexData(I8 x, I8 y, I8 z, I8 u, I8 v, I8 n, I8 t) {
-    return (x & 31) | (y & 31) << 5 | (z & 31) << 10 | (u & 1) << 15 | (v & 1) << 16 | (n & 7) << 17 | (t & 31) << 20;
+    return (x & 31) | (y & 31) << 5 | (z & 31) << 10 | (u & 3) << 15 | (v & 3) << 17 | (n & 7) << 19 | (t & 31) << 23;
 }
 
 void chunkGenerateVAO(CHUNK* chunk, CHUNK_MESH* mesh) {
@@ -37,23 +37,138 @@ void chunkGenerateVAO(CHUNK* chunk, CHUNK_MESH* mesh) {
 
 }
 
-U8 chunkIsMonotype(CHUNK* chunk) {
-    I32 previous = chunk->blocks[0];
+
+
+U8 _chunkIsMonotype(U8* blocks) {
+    I32 previous = blocks[0];
     
     for (I32 i = BLOCK_COUNT - 1; i; i--) {
-        if (previous != chunk->blocks[i])
+        if (previous != blocks[i])
             return 0;
-        previous = chunk->blocks[i];
+        previous = blocks[i];
     }
 
     return 1;
 }
 
+U8 chunkIsMonotype(CHUNK* chunk) {
+    return _chunkIsMonotype(chunk->blocks);
+}
+
 CHUNK_MESH* chunkGenerateMesh(I32* position, U8* blocks) {
     CHUNK_MESH* mesh = malloc(sizeof(CHUNK_MESH));
     I32* vertices = malloc(sizeof(I32) * BLOCK_COUNT * 36);
-    I8* blockPos = malloc(sizeof(I8) * 3);
     I32 vertexIndex = 0;
+
+    // MONO
+
+    if (_chunkIsMonotype(blocks)) {
+        I32 blockType = blocks[0];
+        //TOP BOTTOM
+        U8 top = 0;
+        U8 bottom = 0;
+        for (U8 x = 0; x < CHUNK_SIZE; x++) {
+        for (U8 z = 0; z < CHUNK_SIZE; z++) {
+            if (blocksIsTransparent(worldGetBlock(position[VX] + x, position[VY] + CHUNK_SIZE, position[VZ] + z))) top = 1;
+            if (blocksIsTransparent(worldGetBlock(position[VX] + x, position[VY] - 1, position[VZ] + z))) bottom = 1;
+        }}
+
+        // TOP
+        if (top) {
+            vertices[vertexIndex  ] = chunkPackVertexData(0 + CHUNK_SIZE, 0 + CHUNK_SIZE, 0    , 2, 0, 0, blocksTextureFace(blockType, 0));
+            vertices[vertexIndex+1] = chunkPackVertexData(0    , 0 + CHUNK_SIZE, 0    , 0, 0, 0, blocksTextureFace(blockType, 0));
+            vertices[vertexIndex+2] = chunkPackVertexData(0 + CHUNK_SIZE, 0 + CHUNK_SIZE, 0 + CHUNK_SIZE, 2, 2, 0, blocksTextureFace(blockType, 0));
+
+            vertices[vertexIndex+3] = chunkPackVertexData(0 + CHUNK_SIZE, 0 + CHUNK_SIZE, 0 + CHUNK_SIZE, 2, 2, 0, blocksTextureFace(blockType, 0));
+            vertices[vertexIndex+4] = chunkPackVertexData(0    , 0 + CHUNK_SIZE, 0    , 0, 0, 0, blocksTextureFace(blockType, 0));
+            vertices[vertexIndex+5] = chunkPackVertexData(0    , 0 + CHUNK_SIZE, 0 + CHUNK_SIZE, 0, 2, 0, blocksTextureFace(blockType, 0));
+            vertexIndex += 6;
+        }
+
+        // BOTTOM
+        if (bottom) {
+            vertices[vertexIndex  ] = chunkPackVertexData(0    , 0    , 0    , 0, 2, 5, blocksTextureFace(blockType, 5));
+            vertices[vertexIndex+1] = chunkPackVertexData(0 + CHUNK_SIZE, 0    , 0    , 2, 2, 5, blocksTextureFace(blockType, 5));
+            vertices[vertexIndex+2] = chunkPackVertexData(0 + CHUNK_SIZE, 0    , 0 + CHUNK_SIZE, 2, 0, 5, blocksTextureFace(blockType, 5));
+
+            vertices[vertexIndex+3] = chunkPackVertexData(0 + CHUNK_SIZE, 0    , 0 + CHUNK_SIZE, 2, 0, 5, blocksTextureFace(blockType, 5));
+            vertices[vertexIndex+4] = chunkPackVertexData(0    , 0    , 0 + CHUNK_SIZE, 0, 0, 5, blocksTextureFace(blockType, 5));
+            vertices[vertexIndex+5] = chunkPackVertexData(0    , 0    , 0    , 0, 2, 5, blocksTextureFace(blockType, 5));
+            vertexIndex += 6;
+        }
+
+        //FRONT BACK
+        U8 front = 0;
+        U8 back = 0;
+        for (U8 x = 0; x < CHUNK_SIZE; x++) {
+        for (U8 y = 0; y < CHUNK_SIZE; y++) {
+            if (blocksIsTransparent(worldGetBlock(position[VX] + x, position[VY] + y, position[VZ] - 1))) front = 1;
+            if (blocksIsTransparent(worldGetBlock(position[VX], position[VY], position[VZ] + CHUNK_SIZE))) back = 1;
+        }}
+
+        // FRONT
+        if (front) {
+            vertices[vertexIndex  ] = chunkPackVertexData(0 + CHUNK_SIZE, 0    , 0    , 0, 2, 1, blocksTextureFace(blockType, 1));
+            vertices[vertexIndex+1] = chunkPackVertexData(0    , 0    , 0    , 2, 2, 1, blocksTextureFace(blockType, 1));
+            vertices[vertexIndex+2] = chunkPackVertexData(0 + CHUNK_SIZE, 0 + CHUNK_SIZE, 0    , 0, 0, 1, blocksTextureFace(blockType, 1));
+
+            vertices[vertexIndex+3] = chunkPackVertexData(0 + CHUNK_SIZE, 0 + CHUNK_SIZE, 0    , 0, 0, 1, blocksTextureFace(blockType, 1));
+            vertices[vertexIndex+4] = chunkPackVertexData(0    , 0    , 0    , 2, 2, 1, blocksTextureFace(blockType, 1));
+            vertices[vertexIndex+5] = chunkPackVertexData(0    , 0 + CHUNK_SIZE, 0    , 2, 0, 1, blocksTextureFace(blockType, 1));
+            vertexIndex += 6;
+        }
+
+        // BACK
+        if (back) {
+            vertices[vertexIndex  ] = chunkPackVertexData(0    , 0    , 0 + CHUNK_SIZE, 0, 2, 2, blocksTextureFace(blockType, 2));
+            vertices[vertexIndex+1] = chunkPackVertexData(0 + CHUNK_SIZE, 0    , 0 + CHUNK_SIZE, 2, 2, 2, blocksTextureFace(blockType, 2));
+            vertices[vertexIndex+2] = chunkPackVertexData(0 + CHUNK_SIZE, 0 + CHUNK_SIZE, 0 + CHUNK_SIZE, 2, 0, 2, blocksTextureFace(blockType, 2));
+
+            vertices[vertexIndex+3] = chunkPackVertexData(0 + CHUNK_SIZE, 0 + CHUNK_SIZE, 0 + CHUNK_SIZE, 2, 0, 2, blocksTextureFace(blockType, 2));
+            vertices[vertexIndex+4] = chunkPackVertexData(0    , 0 + CHUNK_SIZE, 0 + CHUNK_SIZE, 0, 0, 2, blocksTextureFace(blockType, 2));
+            vertices[vertexIndex+5] = chunkPackVertexData(0    , 0    , 0 + CHUNK_SIZE, 0, 2, 2, blocksTextureFace(blockType, 2));
+            vertexIndex += 6;
+        }
+
+        //LEFT RIGHT
+        U8 left = 0;
+        U8 right = 0;
+        for (U8 y = 0; y < CHUNK_SIZE; y++) {
+        for (U8 z = 0; z < CHUNK_SIZE; z++) {
+            if (blocksIsTransparent(worldGetBlock(position[VX] - 1, position[VY] + y, position[VZ] + z))) left = 1;
+            if (blocksIsTransparent(worldGetBlock(position[VX] + CHUNK_SIZE, position[VY] + y, position[VZ] + z))) right = 1;
+        }}
+
+        if (left) {
+            vertices[vertexIndex  ] = chunkPackVertexData(0    , 0 + CHUNK_SIZE, 0 + CHUNK_SIZE, 0, 0, 3, blocksTextureFace(blockType, 3));
+            vertices[vertexIndex+1] = chunkPackVertexData(0    , 0 + CHUNK_SIZE, 0    , 2, 0, 3, blocksTextureFace(blockType, 3));
+            vertices[vertexIndex+2] = chunkPackVertexData(0    , 0    , 0    , 2, 2, 3, blocksTextureFace(blockType, 3));
+
+            vertices[vertexIndex+3] = chunkPackVertexData(0    , 0    , 0    , 2, 2, 3, blocksTextureFace(blockType, 3));
+            vertices[vertexIndex+4] = chunkPackVertexData(0    , 0    , 0 + CHUNK_SIZE, 0, 2, 3, blocksTextureFace(blockType, 3));
+            vertices[vertexIndex+5] = chunkPackVertexData(0    , 0 + CHUNK_SIZE, 0 + CHUNK_SIZE, 0, 0, 3, blocksTextureFace(blockType, 3));
+            vertexIndex += 6;
+        }
+
+        if (right) {
+            vertices[vertexIndex  ] = chunkPackVertexData(0 + CHUNK_SIZE, 0    , 0    , 0, 2, 4, blocksTextureFace(blockType, 4));
+            vertices[vertexIndex+1] = chunkPackVertexData(0 + CHUNK_SIZE, 0 + CHUNK_SIZE, 0    , 0, 0, 4, blocksTextureFace(blockType, 4));
+            vertices[vertexIndex+2] = chunkPackVertexData(0 + CHUNK_SIZE, 0 + CHUNK_SIZE, 0 + CHUNK_SIZE, 2, 0, 4, blocksTextureFace(blockType, 4));
+
+            vertices[vertexIndex+3] = chunkPackVertexData(0 + CHUNK_SIZE, 0 + CHUNK_SIZE, 0 + CHUNK_SIZE, 2, 0, 4, blocksTextureFace(blockType, 4));
+            vertices[vertexIndex+4] = chunkPackVertexData(0 + CHUNK_SIZE, 0    , 0 + CHUNK_SIZE, 2, 2, 4, blocksTextureFace(blockType, 4));
+            vertices[vertexIndex+5] = chunkPackVertexData(0 + CHUNK_SIZE, 0    , 0    , 0, 2, 4, blocksTextureFace(blockType, 4));
+            vertexIndex += 6;
+        }
+
+        mesh->vertices = vertices;
+        mesh->vertexCount = vertexIndex;
+        return mesh;
+    }
+
+    // REGULAR
+
+    I8* blockPos = malloc(sizeof(I8) * 3);
     
     for (U16 i = 0; i < BLOCK_COUNT; i++) {
         I32 blockType = blocks[i];

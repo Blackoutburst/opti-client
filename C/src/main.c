@@ -191,7 +191,7 @@ void update(GLFWwindow* window) {
     VAO_QUEUE_ELEM* vaoQueueElement = NULL;
 
     while (!glfwWindowShouldClose(window) && !glfwGetKey(window, GLFW_KEY_ESCAPE)) {
-        //calculateFPS();
+        calculateFPS();
 
         worldRemoveChunkOutOfRenderDistance(20, x, y, z);
         

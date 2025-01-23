@@ -25,6 +25,7 @@ struct chunkMesh {
 void chunkPrint(CHUNK* chunk);
 I32 chunkPackVertexData(I8 x, I8 y, I8 z, I8 u, I8 v, I8 n, I8 t);
 void chunkGenerateVAO(CHUNK * chunk, CHUNK_MESH* mesh);
+U8 _chunkIsMonotype(U8* blocks);
 U8 chunkIsMonotype(CHUNK* chunk);
 CHUNK_MESH* chunkGenerateMesh(I32* position, U8* blocks);
 CHUNK* chunkCreate(I32* position, U8* blocks);

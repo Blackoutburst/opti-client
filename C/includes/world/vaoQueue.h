@@ -6,7 +6,7 @@
 typedef struct vaoQueue VAO_QUEUE;
 typedef struct vaoQueueElement VAO_QUEUE_ELEM;
 
-#define VAO_QUEUE_SIZE 32768
+#define VAO_QUEUE_SIZE 64000
 
 struct vaoQueueElement {
     U8 used;

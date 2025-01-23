@@ -6,7 +6,7 @@
 typedef struct meshQueue MESH_QUEUE;
 typedef struct meshQueueElement MESH_QUEUE_ELEM;
 
-#define MESH_QUEUE_SIZE 32768
+#define MESH_QUEUE_SIZE 64000
 
 struct meshQueueElement {
     U8 used;

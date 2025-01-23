@@ -141,7 +141,7 @@ void update(GLFWwindow* window) {
     while (!glfwWindowShouldClose(window) && !glfwGetKey(window, GLFW_KEY_ESCAPE)) {
         //calculateFPS();
 
-        worldRemoveChunkOutOfRenderDistance(20, x, y, z);
+        worldRemoveChunkOutOfRenderDistance(16, x, y, z);
         
         while (networkQueuePop(&queueElement)) {
             queueElement->function(queueElement->buffer);

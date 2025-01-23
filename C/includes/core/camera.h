@@ -16,8 +16,10 @@ struct camera {
     F64 pitch;
     GLFWwindow* window;
     MATRIX* matrix;
+    F32* direction;
 };
 
+void cameraGetDirection(CAMERA* camera);
 void cameraMove(CAMERA* camera);
 void cameraRotate(CAMERA* camera);
 void cameraUpdate(CAMERA* camera);

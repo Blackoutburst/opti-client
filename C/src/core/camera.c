@@ -8,6 +8,22 @@
 static F64 prevMouseX = 0;
 static F64 prevMouseY = 0;
 
+void cameraGetDirection(CAMERA* camera) {
+    F32 rYaw = rad(camera->yaw);
+    F32 rPitch = rad(camera->pitch);
+
+    F32 x = cos(rPitch) * cos(rYaw);
+    F32 y = sin(rPitch);
+    F32 z = cos(rPitch) * sin(rYaw);
+
+    F32 mag = sqrt(x * x + y * y + z * z);
+    if (!mag) return;
+
+    camera->direction[VX] = x / mag;
+    camera->direction[VY] = y / mag;
+    camera->direction[VZ] = z / mag;
+}
+
 void cameraMove(CAMERA* camera) {
     if (camera == NULL) return;
     
@@ -73,10 +89,16 @@ void cameraClean(CAMERA* camera) {
     if (camera == NULL) return;
     
     free(camera->matrix);
+    free(camera->direction);
     free(camera);
 }
 
 CAMERA* cameraInit(GLFWwindow* window) {
+    F32* direction = malloc(sizeof(F32) * 3);
+    direction[VX] = 0;
+    direction[VY] = 0;
+    direction[VZ] = 0;
+    
     MATRIX* matrix = identityMatrix();
     CAMERA* camera = malloc(sizeof(CAMERA));
     camera->x = 0;
@@ -86,6 +108,7 @@ CAMERA* cameraInit(GLFWwindow* window) {
     camera->pitch = 0;
     camera->window = window;
     camera->matrix = matrix;
+    camera->direction = direction;
 
     glfwGetCursorPos(camera->window, &prevMouseX, &prevMouseY);
     

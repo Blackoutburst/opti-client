@@ -60,6 +60,13 @@ CHUNK_MESH* chunkGenerateMesh(VECTORI* position, U8* blocks) {
     I32* vertices = malloc(sizeof(I32) * BLOCK_COUNT * 36);
     I32 vertexIndex = 0;
 
+    //EMPTY
+    if (_chunkIsMonotype(blocks) && blocks[0] == 0) {
+        mesh->vertices = vertices;
+        mesh->vertexCount = vertexIndex;
+        return mesh;
+    }
+    
     // MONO
 
     if (_chunkIsMonotype(blocks)) {

@@ -192,13 +192,15 @@ void update(GLFWwindow* window) {
 
         if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS && !ld) {
             DDA_RESULT* ddaResult = dda(camera->position, camera->direction, 20);
-            packetSendUpdateBlock(0, ddaResult->position->x, ddaResult->position->y, ddaResult->position->z);
+            if (ddaResult->blockType != 0)
+                packetSendUpdateBlock(0, ddaResult->position->x, ddaResult->position->y, ddaResult->position->z);
         }
         ld = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
 
         if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS && !rd) {
             DDA_RESULT* ddaResult = dda(camera->position, camera->direction, 20);
-            packetSendUpdateBlock(selectedBlockType, ddaResult->position->x + ddaResult->mask->x, ddaResult->position->y + ddaResult->mask->y, ddaResult->position->z + ddaResult->mask->z);
+            if (ddaResult->blockType != 0)
+                packetSendUpdateBlock(selectedBlockType, ddaResult->position->x + ddaResult->mask->x, ddaResult->position->y + ddaResult->mask->y, ddaResult->position->z + ddaResult->mask->z);
         }
         rd = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS;
 

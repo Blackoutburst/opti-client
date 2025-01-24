@@ -65,7 +65,7 @@ void cursorInit() {
     
     texture = textureCreate("./res/awp.png", 1);
     I8* vertexShaderSource = readFile("./res/shaders/2D.vert");
-    I8* fragmentShaderSource = readFile("./res/shaders/awp.frag");
+    I8* fragmentShaderSource = readFile("./res/shaders/AWP.frag");
     I32 vertexShader = compileShader(vertexShaderSource, GL_VERTEX_SHADER);
     I32 fragmentShader = compileShader(fragmentShaderSource, GL_FRAGMENT_SHADER);
     shaderProgram = createShaderProgram(vertexShader, fragmentShader);

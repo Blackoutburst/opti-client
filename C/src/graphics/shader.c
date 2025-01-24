@@ -103,8 +103,9 @@ void setUniform4fP(U32 id, I8* name, VECTORF* vector) {
 }
 
 void setUniformMat4(U32 id, I8* name, MATRIX* matrix) {
-    const F32* values = matrixGetValues(matrix);
-    glProgramUniformMatrix4fv(id, glGetUniformLocation(id, name), 1, GL_FALSE, values);
+    F32* values = matrixGetValues(matrix);
+    glProgramUniformMatrix4fv(id, glGetUniformLocation(id, name), 1, GL_FALSE, (const F32*)values);
+    free(values);
 }
 
 

@@ -110,7 +110,7 @@ CHUNK_MESH* chunkGenerateMesh(VECTORI* position, U8* blocks) {
         for (U8 x = 0; x < CHUNK_SIZE; x++) {
         for (U8 y = 0; y < CHUNK_SIZE; y++) {
             if (blocksIsTransparent(worldGetBlock(position->x + x, position->y + y, position->z - 1))) front = 1;
-            if (blocksIsTransparent(worldGetBlock(position->x, position->y, position->z + CHUNK_SIZE))) back = 1;
+            if (blocksIsTransparent(worldGetBlock(position->x + x, position->y + y, position->z + CHUNK_SIZE))) back = 1;
         }}
 
         // FRONT

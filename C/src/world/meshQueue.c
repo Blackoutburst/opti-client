@@ -24,7 +24,7 @@ void meshQueueCleanElement(U16 index) {
     queue->elements[index]->blocks = NULL;
 }
 
-void meshQueuePush(I32* position, U8* blocks, U8 neighbor) {
+void meshQueuePush(VECTORI* position, U8* blocks, U8 neighbor) {
     if (queue == NULL) return;
 
     mutexLock(&mutex);

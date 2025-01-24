@@ -3,160 +3,120 @@
 #include <stdio.h>
 #include "core/dda.h"
 #include "utils/math.h"
+#include "utils/vectori.h"
+#include "utils/vectorf.h"
 #include "world/world.h"
 
 static DDA_RESULT* result;
 
-static I32* mapPos;
-static F32* deltaDist;
-static I32* rayStep;
-static F32* signRayDir;
-static F32* mapPosVec3;
-static I32* mask;
-static F32* sideDist;
+static VECTORF* deltaDist;
+static VECTORF* signRayDir;
+static VECTORF* mapPosVec3;
+static VECTORF* sideDist;
+
+static VECTORI* mapPos;
+static VECTORI* rayStep;
+static VECTORI* mask;
 
 void ddaClean() {
-    free(result->position);
-    free(result->mask);
+    vectoriClean(result->position);
+    vectoriClean(result->mask);
     free(result);
 
-    free(mapPos);
-    free(deltaDist);
-    free(rayStep);
-    free(signRayDir);
-    free(mapPosVec3);
-    free(mask);
-    free(sideDist);
+    vectorfClean(deltaDist);
+    vectorfClean(signRayDir);
+    vectorfClean(mapPosVec3);
+    vectorfClean(sideDist);
+
+    vectoriClean(mapPos);
+    vectoriClean(rayStep);
+    vectoriClean(mask);
 }
 
 void ddaInit() {
+    VECTORI* resultPosition = vectoriInit();
+    VECTORI* resultMask = vectoriInit();
     result = malloc(sizeof(DDA_RESULT));
-    result->position = malloc(sizeof(I32) * 3);
-    result->mask = malloc(sizeof(I32) * 3);
+    result->position = resultPosition;
+    result->mask = resultMask;
 
-    mapPos = malloc(sizeof(I32) * 3);
-    deltaDist = malloc(sizeof(F32) * 3);
-    rayStep = malloc(sizeof(I32) * 3);
-    signRayDir = malloc(sizeof(F32) * 3);
-    mapPosVec3 = malloc(sizeof(F32) * 3);
-    mask = malloc(sizeof(I32) * 3);
-    sideDist = malloc(sizeof(F32) * 3);
+    deltaDist = vectorfInit();
+    signRayDir = vectorfInit();
+    mapPosVec3 = vectorfInit();
+    sideDist = vectorfInit();
+
+    mapPos = vectoriInit();
+    rayStep = vectoriInit();
+    mask = vectoriInit();
 
     ddaZero();
 }
 
 void ddaZero() {
     result->blockType = 0;
-    result->position[VX] = 0;
-    result->position[VY] = 0;
-    result->position[VZ] = 0;
-    result->mask[VX] = 0;
-    result->mask[VY] = 0;
-    result->mask[VZ] = 0;
+    
+    vectoriZero(result->position);
+    vectoriZero(result->mask);
 
-    mapPos[VX] = 0;
-    mapPos[VY] = 0;
-    mapPos[VZ] = 0;
-    
-    deltaDist[VX] = 0;
-    deltaDist[VY] = 0;
-    deltaDist[VZ] = 0;
-    
-    rayStep[VX] = 0;
-    rayStep[VY] = 0;
-    rayStep[VZ] = 0;
-    
-    signRayDir[VX] = 0;
-    signRayDir[VY] = 0;
-    signRayDir[VZ] = 0;
-    
-    mapPosVec3[VX] = 0;
-    mapPosVec3[VY] = 0;
-    mapPosVec3[VZ] = 0;
-    
-    mask[VX] = 0;
-    mask[VY] = 0;
-    mask[VZ] = 0;
-    
-    sideDist[VX] = 0;
-    sideDist[VY] = 0;
-    sideDist[VZ] = 0;
+    vectorfZero(deltaDist);
+    vectorfZero(signRayDir);
+    vectorfZero(mapPosVec3);
+    vectorfZero(sideDist);
+
+    vectoriZero(mapPos);
+    vectoriZero(rayStep);
+    vectoriZero(mask);
 }
 
-DDA_RESULT* dda(F32 x, F32 y, F32 z, F32* direction, U32 maxStep) {
+DDA_RESULT* dda(VECTORF* position, VECTORF* direction, U32 maxStep) {
     ddaZero();
 
-    mapPos[VX] = floor(x);
-    mapPos[VY] = floor(y);
-    mapPos[VZ] = floor(z);
+    F32 rayDirLength = sqrt(direction->x * direction->x + direction->y * direction->y + direction->z * direction->z);
     
-    F32 rayDirLength = sqrt(direction[VX] * direction[VX] + direction[VY] * direction[VY] + direction[VZ] * direction[VZ]);
+    vectoriSet(mapPos, floor(position->x), floor(position->y), floor(position->z), 0);
+    vectorfSet(deltaDist, fabs(rayDirLength / direction->x), fabs(rayDirLength / direction->y), fabs(rayDirLength / direction->z), 0);
+    vectoriSet(rayStep, fsign(direction->x), fsign(direction->y), fsign(direction->z), 0);
+    vectorfSet(signRayDir, fsignf(direction->x), fsignf(direction->y), fsignf(direction->z), 0);
+    vectorfSet(mapPosVec3, (F32)mapPos->x, (F32)mapPos->y, (F32)mapPos->z, 0);
     
-    deltaDist[VX] = fabs(rayDirLength / direction[VX]);
-    deltaDist[VY] = fabs(rayDirLength / direction[VY]);
-    deltaDist[VZ] = fabs(rayDirLength / direction[VZ]);
+    F32 sideDistX = (F32)(signRayDir->x * (mapPosVec3->x - position->x) + (signRayDir->x * 0.5) + 0.5) * deltaDist->x;
+    F32 sideDistY = (F32)(signRayDir->y * (mapPosVec3->y - position->y) + (signRayDir->y * 0.5) + 0.5) * deltaDist->y;
+    F32 sideDistZ = (F32)(signRayDir->z * (mapPosVec3->z - position->z) + (signRayDir->z * 0.5) + 0.5) * deltaDist->z;
     
-    rayStep[VX] = fsign(direction[VX]);
-    rayStep[VY] = fsign(direction[VY]);
-    rayStep[VZ] = fsign(direction[VZ]);
-
-
-    signRayDir[VX] = fsignf(direction[VX]);
-    signRayDir[VY] = fsignf(direction[VY]);
-    signRayDir[VZ] = fsignf(direction[VZ]);
-
-    mapPosVec3[VX] = (F32)mapPos[VX];
-    mapPosVec3[VY] = (F32)mapPos[VY];
-    mapPosVec3[VZ] = (F32)mapPos[VZ];
-    
-    sideDist[VX] = (F32)(signRayDir[VX] * (mapPosVec3[VX] - x) + (signRayDir[VX] * 0.5) + 0.5) * deltaDist[VX];
-    sideDist[VY] = (F32)(signRayDir[VY] * (mapPosVec3[VY] - y) + (signRayDir[VY] * 0.5) + 0.5) * deltaDist[VY];
-    sideDist[VZ] = (F32)(signRayDir[VZ] * (mapPosVec3[VZ] - z) + (signRayDir[VZ] * 0.5) + 0.5) * deltaDist[VZ];
+    vectorfSet(sideDist, sideDistX, sideDistY, sideDistZ, 0);
 
 
     for (U32 i = 0; i < maxStep; i++) {
-        U8 blockType = worldGetBlock(mapPos[VX], mapPos[VY], mapPos[VZ]);
+        U8 blockType = worldGetBlock(mapPos->x, mapPos->y, mapPos->z);
         result->blockType = blockType;
-        result->position[VX] = mapPos[VX];
-        result->position[VY] = mapPos[VY];
-        result->position[VZ] = mapPos[VZ];
-        result->mask[VX] = mask[VX];
-        result->mask[VY] = mask[VY];
-        result->mask[VZ] = mask[VZ];
+        vectoriSet(result->position, mapPos->x, mapPos->y, mapPos->z, 0);
+        vectoriSet(result->mask, mask->x, mask->y, mask->z, 0);
             
         if (blockType) return result;
 
-        if (sideDist[VX] < sideDist[VY]) {
-            if (sideDist[VX] < sideDist[VZ]) {
-                sideDist[VX] += deltaDist[VX];
-                mapPos[VX] += rayStep[VX];
-                
-                mask[VX] = -rayStep[VX];
-                mask[VY] = 0;
-                mask[VZ] = 0;
+        if (sideDist->x < sideDist->y) {
+            if (sideDist->x < sideDist->z) {
+                sideDist->x += deltaDist->x;
+                mapPos->x += rayStep->x;
+
+                vectoriSet(mask, -rayStep->x, 0, 0, 0);
             } else {
-                sideDist[VZ] += deltaDist[VZ];
-                mapPos[VZ] += rayStep[VZ];
-                
-                mask[VX] = 0;
-                mask[VY] = 0;
-                mask[VZ] = -rayStep[VZ];
+                sideDist->z += deltaDist->z;
+                mapPos->z += rayStep->z;
+
+                vectoriSet(mask, 0, 0, -rayStep->z, 0);
             }
         } else {
-            if (sideDist[VY] < sideDist[VZ]) {
-                sideDist[VY] += deltaDist[VY];
-                mapPos[VY] += rayStep[VY];
-                
-                mask[VX] = 0;
-                mask[VY] = -rayStep[VY];
-                mask[VZ] = 0;
+            if (sideDist->y < sideDist->z) {
+                sideDist->y += deltaDist->y;
+                mapPos->y += rayStep->y;
+
+                vectoriSet(mask, 0, -rayStep->y, 0, 0);
             } else {
-                sideDist[VZ] += deltaDist[VZ];
-                mapPos[VZ] += rayStep[VZ];
+                sideDist->z += deltaDist->z;
+                mapPos->z += rayStep->z;
                 
-                mask[VX] = 0;
-                mask[VY] = 0;
-                mask[VZ] = -rayStep[VZ];
+                vectoriSet(mask, 0, 0, -rayStep->z, 0);
             }
         }
     }

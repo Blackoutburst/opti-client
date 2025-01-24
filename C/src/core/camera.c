@@ -22,35 +22,35 @@ void cameraGetDirection(CAMERA* camera) {
     F32 mag = sqrt(x * x + y * y + z * z);
     if (mag == 0.0) return;
 
-    camera->direction[VX] = x / mag;
-    camera->direction[VY] = y / mag;
-    camera->direction[VZ] = z / mag;
+    camera->direction->x = x / mag;
+    camera->direction->y = y / mag;
+    camera->direction->z = z / mag;
 }
 
 void cameraMove(CAMERA* camera) {
     if (camera == NULL) return;
     
     if (glfwGetKey(camera->window, GLFW_KEY_W) == GLFW_PRESS) {
-        camera->x -= sin(rad(-camera->yaw)) * CAMERA_SPEED;
-        camera->z -= cos(rad(-camera->yaw)) * CAMERA_SPEED;
+        camera->position->x -= sin(rad(-camera->yaw)) * CAMERA_SPEED;
+        camera->position->z -= cos(rad(-camera->yaw)) * CAMERA_SPEED;
     }
     if (glfwGetKey(camera->window, GLFW_KEY_S) == GLFW_PRESS) {
-        camera->x += sin(rad(-camera->yaw)) * CAMERA_SPEED;
-        camera->z += cos(rad(-camera->yaw)) * CAMERA_SPEED;
+        camera->position->x += sin(rad(-camera->yaw)) * CAMERA_SPEED;
+        camera->position->z += cos(rad(-camera->yaw)) * CAMERA_SPEED;
     }
     if (glfwGetKey(camera->window, GLFW_KEY_A) == GLFW_PRESS) {
-        camera->x += sin(rad(-camera->yaw - 90)) * CAMERA_SPEED;
-        camera->z += cos(rad(-camera->yaw - 90)) * CAMERA_SPEED;
+        camera->position->x += sin(rad(-camera->yaw - 90)) * CAMERA_SPEED;
+        camera->position->z += cos(rad(-camera->yaw - 90)) * CAMERA_SPEED;
     }
     if (glfwGetKey(camera->window, GLFW_KEY_D) == GLFW_PRESS) {
-        camera->x += sin(rad(-camera->yaw + 90)) * CAMERA_SPEED;
-        camera->z += cos(rad(-camera->yaw + 90)) * CAMERA_SPEED;
+        camera->position->x += sin(rad(-camera->yaw + 90)) * CAMERA_SPEED;
+        camera->position->z += cos(rad(-camera->yaw + 90)) * CAMERA_SPEED;
     }
     if (glfwGetKey(camera->window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
-        camera->y -= 1 * CAMERA_SPEED;
+        camera->position->y -= 1 * CAMERA_SPEED;
     }
     if (glfwGetKey(camera->window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-        camera->y += 1 * CAMERA_SPEED;
+        camera->position->y += 1 * CAMERA_SPEED;
     }
 }
 
@@ -86,28 +86,24 @@ void cameraUpdate(CAMERA* camera) {
     matrixSetIdentity(camera->matrix);
     matrixRotate(camera->matrix, rad(camera->pitch), -1, 0, 0);
     matrixRotate(camera->matrix, rad(camera->yaw), 0, 1, 0);
-    matrixTranslate3d(camera->matrix, -camera->x, -camera->y, -camera->z);
+    matrixTranslate3d(camera->matrix, -camera->position->x, -camera->position->y, -camera->position->z);
 }
 
 void cameraClean(CAMERA* camera) {
     if (camera == NULL) return;
     
     free(camera->matrix);
-    free(camera->direction);
+    vectorfClean(camera->position);
+    vectorfClean(camera->direction);
     free(camera);
 }
 
 CAMERA* cameraInit(GLFWwindow* window) {
-    F32* direction = malloc(sizeof(F32) * 3);
-    direction[VX] = 0;
-    direction[VY] = 0;
-    direction[VZ] = 0;
-    
+    VECTORF* position = vectorfInit();
+    VECTORF* direction = vectorfInit();
     MATRIX* matrix = identityMatrix();
     CAMERA* camera = malloc(sizeof(CAMERA));
-    camera->x = 0;
-    camera->y = 0;
-    camera->z = 0;
+    camera->position = position;
     camera->yaw = 0;
     camera->pitch = 0;
     camera->window = window;

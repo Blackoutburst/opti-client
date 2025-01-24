@@ -136,11 +136,14 @@ void update(GLFWwindow* window) {
 
     U8 ld = 0;
     U8 rd = 0;
+    U8 md = 0;
+
+    U8 selectedBlockType = 3;
 
     while (!glfwWindowShouldClose(window) && !glfwGetKey(window, GLFW_KEY_ESCAPE)) {
         //calculateFPS();
 
-        worldRemoveChunkOutOfRenderDistance(20, camera->x, camera->y, camera->z);
+        worldRemoveChunkOutOfRenderDistance(20, camera->position->x, camera->position->y, camera->position->z);
         
         while (networkQueuePop(&queueElement)) {
             queueElement->function(queueElement->buffer);
@@ -159,20 +162,20 @@ void update(GLFWwindow* window) {
                 worldAddChunk(chunk);
 
                 I32 chunkPoses[6][3] = {
-                    {vaoQueueElement->position[VX] + CHUNK_SIZE, vaoQueueElement->position[VY], vaoQueueElement->position[VZ]},
-                    {vaoQueueElement->position[VX] - CHUNK_SIZE, vaoQueueElement->position[VY], vaoQueueElement->position[VZ]},
-                    {vaoQueueElement->position[VX], vaoQueueElement->position[VY] + CHUNK_SIZE, vaoQueueElement->position[VZ]},
-                    {vaoQueueElement->position[VX], vaoQueueElement->position[VY] - CHUNK_SIZE, vaoQueueElement->position[VZ]},
-                    {vaoQueueElement->position[VX], vaoQueueElement->position[VY], vaoQueueElement->position[VZ] + CHUNK_SIZE},
-                    {vaoQueueElement->position[VX], vaoQueueElement->position[VY], vaoQueueElement->position[VZ] - CHUNK_SIZE},
+                    {vaoQueueElement->position->x + CHUNK_SIZE, vaoQueueElement->position->y, vaoQueueElement->position->z},
+                    {vaoQueueElement->position->x - CHUNK_SIZE, vaoQueueElement->position->y, vaoQueueElement->position->z},
+                    {vaoQueueElement->position->x, vaoQueueElement->position->y + CHUNK_SIZE, vaoQueueElement->position->z},
+                    {vaoQueueElement->position->x, vaoQueueElement->position->y - CHUNK_SIZE, vaoQueueElement->position->z},
+                    {vaoQueueElement->position->x, vaoQueueElement->position->y, vaoQueueElement->position->z + CHUNK_SIZE},
+                    {vaoQueueElement->position->x, vaoQueueElement->position->y, vaoQueueElement->position->z - CHUNK_SIZE},
                 };
 
                 for (U8 i = 0; i < 6; i++) {
-                    CHUNK* tmp = worldGetChunk(chunkPoses[i][VX], chunkPoses[i][VY], chunkPoses[i][VZ]);
+                    CHUNK* tmp = worldGetChunk(chunkPoses[i][0], chunkPoses[i][1], chunkPoses[i][2]);
                     if (tmp == NULL) continue;
-                    I32* position = malloc(sizeof(I32) * 3);
+                    VECTORI* position = vectoriInit();
+                    vectoriSet(position, tmp->position->x, tmp->position->y, tmp->position->z, tmp->position->w);
                     U8* blocks = malloc(sizeof(U8) * CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE);
-                    memcpy(position, tmp->position, sizeof(I32) * 3);
                     memcpy(blocks, tmp->blocks, sizeof(U8) * CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE);
                     meshQueuePush(position, blocks, 1);
                 }
@@ -180,7 +183,7 @@ void update(GLFWwindow* window) {
             }
         }
 
-        sendPosition(camera->x, camera->y, camera->z, camera->yaw, camera->pitch);
+        sendPosition(camera->position->x, camera->position->y, camera->position->z, camera->yaw, camera->pitch);
 
         windowClear();
 
@@ -189,16 +192,22 @@ void update(GLFWwindow* window) {
         setUniformMat4(shaderProgram, "view", camera->matrix);
 
         if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS && !ld) {
-            DDA_RESULT* ddaResult = dda(camera->x, camera->y, camera->z, camera->direction, 20);
-            packetSendUpdateBlock(0, ddaResult->position[VX], ddaResult->position[VY], ddaResult->position[VZ]);
+            DDA_RESULT* ddaResult = dda(camera->position, camera->direction, 20);
+            packetSendUpdateBlock(0, ddaResult->position->x, ddaResult->position->y, ddaResult->position->z);
         }
         ld = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
 
         if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS && !rd) {
-            DDA_RESULT* ddaResult = dda(camera->x, camera->y, camera->z, camera->direction, 20);
-            packetSendUpdateBlock(3, ddaResult->position[VX] + ddaResult->mask[VX], ddaResult->position[VY] + ddaResult->mask[VY], ddaResult->position[VZ] + ddaResult->mask[VZ]);
+            DDA_RESULT* ddaResult = dda(camera->position, camera->direction, 20);
+            packetSendUpdateBlock(selectedBlockType, ddaResult->position->x + ddaResult->mask->x, ddaResult->position->y + ddaResult->mask->y, ddaResult->position->z + ddaResult->mask->z);
         }
         rd = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS;
+
+        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS && !md) {
+            DDA_RESULT* ddaResult = dda(camera->position, camera->direction, 20);
+            selectedBlockType = ddaResult->blockType;
+        }
+        md = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS;
 
         if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS) {
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);

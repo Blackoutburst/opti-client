@@ -50,24 +50,24 @@ void setUniform2i(I32 id, I8* name, I32 x, I32 y) {
     glProgramUniform2i(id, glGetUniformLocation(id, name), x, y);
 }
 
-void setUniform2iP(I32 id, I8* name, I32* x) {
-    glProgramUniform2i(id, glGetUniformLocation(id, name), x[VX], x[VY]);
+void setUniform2iP(I32 id, I8* name, VECTORI* vector) {
+    glProgramUniform2i(id, glGetUniformLocation(id, name), vector->x, vector->y);
 }
 
 void setUniform3i(I32 id, I8* name, I32 x, I32 y, I32 z) {
     glProgramUniform3i(id, glGetUniformLocation(id, name), x, y, z);
 }
 
-void setUniform3iP(I32 id, I8* name, I32* x) {
-    glProgramUniform3i(id, glGetUniformLocation(id, name), x[VX], x[VY], x[VZ]);
+void setUniform3iP(I32 id, I8* name, VECTORI* vector) {
+    glProgramUniform3i(id, glGetUniformLocation(id, name), vector->x, vector->y, vector->z);
 }
 
 void setUniform4i(I32 id, I8* name, I32 x, I32 y, I32 z, I32 w) {
     glProgramUniform4i(id, glGetUniformLocation(id, name), x, y, z, w);
 }
 
-void setUniform4iP(I32 id, I8* name, I32* x) {
-    glProgramUniform4i(id, glGetUniformLocation(id, name), x[VX], x[VY], x[VZ], x[VW]);
+void setUniform4iP(I32 id, I8* name, VECTORI* vector) {
+    glProgramUniform4i(id, glGetUniformLocation(id, name), vector->x, vector->y, vector->z, vector->w);
 }
 
 void setUniform1f(I32 id, I8* name, F32 x) {
@@ -78,28 +78,29 @@ void setUniform2f(I32 id, I8* name, F32 x, F32 y) {
     glProgramUniform2f(id, glGetUniformLocation(id, name), x, y);
 }
 
-void setUniform2fP(I32 id, I8* name, F32* x) {
-    glProgramUniform2f(id, glGetUniformLocation(id, name), x[VX], x[VY]);
+void setUniform2fP(I32 id, I8* name, VECTORF* vector) {
+    glProgramUniform2f(id, glGetUniformLocation(id, name), vector->x, vector->y);
 }
 
 void setUniform3f(I32 id, I8* name, F32 x, F32 y, F32 z) {
     glProgramUniform3f(id, glGetUniformLocation(id, name), x, y, z);
 }
 
-void setUniform3fP(I32 id, I8* name, F32* x) {
-    glProgramUniform3f(id, glGetUniformLocation(id, name), x[VX], x[VY], x[VZ]);
+void setUniform3fP(I32 id, I8* name, VECTORF* vector) {
+    glProgramUniform3f(id, glGetUniformLocation(id, name), vector->x, vector->y, vector->z);
 }
 
 void setUniform4f(I32 id, I8* name, F32 x, F32 y, F32 z, F32 w) {
     glProgramUniform4f(id, glGetUniformLocation(id, name), x, y, z, w);
 }
 
-void setUniform4fP(I32 id, I8* name, F32* x) {
-    glProgramUniform4f(id, glGetUniformLocation(id, name), x[VX], x[VY], x[VZ], x[VW]);
+void setUniform4fP(I32 id, I8* name, VECTORF* vector) {
+    glProgramUniform4f(id, glGetUniformLocation(id, name), vector->x, vector->y, vector->z, vector->w);
 }
 
-void setUniformMat4(I32 id, I8* name, const F32* matrix) {
-    glProgramUniformMatrix4fv(id, glGetUniformLocation(id, name), 1, GL_FALSE, matrix);
+void setUniformMat4(I32 id, I8* name, MATRIX* matrix) {
+    const F32* values = matrixGetValues(matrix);
+    glProgramUniformMatrix4fv(id, glGetUniformLocation(id, name), 1, GL_FALSE, values);
 }
 
 

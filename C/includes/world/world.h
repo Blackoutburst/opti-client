@@ -1,6 +1,7 @@
 #pragma once
 
 #include "utils/types.h"
+#include "utils/vectori.h"
 #include "world/chunk.h"
 
 #define CHUNK_COUNT 64000
@@ -8,9 +9,7 @@
 typedef struct hashSlot HASH;
 
 struct hashSlot {
-    I32 x;
-    I32 y;
-    I32 z;
+    VECTORI* position;
     CHUNK* chunk;
     U8 used;
 };

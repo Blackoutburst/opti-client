@@ -55,7 +55,7 @@ U8 chunkIsMonotype(CHUNK* chunk) {
     return _chunkIsMonotype(chunk->blocks);
 }
 
-CHUNK_MESH* chunkGenerateMesh(I32* position, U8* blocks) {
+CHUNK_MESH* chunkGenerateMesh(VECTORI* position, U8* blocks) {
     CHUNK_MESH* mesh = malloc(sizeof(CHUNK_MESH));
     I32* vertices = malloc(sizeof(I32) * BLOCK_COUNT * 36);
     I32 vertexIndex = 0;
@@ -69,8 +69,8 @@ CHUNK_MESH* chunkGenerateMesh(I32* position, U8* blocks) {
         U8 bottom = 0;
         for (U8 x = 0; x < CHUNK_SIZE; x++) {
         for (U8 z = 0; z < CHUNK_SIZE; z++) {
-            if (blocksIsTransparent(worldGetBlock(position[VX] + x, position[VY] + CHUNK_SIZE, position[VZ] + z))) top = 1;
-            if (blocksIsTransparent(worldGetBlock(position[VX] + x, position[VY] - 1, position[VZ] + z))) bottom = 1;
+            if (blocksIsTransparent(worldGetBlock(position->x + x, position->y + CHUNK_SIZE, position->z + z))) top = 1;
+            if (blocksIsTransparent(worldGetBlock(position->x + x, position->y - 1, position->z + z))) bottom = 1;
         }}
 
         // TOP
@@ -102,8 +102,8 @@ CHUNK_MESH* chunkGenerateMesh(I32* position, U8* blocks) {
         U8 back = 0;
         for (U8 x = 0; x < CHUNK_SIZE; x++) {
         for (U8 y = 0; y < CHUNK_SIZE; y++) {
-            if (blocksIsTransparent(worldGetBlock(position[VX] + x, position[VY] + y, position[VZ] - 1))) front = 1;
-            if (blocksIsTransparent(worldGetBlock(position[VX], position[VY], position[VZ] + CHUNK_SIZE))) back = 1;
+            if (blocksIsTransparent(worldGetBlock(position->x + x, position->y + y, position->z - 1))) front = 1;
+            if (blocksIsTransparent(worldGetBlock(position->x, position->y, position->z + CHUNK_SIZE))) back = 1;
         }}
 
         // FRONT
@@ -135,8 +135,8 @@ CHUNK_MESH* chunkGenerateMesh(I32* position, U8* blocks) {
         U8 right = 0;
         for (U8 y = 0; y < CHUNK_SIZE; y++) {
         for (U8 z = 0; z < CHUNK_SIZE; z++) {
-            if (blocksIsTransparent(worldGetBlock(position[VX] - 1, position[VY] + y, position[VZ] + z))) left = 1;
-            if (blocksIsTransparent(worldGetBlock(position[VX] + CHUNK_SIZE, position[VY] + y, position[VZ] + z))) right = 1;
+            if (blocksIsTransparent(worldGetBlock(position->x - 1, position->y + y, position->z + z))) left = 1;
+            if (blocksIsTransparent(worldGetBlock(position->x + CHUNK_SIZE, position->y + y, position->z + z))) right = 1;
         }}
 
         if (left) {
@@ -168,7 +168,7 @@ CHUNK_MESH* chunkGenerateMesh(I32* position, U8* blocks) {
 
     // REGULAR
 
-    I8* blockPos = malloc(sizeof(I8) * 3);
+    VECTORI* blockPos = vectoriInit();
     
     for (U16 i = 0; i < BLOCK_COUNT; i++) {
         I32 blockType = blocks[i];
@@ -177,110 +177,110 @@ CHUNK_MESH* chunkGenerateMesh(I32* position, U8* blocks) {
         indexToXYZ(blockPos, i);
 
         // TOP
-        U32 topIndex = xyzToIndexOobCheck(blockPos[VX], blockPos[VY] + 1, blockPos[VZ]);
+        U32 topIndex = xyzToIndexOobCheck(blockPos->x, blockPos->y + 1, blockPos->z);
         if (
-            (topIndex >= BLOCK_COUNT && blocksIsTransparent(worldGetBlock(position[VX] + blockPos[VX], position[VY] + blockPos[VY] + 1, position[VZ] + blockPos[VZ]))) || 
+            (topIndex >= BLOCK_COUNT && blocksIsTransparent(worldGetBlock(position->x + blockPos->x, position->y + blockPos->y + 1, position->z + blockPos->z))) || 
             (topIndex < BLOCK_COUNT && blocksIsTransparent(blocks[topIndex]))
         ) {
-            vertices[vertexIndex  ] = chunkPackVertexData(blockPos[VX] + 1, blockPos[VY] + 1, blockPos[VZ]    , 1, 0, 0, blocksTextureFace(blockType, 0));
-            vertices[vertexIndex+1] = chunkPackVertexData(blockPos[VX]    , blockPos[VY] + 1, blockPos[VZ]    , 0, 0, 0, blocksTextureFace(blockType, 0));
-            vertices[vertexIndex+2] = chunkPackVertexData(blockPos[VX] + 1, blockPos[VY] + 1, blockPos[VZ] + 1, 1, 1, 0, blocksTextureFace(blockType, 0));
+            vertices[vertexIndex  ] = chunkPackVertexData(blockPos->x + 1, blockPos->y + 1, blockPos->z    , 1, 0, 0, blocksTextureFace(blockType, 0));
+            vertices[vertexIndex+1] = chunkPackVertexData(blockPos->x    , blockPos->y + 1, blockPos->z    , 0, 0, 0, blocksTextureFace(blockType, 0));
+            vertices[vertexIndex+2] = chunkPackVertexData(blockPos->x + 1, blockPos->y + 1, blockPos->z + 1, 1, 1, 0, blocksTextureFace(blockType, 0));
 
-            vertices[vertexIndex+3] = chunkPackVertexData(blockPos[VX] + 1, blockPos[VY] + 1, blockPos[VZ] + 1, 1, 1, 0, blocksTextureFace(blockType, 0));
-            vertices[vertexIndex+4] = chunkPackVertexData(blockPos[VX]    , blockPos[VY] + 1, blockPos[VZ]    , 0, 0, 0, blocksTextureFace(blockType, 0));
-            vertices[vertexIndex+5] = chunkPackVertexData(blockPos[VX]    , blockPos[VY] + 1, blockPos[VZ] + 1, 0, 1, 0, blocksTextureFace(blockType, 0));
+            vertices[vertexIndex+3] = chunkPackVertexData(blockPos->x + 1, blockPos->y + 1, blockPos->z + 1, 1, 1, 0, blocksTextureFace(blockType, 0));
+            vertices[vertexIndex+4] = chunkPackVertexData(blockPos->x    , blockPos->y + 1, blockPos->z    , 0, 0, 0, blocksTextureFace(blockType, 0));
+            vertices[vertexIndex+5] = chunkPackVertexData(blockPos->x    , blockPos->y + 1, blockPos->z + 1, 0, 1, 0, blocksTextureFace(blockType, 0));
             vertexIndex += 6;
         }
 
         // FRONT
-        U32 frontIndex = xyzToIndexOobCheck(blockPos[VX], blockPos[VY], blockPos[VZ] - 1);
+        U32 frontIndex = xyzToIndexOobCheck(blockPos->x, blockPos->y, blockPos->z - 1);
         if (
-            (frontIndex >= BLOCK_COUNT && blocksIsTransparent(worldGetBlock(position[VX] + blockPos[VX], position[VY] + blockPos[VY], position[VZ] + blockPos[VZ] - 1))) || 
+            (frontIndex >= BLOCK_COUNT && blocksIsTransparent(worldGetBlock(position->x + blockPos->x, position->y + blockPos->y, position->z + blockPos->z - 1))) || 
             (frontIndex < BLOCK_COUNT && blocksIsTransparent(blocks[frontIndex]))
         ) {
-            vertices[vertexIndex  ] = chunkPackVertexData(blockPos[VX] + 1, blockPos[VY]    , blockPos[VZ]    , 0, 1, 1, blocksTextureFace(blockType, 1));
-            vertices[vertexIndex+1] = chunkPackVertexData(blockPos[VX]    , blockPos[VY]    , blockPos[VZ]    , 1, 1, 1, blocksTextureFace(blockType, 1));
-            vertices[vertexIndex+2] = chunkPackVertexData(blockPos[VX] + 1, blockPos[VY] + 1, blockPos[VZ]    , 0, 0, 1, blocksTextureFace(blockType, 1));
+            vertices[vertexIndex  ] = chunkPackVertexData(blockPos->x + 1, blockPos->y    , blockPos->z    , 0, 1, 1, blocksTextureFace(blockType, 1));
+            vertices[vertexIndex+1] = chunkPackVertexData(blockPos->x    , blockPos->y    , blockPos->z    , 1, 1, 1, blocksTextureFace(blockType, 1));
+            vertices[vertexIndex+2] = chunkPackVertexData(blockPos->x + 1, blockPos->y + 1, blockPos->z    , 0, 0, 1, blocksTextureFace(blockType, 1));
 
-            vertices[vertexIndex+3] = chunkPackVertexData(blockPos[VX] + 1, blockPos[VY] + 1, blockPos[VZ]    , 0, 0, 1, blocksTextureFace(blockType, 1));
-            vertices[vertexIndex+4] = chunkPackVertexData(blockPos[VX]    , blockPos[VY]    , blockPos[VZ]    , 1, 1, 1, blocksTextureFace(blockType, 1));
-            vertices[vertexIndex+5] = chunkPackVertexData(blockPos[VX]    , blockPos[VY] + 1, blockPos[VZ]    , 1, 0, 1, blocksTextureFace(blockType, 1));
+            vertices[vertexIndex+3] = chunkPackVertexData(blockPos->x + 1, blockPos->y + 1, blockPos->z    , 0, 0, 1, blocksTextureFace(blockType, 1));
+            vertices[vertexIndex+4] = chunkPackVertexData(blockPos->x    , blockPos->y    , blockPos->z    , 1, 1, 1, blocksTextureFace(blockType, 1));
+            vertices[vertexIndex+5] = chunkPackVertexData(blockPos->x    , blockPos->y + 1, blockPos->z    , 1, 0, 1, blocksTextureFace(blockType, 1));
             vertexIndex += 6;
         }
 
         // BACK
-        U32 backIndex = xyzToIndexOobCheck(blockPos[VX], blockPos[VY], blockPos[VZ] + 1);
+        U32 backIndex = xyzToIndexOobCheck(blockPos->x, blockPos->y, blockPos->z + 1);
         if (
-            (backIndex >= BLOCK_COUNT && blocksIsTransparent(worldGetBlock(position[VX] + blockPos[VX], position[VY] + blockPos[VY], position[VZ] + blockPos[VZ] + 1))) || 
+            (backIndex >= BLOCK_COUNT && blocksIsTransparent(worldGetBlock(position->x + blockPos->x, position->y + blockPos->y, position->z + blockPos->z + 1))) || 
             (backIndex < BLOCK_COUNT && blocksIsTransparent(blocks[backIndex]))
         ) {
-            vertices[vertexIndex  ] = chunkPackVertexData(blockPos[VX]    , blockPos[VY]    , blockPos[VZ] + 1, 0, 1, 2, blocksTextureFace(blockType, 2));
-            vertices[vertexIndex+1] = chunkPackVertexData(blockPos[VX] + 1, blockPos[VY]    , blockPos[VZ] + 1, 1, 1, 2, blocksTextureFace(blockType, 2));
-            vertices[vertexIndex+2] = chunkPackVertexData(blockPos[VX] + 1, blockPos[VY] + 1, blockPos[VZ] + 1, 1, 0, 2, blocksTextureFace(blockType, 2));
+            vertices[vertexIndex  ] = chunkPackVertexData(blockPos->x    , blockPos->y    , blockPos->z + 1, 0, 1, 2, blocksTextureFace(blockType, 2));
+            vertices[vertexIndex+1] = chunkPackVertexData(blockPos->x + 1, blockPos->y    , blockPos->z + 1, 1, 1, 2, blocksTextureFace(blockType, 2));
+            vertices[vertexIndex+2] = chunkPackVertexData(blockPos->x + 1, blockPos->y + 1, blockPos->z + 1, 1, 0, 2, blocksTextureFace(blockType, 2));
 
-            vertices[vertexIndex+3] = chunkPackVertexData(blockPos[VX] + 1, blockPos[VY] + 1, blockPos[VZ] + 1, 1, 0, 2, blocksTextureFace(blockType, 2));
-            vertices[vertexIndex+4] = chunkPackVertexData(blockPos[VX]    , blockPos[VY] + 1, blockPos[VZ] + 1, 0, 0, 2, blocksTextureFace(blockType, 2));
-            vertices[vertexIndex+5] = chunkPackVertexData(blockPos[VX]    , blockPos[VY]    , blockPos[VZ] + 1, 0, 1, 2, blocksTextureFace(blockType, 2));
+            vertices[vertexIndex+3] = chunkPackVertexData(blockPos->x + 1, blockPos->y + 1, blockPos->z + 1, 1, 0, 2, blocksTextureFace(blockType, 2));
+            vertices[vertexIndex+4] = chunkPackVertexData(blockPos->x    , blockPos->y + 1, blockPos->z + 1, 0, 0, 2, blocksTextureFace(blockType, 2));
+            vertices[vertexIndex+5] = chunkPackVertexData(blockPos->x    , blockPos->y    , blockPos->z + 1, 0, 1, 2, blocksTextureFace(blockType, 2));
             vertexIndex += 6;
         }
 
         // LEFT
-        U32 leftIndex = xyzToIndexOobCheck(blockPos[VX] - 1, blockPos[VY], blockPos[VZ]);
+        U32 leftIndex = xyzToIndexOobCheck(blockPos->x - 1, blockPos->y, blockPos->z);
         if (
-            (leftIndex >= BLOCK_COUNT && blocksIsTransparent(worldGetBlock(position[VX] + blockPos[VX] - 1, position[VY] + blockPos[VY], position[VZ] + blockPos[VZ]))) || 
+            (leftIndex >= BLOCK_COUNT && blocksIsTransparent(worldGetBlock(position->x + blockPos->x - 1, position->y + blockPos->y, position->z + blockPos->z))) || 
             (leftIndex < BLOCK_COUNT && blocksIsTransparent(blocks[leftIndex]))
         ) {
-            vertices[vertexIndex  ] = chunkPackVertexData(blockPos[VX]    , blockPos[VY] + 1, blockPos[VZ] + 1, 0, 0, 3, blocksTextureFace(blockType, 3));
-            vertices[vertexIndex+1] = chunkPackVertexData(blockPos[VX]    , blockPos[VY] + 1, blockPos[VZ]    , 1, 0, 3, blocksTextureFace(blockType, 3));
-            vertices[vertexIndex+2] = chunkPackVertexData(blockPos[VX]    , blockPos[VY]    , blockPos[VZ]    , 1, 1, 3, blocksTextureFace(blockType, 3));
+            vertices[vertexIndex  ] = chunkPackVertexData(blockPos->x    , blockPos->y + 1, blockPos->z + 1, 0, 0, 3, blocksTextureFace(blockType, 3));
+            vertices[vertexIndex+1] = chunkPackVertexData(blockPos->x    , blockPos->y + 1, blockPos->z    , 1, 0, 3, blocksTextureFace(blockType, 3));
+            vertices[vertexIndex+2] = chunkPackVertexData(blockPos->x    , blockPos->y    , blockPos->z    , 1, 1, 3, blocksTextureFace(blockType, 3));
 
-            vertices[vertexIndex+3] = chunkPackVertexData(blockPos[VX]    , blockPos[VY]    , blockPos[VZ]    , 1, 1, 3, blocksTextureFace(blockType, 3));
-            vertices[vertexIndex+4] = chunkPackVertexData(blockPos[VX]    , blockPos[VY]    , blockPos[VZ] + 1, 0, 1, 3, blocksTextureFace(blockType, 3));
-            vertices[vertexIndex+5] = chunkPackVertexData(blockPos[VX]    , blockPos[VY] + 1, blockPos[VZ] + 1, 0, 0, 3, blocksTextureFace(blockType, 3));
+            vertices[vertexIndex+3] = chunkPackVertexData(blockPos->x    , blockPos->y    , blockPos->z    , 1, 1, 3, blocksTextureFace(blockType, 3));
+            vertices[vertexIndex+4] = chunkPackVertexData(blockPos->x    , blockPos->y    , blockPos->z + 1, 0, 1, 3, blocksTextureFace(blockType, 3));
+            vertices[vertexIndex+5] = chunkPackVertexData(blockPos->x    , blockPos->y + 1, blockPos->z + 1, 0, 0, 3, blocksTextureFace(blockType, 3));
             vertexIndex += 6;
         }
 
         // RIGHT
-        U32 rightIndex = xyzToIndexOobCheck(blockPos[VX] + 1, blockPos[VY], blockPos[VZ]);
+        U32 rightIndex = xyzToIndexOobCheck(blockPos->x + 1, blockPos->y, blockPos->z);
         if (
-            (rightIndex >= BLOCK_COUNT && blocksIsTransparent(worldGetBlock(position[VX] + blockPos[VX] + 1, position[VY] + blockPos[VY], position[VZ] + blockPos[VZ]))) || 
+            (rightIndex >= BLOCK_COUNT && blocksIsTransparent(worldGetBlock(position->x + blockPos->x + 1, position->y + blockPos->y, position->z + blockPos->z))) || 
             (rightIndex < BLOCK_COUNT && blocksIsTransparent(blocks[rightIndex]))
         ) {
-            vertices[vertexIndex  ] = chunkPackVertexData(blockPos[VX] + 1, blockPos[VY]    , blockPos[VZ]    , 0, 1, 4, blocksTextureFace(blockType, 4));
-            vertices[vertexIndex+1] = chunkPackVertexData(blockPos[VX] + 1, blockPos[VY] + 1, blockPos[VZ]    , 0, 0, 4, blocksTextureFace(blockType, 4));
-            vertices[vertexIndex+2] = chunkPackVertexData(blockPos[VX] + 1, blockPos[VY] + 1, blockPos[VZ] + 1, 1, 0, 4, blocksTextureFace(blockType, 4));
+            vertices[vertexIndex  ] = chunkPackVertexData(blockPos->x + 1, blockPos->y    , blockPos->z    , 0, 1, 4, blocksTextureFace(blockType, 4));
+            vertices[vertexIndex+1] = chunkPackVertexData(blockPos->x + 1, blockPos->y + 1, blockPos->z    , 0, 0, 4, blocksTextureFace(blockType, 4));
+            vertices[vertexIndex+2] = chunkPackVertexData(blockPos->x + 1, blockPos->y + 1, blockPos->z + 1, 1, 0, 4, blocksTextureFace(blockType, 4));
 
-            vertices[vertexIndex+3] = chunkPackVertexData(blockPos[VX] + 1, blockPos[VY] + 1, blockPos[VZ] + 1, 1, 0, 4, blocksTextureFace(blockType, 4));
-            vertices[vertexIndex+4] = chunkPackVertexData(blockPos[VX] + 1, blockPos[VY]    , blockPos[VZ] + 1, 1, 1, 4, blocksTextureFace(blockType, 4));
-            vertices[vertexIndex+5] = chunkPackVertexData(blockPos[VX] + 1, blockPos[VY]    , blockPos[VZ]    , 0, 1, 4, blocksTextureFace(blockType, 4));
+            vertices[vertexIndex+3] = chunkPackVertexData(blockPos->x + 1, blockPos->y + 1, blockPos->z + 1, 1, 0, 4, blocksTextureFace(blockType, 4));
+            vertices[vertexIndex+4] = chunkPackVertexData(blockPos->x + 1, blockPos->y    , blockPos->z + 1, 1, 1, 4, blocksTextureFace(blockType, 4));
+            vertices[vertexIndex+5] = chunkPackVertexData(blockPos->x + 1, blockPos->y    , blockPos->z    , 0, 1, 4, blocksTextureFace(blockType, 4));
             vertexIndex += 6;
         }
 
         // BOTTOM
-        U32 bottomIndex = xyzToIndexOobCheck(blockPos[VX], blockPos[VY] - 1, blockPos[VZ]);
+        U32 bottomIndex = xyzToIndexOobCheck(blockPos->x, blockPos->y - 1, blockPos->z);
         if (
-            (bottomIndex >= BLOCK_COUNT && blocksIsTransparent(worldGetBlock(position[VX] + blockPos[VX], position[VY] + blockPos[VY] - 1, position[VZ] + blockPos[VZ]))) || 
+            (bottomIndex >= BLOCK_COUNT && blocksIsTransparent(worldGetBlock(position->x + blockPos->x, position->y + blockPos->y - 1, position->z + blockPos->z))) || 
             (bottomIndex < BLOCK_COUNT && blocksIsTransparent(blocks[bottomIndex]))
         ) {
-            vertices[vertexIndex  ] = chunkPackVertexData(blockPos[VX]    , blockPos[VY]    , blockPos[VZ]    , 0, 1, 5, blocksTextureFace(blockType, 5));
-            vertices[vertexIndex+1] = chunkPackVertexData(blockPos[VX] + 1, blockPos[VY]    , blockPos[VZ]    , 1, 1, 5, blocksTextureFace(blockType, 5));
-            vertices[vertexIndex+2] = chunkPackVertexData(blockPos[VX] + 1, blockPos[VY]    , blockPos[VZ] + 1, 1, 0, 5, blocksTextureFace(blockType, 5));
+            vertices[vertexIndex  ] = chunkPackVertexData(blockPos->x    , blockPos->y    , blockPos->z    , 0, 1, 5, blocksTextureFace(blockType, 5));
+            vertices[vertexIndex+1] = chunkPackVertexData(blockPos->x + 1, blockPos->y    , blockPos->z    , 1, 1, 5, blocksTextureFace(blockType, 5));
+            vertices[vertexIndex+2] = chunkPackVertexData(blockPos->x + 1, blockPos->y    , blockPos->z + 1, 1, 0, 5, blocksTextureFace(blockType, 5));
 
-            vertices[vertexIndex+3] = chunkPackVertexData(blockPos[VX] + 1, blockPos[VY]    , blockPos[VZ] + 1, 1, 0, 5, blocksTextureFace(blockType, 5));
-            vertices[vertexIndex+4] = chunkPackVertexData(blockPos[VX]    , blockPos[VY]    , blockPos[VZ] + 1, 0, 0, 5, blocksTextureFace(blockType, 5));
-            vertices[vertexIndex+5] = chunkPackVertexData(blockPos[VX]    , blockPos[VY]    , blockPos[VZ]    , 0, 1, 5, blocksTextureFace(blockType, 5));
+            vertices[vertexIndex+3] = chunkPackVertexData(blockPos->x + 1, blockPos->y    , blockPos->z + 1, 1, 0, 5, blocksTextureFace(blockType, 5));
+            vertices[vertexIndex+4] = chunkPackVertexData(blockPos->x    , blockPos->y    , blockPos->z + 1, 0, 0, 5, blocksTextureFace(blockType, 5));
+            vertices[vertexIndex+5] = chunkPackVertexData(blockPos->x    , blockPos->y    , blockPos->z    , 0, 1, 5, blocksTextureFace(blockType, 5));
             vertexIndex += 6;
         }
     }
 
-    free(blockPos);
+    vectoriClean(blockPos);
 
     mesh->vertices = vertices;
     mesh->vertexCount = vertexIndex;
     return mesh;
 }
 
-CHUNK* chunkCreate(I32* position, U8* blocks) {
+CHUNK* chunkCreate(VECTORI* position, U8* blocks) {
     CHUNK* chunk = malloc(sizeof(CHUNK));
 
     glGenVertexArrays(1, &chunk->vaoID);
@@ -308,7 +308,7 @@ void chunkDrestroy(CHUNK* chunk) {
     glDeleteVertexArrays(1, &chunk->vaoID);
     glDeleteBuffers(1, &chunk->vboID);
     glDeleteBuffers(1, &chunk->eboID);
-    free(chunk->position);
+    vectoriClean(chunk->position);
     free(chunk->blocks);
     free(chunk);
     chunk = NULL;

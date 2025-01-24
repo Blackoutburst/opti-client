@@ -2,6 +2,7 @@
 
 #include "glfw/glfw3.h"
 #include "utils/types.h"
+#include "utils/vectorf.h"
 
 typedef struct camera CAMERA;
 
@@ -9,14 +10,12 @@ typedef struct camera CAMERA;
 #define CAMERA_SENSITIVITY 0.1
 
 struct camera {
-    F32 x;
-    F32 y;
-    F32 z;
-    F64 yaw;
-    F64 pitch;
+    VECTORF* position;
+    F32 yaw;
+    F32 pitch;
     GLFWwindow* window;
     MATRIX* matrix;
-    F32* direction;
+    VECTORF* direction;
 };
 
 void cameraGetDirection(CAMERA* camera);

@@ -28,7 +28,7 @@ CHUNK* _worldGetChunk(I32 x, I32 y, I32 z) {
             return NULL;
         }
         
-        if (chunks[index].x == x && chunks[index].y == y && chunks[index].z == z) {
+        if (chunks[index].position->x == x && chunks[index].position->y == y && chunks[index].position->z == z) {
             return chunks[index].chunk;
         }
 
@@ -82,23 +82,18 @@ void worldAddChunk(CHUNK* chunk) {
         return;
     }
 
-    U32 index = chunkHash(chunk->position[VX], chunk->position[VY], chunk->position[VZ]) % CHUNK_COUNT;
+    U32 index = chunkHash(chunk->position->x, chunk->position->y, chunk->position->z) % CHUNK_COUNT;
     U32 start = index;
 
     while (1) {
         if (!chunks[index].used) {
-            chunks[index].x = chunk->position[VX];
-            chunks[index].y = chunk->position[VY];
-            chunks[index].z = chunk->position[VZ];
+            vectoriSet(chunks[index].position, chunk->position->x, chunk->position->y, chunk->position->z, 0);
             chunks[index].chunk = chunk;
             chunks[index].used = 1;
             
             mutexUnlock(&mutex);
             return;
-        } else if (chunks[index].used &&
-                   chunks[index].x == chunk->position[VX] &&
-                   chunks[index].y == chunk->position[VY] &&
-                   chunks[index].z == chunk->position[VZ])
+        } else if (chunks[index].used && vectoriEquals(chunks[index].position, chunk->position))
         {
             chunkDrestroy(chunks[index].chunk);
             chunks[index].chunk = chunk;
@@ -121,15 +116,12 @@ void _worldRemoveChunk(I32 x, I32 y, I32 z) {
 
     while (1) {
         if (chunks[index].used &&
-            chunks[index].x == x &&
-            chunks[index].y == y &&
-            chunks[index].z == z)
+            chunks[index].position->x == x &&
+            chunks[index].position->y == y &&
+            chunks[index].position->z == z)
         {
             chunkDrestroy(chunks[index].chunk);
-        
-            chunks[index].x = 0;
-            chunks[index].y = 0;
-            chunks[index].z = 0;
+            vectoriSet(chunks[index].position, 0, 0, 0, 0);
             chunks[index].chunk = NULL;
             chunks[index].used = 0;
 
@@ -167,11 +159,11 @@ void worldRemoveChunkOutOfRenderDistance(U8 renderDistance, I32 x, I32 y, I32 z)
     for (U16 i = 0; i < CHUNK_COUNT; i++) {
         if (!chunks[i].used) continue;
 
-        if (abs(chunks[i].x - px) > (renderDistance * CHUNK_SIZE) ||
-            abs(chunks[i].y - py) > (renderDistance * CHUNK_SIZE) ||
-            abs(chunks[i].z - pz) > (renderDistance * CHUNK_SIZE))
+        if (abs(chunks[i].position->x - px) > (renderDistance * CHUNK_SIZE) ||
+            abs(chunks[i].position->y - py) > (renderDistance * CHUNK_SIZE) ||
+            abs(chunks[i].position->z - pz) > (renderDistance * CHUNK_SIZE))
         {
-            _worldRemoveChunk(chunks[i].x, chunks[i].y, chunks[i].z);
+            _worldRemoveChunk(chunks[i].position->x, chunks[i].position->y, chunks[i].position->z);
         }
     }
 
@@ -183,7 +175,7 @@ void worldRender(I32 shaderProgram) {
     
     for (U32 i = 0; i < CHUNK_COUNT; i++) {
         if (chunks[i].chunk == NULL) continue;
-        setUniform3f(shaderProgram, "chunkPos", chunks[i].chunk->position[VX], chunks[i].chunk->position[VY], chunks[i].chunk->position[VZ]);
+        setUniform3f(shaderProgram, "chunkPos", chunks[i].chunk->position->x, chunks[i].chunk->position->y, chunks[i].chunk->position->z);
         chunkRender(chunks[i].chunk);
     }
 }
@@ -191,7 +183,11 @@ void worldRender(I32 shaderProgram) {
 void worldClean() {
     if (chunks == NULL) return;
     
-    for (U32 i = 0; i < CHUNK_COUNT; i++) chunkDrestroy(chunks[i].chunk);
+    for (U32 i = 0; i < CHUNK_COUNT; i++) {
+        vectoriClean(chunks[i].position);
+        chunkDrestroy(chunks[i].chunk);
+    }
+    
     free(chunks);
 
     mutexDestroy(&mutex);
@@ -199,12 +195,10 @@ void worldClean() {
 
 void worldInit() {
     if (chunks != NULL) return;
-    
+
     chunks = malloc(sizeof(HASH) * CHUNK_COUNT);
     for (U32 i = 0; i < CHUNK_COUNT; i++) {
-        chunks[i].x = 0;
-        chunks[i].y = 0;
-        chunks[i].z = 0;
+        chunks[i].position = vectoriInit();
         chunks[i].chunk = NULL;
         chunks[i].used = 0;
     }

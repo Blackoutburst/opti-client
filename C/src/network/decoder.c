@@ -2,6 +2,7 @@
 #include "utils/types.h"
 #include "utils/ioUtils.h"
 #include "utils/math.h"
+#include "utils/vectori.h"
 #include "network/packet.h"
 #include "world/chunk.h"
 #include "world/world.h"
@@ -25,10 +26,8 @@ void decodePacketUpdateEntity(U8* buffer) {
 
 void decodePacketSendChunk(U8* buffer) {
     U8** bufferptr = &buffer;
-    I32* position = malloc(sizeof(I32) * 3);
-    position[VX] = getI32(bufferptr);
-    position[VY] = getI32(bufferptr);
-    position[VZ] = getI32(bufferptr);
+    VECTORI* position = vectoriInit();
+    vectoriSet(position, getI32(bufferptr), getI32(bufferptr), getI32(bufferptr), 0);
     U8* blocks = malloc(sizeof(U8) * CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE);
     for (I32 i = 0; i < CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE; i++) blocks[i] = getU8(bufferptr);
     meshQueuePush(position, blocks, 0);
@@ -36,10 +35,8 @@ void decodePacketSendChunk(U8* buffer) {
 
 void decodePacketSendMonotypeChunk(U8* buffer) {
     U8** bufferptr = &buffer;
-    I32* position = malloc(sizeof(I32) * 3);
-    position[VX] = getI32(bufferptr);
-    position[VY] = getI32(bufferptr);
-    position[VZ] = getI32(bufferptr);
+    VECTORI* position = vectoriInit();
+    vectoriSet(position, getI32(bufferptr), getI32(bufferptr), getI32(bufferptr), 0);
     U8* blocks = malloc(sizeof(U8) * CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE);
     U8 blockType = getU8(bufferptr);
     for (I32 i = 0; i < CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE; i++) blocks[i] = blockType;

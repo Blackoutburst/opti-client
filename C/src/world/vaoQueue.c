@@ -25,7 +25,7 @@ void vaoQueueCleanElement(U16 index) {
     queue->elements[index]->mesh = NULL;
 }
 
-void vaoQueuePush(I32* position, U8* blocks, CHUNK_MESH* mesh, U8 neighbor) {
+void vaoQueuePush(VECTORI* position, U8* blocks, CHUNK_MESH* mesh, U8 neighbor) {
     if (queue == NULL) return;
 
     mutexLock(&mutex);

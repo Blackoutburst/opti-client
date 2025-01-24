@@ -1,6 +1,7 @@
 #pragma once
 
 #include "utils/types.h"
+#include "utils/vectori.h"
 #include "world/chunk.h"
 
 typedef struct meshQueue MESH_QUEUE;
@@ -12,7 +13,7 @@ struct meshQueueElement {
     U8 used;
     U16 id;
     U8 neighbor;
-    I32* position;
+    VECTORI* position;
     U8* blocks;
 };
 
@@ -24,7 +25,7 @@ struct meshQueue {
 };
 
 void meshQueueCleanElement(U16 index);
-void meshQueuePush(I32* position, U8* blocks, U8 neighbor);
+void meshQueuePush(VECTORI* position, U8* blocks, U8 neighbor);
 U8 meshQueuePop(MESH_QUEUE_ELEM** element);
 void meshQueueFree();
 void meshQueueInit();

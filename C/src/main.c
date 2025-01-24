@@ -24,6 +24,7 @@
 #include "core/camera.h"
 #include "core/dda.h"
 #include "utils/framerate.h"
+#include "ui/cursor.h"
 
 #if defined(_WIN32) || defined(_WIN64)
 void sendPosition(F32 x, F32 y, F32 z, F32 yaw, F32 pitch) {
@@ -66,6 +67,8 @@ void sendPosition(F32 x, F32 y, F32 z, F32 yaw, F32 pitch) {
 
 void update(GLFWwindow* window) {
 
+    cursorInit();
+
     ////// TEXTURE ///////
 
     I8* textureFiles[] = {
@@ -93,7 +96,7 @@ void update(GLFWwindow* window) {
         "./res/blocks/bookshelf.png",
     };
 
-    I32 diffuseMap = createTextureArray(textureFiles, 22, 16);
+    I32 diffuseMap = textureArrayCreate(textureFiles, 22, 16);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D_ARRAY, diffuseMap);
 
@@ -187,10 +190,6 @@ void update(GLFWwindow* window) {
 
         windowClear();
 
-        cameraUpdate(camera);
-
-        setUniformMat4(shaderProgram, "view", camera->matrix);
-
         if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS && !ld) {
             DDA_RESULT* ddaResult = dda(camera->position, camera->direction, 20);
             packetSendUpdateBlock(0, ddaResult->position->x, ddaResult->position->y, ddaResult->position->z);
@@ -216,8 +215,19 @@ void update(GLFWwindow* window) {
         if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) {
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         }
-    
+
+        glUseProgram(shaderProgram);
+        cameraUpdate(camera);
+        setUniformMat4(shaderProgram, "view", camera->matrix);
         worldRender(shaderProgram);
+
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glDisable(GL_DEPTH_TEST);
+        glDisable(GL_CULL_FACE);
+        cursorRender(selectedBlockType, diffuseMap);
+        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_CULL_FACE);
 
         windowUpdate(window);
     }
@@ -227,6 +237,10 @@ void update(GLFWwindow* window) {
     ddaClean();
 
     cameraClean(camera);
+
+    textureArrayDelete(diffuseMap);
+    deleteShaderProgram(shaderProgram);
+    cursorClean();
 
     glfwTerminate();
 

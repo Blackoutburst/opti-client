@@ -1,5 +1,6 @@
 #pragma once
 #include "utils/types.h"
 
-I32 createTextureArray(I8** files, I16 filesCount, I16 fileSize);
+void textureArrayDelete(U32 id);
+U32 textureArrayCreate(I8** files, I16 filesCount, I16 fileSize);
 

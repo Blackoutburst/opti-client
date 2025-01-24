@@ -36,5 +36,7 @@ U32 textureCreate(const I8* path, U8 flip) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
+    stbi_set_flip_vertically_on_load(0);
+
     return id;
 }

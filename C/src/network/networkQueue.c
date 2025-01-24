@@ -20,12 +20,13 @@ void networkQueueCleanElement(U16 index) {
         mutexUnlock(&mutex);
         return;
     }
-    
-    free(element->buffer);
+
+    if (element->buffer != NULL)
+        free(element->buffer);
     
     element->buffer = NULL;
     element->function = NULL;
-    networkQueue->elements[index]->used = 0;
+    element->used = 0;
 
     mutexUnlock(&mutex);
 }

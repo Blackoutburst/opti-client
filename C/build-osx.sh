@@ -7,4 +7,5 @@ src/world/*.c \
 src/network/*.c \
 src/core/*.c \
 src/ui/*.c \
+src/entity/*.c \
 -Iincludes -L/opt/homebrew/lib -pthread -lglfw -framework Cocoa -framework OpenGL -framework IOKit -Wno-deprecated-declarations -W -Wall -Wextra -Wno-implicit-fallthrough -Wno-unused-parameter -g3 -fno-omit-frame-pointer -fsanitize=address

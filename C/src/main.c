@@ -10,6 +10,7 @@
 #include "graphics/textureArray.h"
 #include "graphics/opengl.h"
 #include "window/window.h"
+#include "entity/entityManager.h"
 #include "utils/ioUtils.h"
 #include "utils/matrix.h"
 #include "utils/math.h"
@@ -68,6 +69,7 @@ void sendPosition(F32 x, F32 y, F32 z, F32 yaw, F32 pitch) {
 void update(GLFWwindow* window) {
 
     cursorInit();
+    entityManagerInit();
 
     ////// TEXTURE ///////
 
@@ -197,6 +199,8 @@ void update(GLFWwindow* window) {
         setUniformMat4(shaderProgram, "view", camera->matrix);
         worldRender(shaderProgram);
 
+        entityManagerUpdateEntity();
+
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glDisable(GL_DEPTH_TEST);
@@ -216,6 +220,7 @@ void update(GLFWwindow* window) {
 
     textureArrayDelete(diffuseMap);
     deleteShaderProgram(shaderProgram);
+    entityManagerClean();
     cursorClean();
 
     glfwTerminate();

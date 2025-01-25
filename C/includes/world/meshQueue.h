@@ -12,7 +12,6 @@ typedef struct meshQueueElement MESH_QUEUE_ELEM;
 struct meshQueueElement {
     U8 used;
     U16 id;
-    U8 neighbor;
     VECTORI* position;
     U8* blocks;
 };
@@ -25,7 +24,7 @@ struct meshQueue {
 };
 
 void meshQueueCleanElement(U16 index);
-void meshQueuePush(VECTORI* position, U8* blocks, U8 neighbor);
+void meshQueuePush(VECTORI* position, U8* blocks);
 U8 meshQueuePop(MESH_QUEUE_ELEM** element);
 void meshQueueFree();
 void meshQueueInit();

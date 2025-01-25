@@ -12,7 +12,6 @@ typedef struct vaoQueueElement VAO_QUEUE_ELEM;
 struct vaoQueueElement {
     U8 used;
     U16 id;
-    U8 neighbor;
     VECTORI* position;
     U8* blocks;
     CHUNK_MESH* mesh;
@@ -26,7 +25,7 @@ struct vaoQueue {
 };
 
 void vaoQueueCleanElement(U16 index);
-void vaoQueuePush(VECTORI* position, U8* blocks, CHUNK_MESH* mesh, U8 neighbor);
+void vaoQueuePush(VECTORI* position, U8* blocks, CHUNK_MESH* mesh);
 U8 vaoQueuePop(VAO_QUEUE_ELEM** element);
 void vaoQueueFree();
 void vaoQueueInit();

@@ -19,13 +19,12 @@ void vaoQueueCleanElement(U16 index) {
     if (element == NULL) return;
 
     queue->elements[index]->used = 0;
-    queue->elements[index]->neighbor = 0;
     queue->elements[index]->position = NULL;
     queue->elements[index]->blocks = NULL;
     queue->elements[index]->mesh = NULL;
 }
 
-void vaoQueuePush(VECTORI* position, U8* blocks, CHUNK_MESH* mesh, U8 neighbor) {
+void vaoQueuePush(VECTORI* position, U8* blocks, CHUNK_MESH* mesh) {
     if (queue == NULL) return;
 
     mutexLock(&mutex);
@@ -39,7 +38,6 @@ void vaoQueuePush(VECTORI* position, U8* blocks, CHUNK_MESH* mesh, U8 neighbor) 
     queue->elements[queue->pushIndex]->mesh = mesh;
     queue->elements[queue->pushIndex]->id = queue->pushIndex;
     queue->elements[queue->pushIndex]->used = 1;
-    queue->elements[queue->pushIndex]->neighbor = neighbor;
 
     queue->pushIndex++;
     
@@ -102,7 +100,6 @@ void vaoQueueInit() {
         q->elements[i]->mesh = NULL;
         q->elements[i]->id = 0;
         q->elements[i]->used = 0;
-        q->elements[i]->neighbor = 0;
     }
     queue = q;
 

@@ -19,12 +19,11 @@ void meshQueueCleanElement(U16 index) {
     if (element == NULL) return;
     
     queue->elements[index]->used = 0;
-    queue->elements[index]->neighbor = 0;
     queue->elements[index]->position = NULL;
     queue->elements[index]->blocks = NULL;
 }
 
-void meshQueuePush(VECTORI* position, U8* blocks, U8 neighbor) {
+void meshQueuePush(VECTORI* position, U8* blocks) {
     if (queue == NULL) return;
 
     mutexLock(&mutex);
@@ -37,7 +36,6 @@ void meshQueuePush(VECTORI* position, U8* blocks, U8 neighbor) {
     queue->elements[queue->pushIndex]->blocks = blocks;
     queue->elements[queue->pushIndex]->id = queue->pushIndex;
     queue->elements[queue->pushIndex]->used = 1;
-    queue->elements[queue->pushIndex]->neighbor = neighbor;
 
     queue->pushIndex++;
     
@@ -99,7 +97,6 @@ void meshQueueInit() {
         q->elements[i]->blocks = NULL;
         q->elements[i]->id = 0;
         q->elements[i]->used = 0;
-        q->elements[i]->neighbor = 0;
     }
     queue = q;
 

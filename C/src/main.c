@@ -154,36 +154,10 @@ void update(GLFWwindow* window) {
         }
         
         while (vaoQueuePop(&vaoQueueElement)) {
-            if (vaoQueueElement->neighbor) {
-                CHUNK* chunk = chunkCreate(vaoQueueElement->position, vaoQueueElement->blocks);
-                chunkGenerateVAO(chunk, vaoQueueElement->mesh);
-                worldAddChunk(chunk);
-                vaoQueueCleanElement(vaoQueueElement->id);
-            } else {
-                CHUNK* chunk = chunkCreate(vaoQueueElement->position, vaoQueueElement->blocks);
-                chunkGenerateVAO(chunk, vaoQueueElement->mesh);
-                worldAddChunk(chunk);
-
-                I32 chunkPoses[6][3] = {
-                    {vaoQueueElement->position->x + CHUNK_SIZE, vaoQueueElement->position->y, vaoQueueElement->position->z},
-                    {vaoQueueElement->position->x - CHUNK_SIZE, vaoQueueElement->position->y, vaoQueueElement->position->z},
-                    {vaoQueueElement->position->x, vaoQueueElement->position->y + CHUNK_SIZE, vaoQueueElement->position->z},
-                    {vaoQueueElement->position->x, vaoQueueElement->position->y - CHUNK_SIZE, vaoQueueElement->position->z},
-                    {vaoQueueElement->position->x, vaoQueueElement->position->y, vaoQueueElement->position->z + CHUNK_SIZE},
-                    {vaoQueueElement->position->x, vaoQueueElement->position->y, vaoQueueElement->position->z - CHUNK_SIZE},
-                };
-
-                for (U8 i = 0; i < 6; i++) {
-                    CHUNK* tmp = worldGetChunk(chunkPoses[i][0], chunkPoses[i][1], chunkPoses[i][2]);
-                    if (tmp == NULL) continue;
-                    VECTORI* position = vectoriInit();
-                    vectoriSet(position, tmp->position->x, tmp->position->y, tmp->position->z, tmp->position->w);
-                    U8* blocks = malloc(sizeof(U8) * CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE);
-                    memcpy(blocks, tmp->blocks, sizeof(U8) * CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE);
-                    meshQueuePush(position, blocks, 1);
-                }
-                vaoQueueCleanElement(vaoQueueElement->id);
-            }
+            CHUNK* chunk = chunkCreate(vaoQueueElement->position, vaoQueueElement->blocks);
+            chunkGenerateVAO(chunk, vaoQueueElement->mesh);
+            worldAddChunk(chunk);
+            vaoQueueCleanElement(vaoQueueElement->id);
         }
 
         sendPosition(camera->position->x, camera->position->y, camera->position->z, camera->yaw, camera->pitch);

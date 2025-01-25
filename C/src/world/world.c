@@ -120,10 +120,10 @@ void _worldRemoveChunk(I32 x, I32 y, I32 z) {
             chunks[index].position->y == y &&
             chunks[index].position->z == z)
         {
+            chunks[index].used = 0;
             chunkDrestroy(chunks[index].chunk);
             vectoriSet(chunks[index].position, 0, 0, 0, 0);
             chunks[index].chunk = NULL;
-            chunks[index].used = 0;
 
             return;
         }
@@ -144,7 +144,7 @@ void worldRemoveChunk(I32 x, I32 y, I32 z) {
     mutexUnlock(&mutex);
 }
 
-void worldRemoveChunkOutOfRenderDistance(U8 renderDistance, I32 x, I32 y, I32 z) {
+void worldRemoveChunkOutOfRenderDistance(I32 renderDistance, I32 x, I32 y, I32 z) {
     mutexLock(&mutex);
 
     if (chunks == NULL) {
@@ -157,7 +157,7 @@ void worldRemoveChunkOutOfRenderDistance(U8 renderDistance, I32 x, I32 y, I32 z)
     I32 pz = (z < 0 ? (z + 1) / CHUNK_SIZE - 1 : z / CHUNK_SIZE) * CHUNK_SIZE;
 
     for (U16 i = 0; i < CHUNK_COUNT; i++) {
-        if (!chunks[i].used) continue;
+        if (!chunks[i].used || chunks[i].chunk == NULL) continue;
 
         if (abs(chunks[i].position->x - px) > (renderDistance * CHUNK_SIZE) ||
             abs(chunks[i].position->y - py) > (renderDistance * CHUNK_SIZE) ||
@@ -174,7 +174,7 @@ void worldRender(I32 shaderProgram) {
     if (chunks == NULL) return;
     
     for (U32 i = 0; i < CHUNK_COUNT; i++) {
-        if (chunks[i].chunk == NULL) continue;
+        if (!chunks[i].used || chunks[i].chunk == NULL) continue;
         setUniform3f(shaderProgram, "chunkPos", chunks[i].chunk->position->x, chunks[i].chunk->position->y, chunks[i].chunk->position->z);
         chunkRender(chunks[i].chunk);
     }

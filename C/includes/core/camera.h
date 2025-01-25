@@ -6,7 +6,7 @@
 
 typedef struct camera CAMERA;
 
-#define CAMERA_SPEED 0.5
+#define CAMERA_SPEED 0.1
 #define CAMERA_SENSITIVITY 0.1
 
 struct camera {

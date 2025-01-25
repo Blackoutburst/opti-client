@@ -20,7 +20,7 @@ U8 worldGetBlock(I32 x, I32 y, I32 z);
 void worldAddChunk(CHUNK* chunk);
 void _worldRemoveChunk(I32 x, I32 y, I32 z);
 void worldRemoveChunk(I32 x, I32 y, I32 z);
-void worldRemoveChunkOutOfRenderDistance(U8 renderDistance, I32 x, I32 y, I32 z);
+void worldRemoveChunkOutOfRenderDistance(I32 renderDistance, I32 x, I32 y, I32 z);
 void worldRender(I32 shaderProgram);
 void worldClean();
 void worldInit();

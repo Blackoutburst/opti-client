@@ -9,7 +9,7 @@
 #include "world/meshQueue.h"
 
 void chunkPrint(CHUNK* chunk) {
-    printf("vao: %i, vbo: %i, ebo: %i, vertex count: %u position: %p blocks: %p\n", chunk->vaoID, chunk->vboID, chunk->eboID, chunk->vertexCount, chunk->position, chunk->blocks);
+    printf("vao: %i, vbo: %i, ebo: %i, vertex count: %u position: %p blocks: %p\n", chunk->vaoID, chunk->vboID, chunk->eboID, chunk->indexCount, chunk->position, chunk->blocks);
 }
 
 I32 chunkPackVertexData(I8 x, I8 y, I8 z, I8 u, I8 v, I8 n, I8 t) {
@@ -17,8 +17,9 @@ I32 chunkPackVertexData(I8 x, I8 y, I8 z, I8 u, I8 v, I8 n, I8 t) {
 }
 
 void chunkGenerateVAO(CHUNK* chunk, CHUNK_MESH* mesh) {
-    if (!mesh->vertexCount) {
+    if (!mesh->indexCount) {
         free(mesh->vertices);
+        free(mesh->indices);
         free(mesh);
         return;
     }
@@ -27,12 +28,17 @@ void chunkGenerateVAO(CHUNK* chunk, CHUNK_MESH* mesh) {
 
     glBindBuffer(GL_ARRAY_BUFFER, chunk->vboID);
     glBufferData(GL_ARRAY_BUFFER, sizeof(I32) * mesh->vertexCount, mesh->vertices, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, chunk->eboID);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(I32) * mesh->indexCount, mesh->indices, GL_STATIC_DRAW);
+    
     glEnableVertexAttribArray(0);
     glVertexAttribIPointer(0, 1, GL_INT, 4, 0);
     
-    chunk->vertexCount = mesh->vertexCount;
+    chunk->indexCount = mesh->indexCount;
     
     free(mesh->vertices);
+    free(mesh->indices);
     free(mesh);
 
 }
@@ -57,13 +63,17 @@ U8 chunkIsMonotype(CHUNK* chunk) {
 
 CHUNK_MESH* chunkGenerateMesh(VECTORI* position, U8* blocks) {
     CHUNK_MESH* mesh = malloc(sizeof(CHUNK_MESH));
-    I32* vertices = malloc(sizeof(I32) * BLOCK_COUNT * 36);
-    I32 vertexIndex = 0;
+    I32* vertices = malloc(sizeof(I32) * BLOCK_COUNT * 24);
+    I32* indices = malloc(sizeof(I32) * BLOCK_COUNT * 36);
+    I32 indexIndex = 0;
+    I32 indexCount = 0;
 
     //EMPTY
     if (_chunkIsMonotype(blocks) && blocks[0] == 0) {
         mesh->vertices = vertices;
-        mesh->vertexCount = vertexIndex;
+        mesh->indices = indices;
+        mesh->vertexCount = indexIndex;
+        mesh->indexCount = indexCount;
         return mesh;
     }
     
@@ -82,26 +92,38 @@ CHUNK_MESH* chunkGenerateMesh(VECTORI* position, U8* blocks) {
 
         // TOP
         if (top) {
-            vertices[vertexIndex  ] = chunkPackVertexData(0 + CHUNK_SIZE, 0 + CHUNK_SIZE, 0    , 2, 0, 0, blocksTextureFace(blockType, 0));
-            vertices[vertexIndex+1] = chunkPackVertexData(0    , 0 + CHUNK_SIZE, 0    , 0, 0, 0, blocksTextureFace(blockType, 0));
-            vertices[vertexIndex+2] = chunkPackVertexData(0 + CHUNK_SIZE, 0 + CHUNK_SIZE, 0 + CHUNK_SIZE, 2, 2, 0, blocksTextureFace(blockType, 0));
-
-            vertices[vertexIndex+3] = chunkPackVertexData(0 + CHUNK_SIZE, 0 + CHUNK_SIZE, 0 + CHUNK_SIZE, 2, 2, 0, blocksTextureFace(blockType, 0));
-            vertices[vertexIndex+4] = chunkPackVertexData(0    , 0 + CHUNK_SIZE, 0    , 0, 0, 0, blocksTextureFace(blockType, 0));
-            vertices[vertexIndex+5] = chunkPackVertexData(0    , 0 + CHUNK_SIZE, 0 + CHUNK_SIZE, 0, 2, 0, blocksTextureFace(blockType, 0));
-            vertexIndex += 6;
+            vertices[indexIndex  ] = chunkPackVertexData(0    , 0 + CHUNK_SIZE, 0    , 0, 0, 0, blocksTextureFace(blockType, 0));
+            vertices[indexIndex+1] = chunkPackVertexData(0 + CHUNK_SIZE, 0 + CHUNK_SIZE, 0    , 2, 0, 0, blocksTextureFace(blockType, 0));
+            vertices[indexIndex+2] = chunkPackVertexData(0 + CHUNK_SIZE, 0 + CHUNK_SIZE, 0 + CHUNK_SIZE, 2, 2, 0, blocksTextureFace(blockType, 0));
+            vertices[indexIndex+3] = chunkPackVertexData(0    , 0 + CHUNK_SIZE, 0 + CHUNK_SIZE, 0, 2, 0, blocksTextureFace(blockType, 0));
+            
+            indices[indexCount  ] = 0 + indexIndex;
+            indices[indexCount+1] = 2 + indexIndex;
+            indices[indexCount+2] = 1 + indexIndex;
+            indices[indexCount+3] = 0 + indexIndex;
+            indices[indexCount+4] = 3 + indexIndex;
+            indices[indexCount+5] = 2 + indexIndex;
+            
+            indexIndex += 4;
+            indexCount += 6;
         }
 
         // BOTTOM
         if (bottom) {
-            vertices[vertexIndex  ] = chunkPackVertexData(0    , 0    , 0    , 0, 2, 5, blocksTextureFace(blockType, 5));
-            vertices[vertexIndex+1] = chunkPackVertexData(0 + CHUNK_SIZE, 0    , 0    , 2, 2, 5, blocksTextureFace(blockType, 5));
-            vertices[vertexIndex+2] = chunkPackVertexData(0 + CHUNK_SIZE, 0    , 0 + CHUNK_SIZE, 2, 0, 5, blocksTextureFace(blockType, 5));
-
-            vertices[vertexIndex+3] = chunkPackVertexData(0 + CHUNK_SIZE, 0    , 0 + CHUNK_SIZE, 2, 0, 5, blocksTextureFace(blockType, 5));
-            vertices[vertexIndex+4] = chunkPackVertexData(0    , 0    , 0 + CHUNK_SIZE, 0, 0, 5, blocksTextureFace(blockType, 5));
-            vertices[vertexIndex+5] = chunkPackVertexData(0    , 0    , 0    , 0, 2, 5, blocksTextureFace(blockType, 5));
-            vertexIndex += 6;
+            vertices[indexIndex  ] = chunkPackVertexData(0    , 0    , 0    , 0, 2, 5, blocksTextureFace(blockType, 5));
+            vertices[indexIndex+1] = chunkPackVertexData(0 + CHUNK_SIZE, 0    , 0    , 2, 2, 5, blocksTextureFace(blockType, 5));
+            vertices[indexIndex+2] = chunkPackVertexData(0 + CHUNK_SIZE, 0    , 0 + CHUNK_SIZE, 2, 0, 5, blocksTextureFace(blockType, 5));
+            vertices[indexIndex+3] = chunkPackVertexData(0    , 0    , 0 + CHUNK_SIZE, 0, 0, 5, blocksTextureFace(blockType, 5));
+            
+            indices[indexCount  ] = 1 + indexIndex;
+            indices[indexCount+1] = 2 + indexIndex;
+            indices[indexCount+2] = 0 + indexIndex;
+            indices[indexCount+3] = 2 + indexIndex;
+            indices[indexCount+4] = 3 + indexIndex;
+            indices[indexCount+5] = 0 + indexIndex;
+            
+            indexIndex += 4;
+            indexCount += 6;
         }
 
         //FRONT BACK
@@ -115,26 +137,38 @@ CHUNK_MESH* chunkGenerateMesh(VECTORI* position, U8* blocks) {
 
         // FRONT
         if (front) {
-            vertices[vertexIndex  ] = chunkPackVertexData(0 + CHUNK_SIZE, 0    , 0    , 0, 2, 1, blocksTextureFace(blockType, 1));
-            vertices[vertexIndex+1] = chunkPackVertexData(0    , 0    , 0    , 2, 2, 1, blocksTextureFace(blockType, 1));
-            vertices[vertexIndex+2] = chunkPackVertexData(0 + CHUNK_SIZE, 0 + CHUNK_SIZE, 0    , 0, 0, 1, blocksTextureFace(blockType, 1));
-
-            vertices[vertexIndex+3] = chunkPackVertexData(0 + CHUNK_SIZE, 0 + CHUNK_SIZE, 0    , 0, 0, 1, blocksTextureFace(blockType, 1));
-            vertices[vertexIndex+4] = chunkPackVertexData(0    , 0    , 0    , 2, 2, 1, blocksTextureFace(blockType, 1));
-            vertices[vertexIndex+5] = chunkPackVertexData(0    , 0 + CHUNK_SIZE, 0    , 2, 0, 1, blocksTextureFace(blockType, 1));
-            vertexIndex += 6;
+            vertices[indexIndex  ] = chunkPackVertexData(0    , 0    , 0    , 2, 2, 1, blocksTextureFace(blockType, 1));
+            vertices[indexIndex+1] = chunkPackVertexData(0 + CHUNK_SIZE, 0    , 0    , 0, 2, 1, blocksTextureFace(blockType, 1));
+            vertices[indexIndex+2] = chunkPackVertexData(0 + CHUNK_SIZE, 0 + CHUNK_SIZE, 0    , 0, 0, 1, blocksTextureFace(blockType, 1));
+            vertices[indexIndex+3] = chunkPackVertexData(0    , 0 + CHUNK_SIZE, 0    , 2, 0, 1, blocksTextureFace(blockType, 1));
+            
+            indices[indexCount  ] = 0 + indexIndex;
+            indices[indexCount+1] = 2 + indexIndex;
+            indices[indexCount+2] = 1 + indexIndex;
+            indices[indexCount+3] = 0 + indexIndex;
+            indices[indexCount+4] = 3 + indexIndex;
+            indices[indexCount+5] = 2 + indexIndex;
+            
+            indexIndex += 4;
+            indexCount += 6;
         }
 
         // BACK
         if (back) {
-            vertices[vertexIndex  ] = chunkPackVertexData(0    , 0    , 0 + CHUNK_SIZE, 0, 2, 2, blocksTextureFace(blockType, 2));
-            vertices[vertexIndex+1] = chunkPackVertexData(0 + CHUNK_SIZE, 0    , 0 + CHUNK_SIZE, 2, 2, 2, blocksTextureFace(blockType, 2));
-            vertices[vertexIndex+2] = chunkPackVertexData(0 + CHUNK_SIZE, 0 + CHUNK_SIZE, 0 + CHUNK_SIZE, 2, 0, 2, blocksTextureFace(blockType, 2));
-
-            vertices[vertexIndex+3] = chunkPackVertexData(0 + CHUNK_SIZE, 0 + CHUNK_SIZE, 0 + CHUNK_SIZE, 2, 0, 2, blocksTextureFace(blockType, 2));
-            vertices[vertexIndex+4] = chunkPackVertexData(0    , 0 + CHUNK_SIZE, 0 + CHUNK_SIZE, 0, 0, 2, blocksTextureFace(blockType, 2));
-            vertices[vertexIndex+5] = chunkPackVertexData(0    , 0    , 0 + CHUNK_SIZE, 0, 2, 2, blocksTextureFace(blockType, 2));
-            vertexIndex += 6;
+            vertices[indexIndex  ] = chunkPackVertexData(0    , 0    , 0 + CHUNK_SIZE, 0, 2, 2, blocksTextureFace(blockType, 2));
+            vertices[indexIndex+1] = chunkPackVertexData(0 + CHUNK_SIZE, 0    , 0 + CHUNK_SIZE, 2, 2, 2, blocksTextureFace(blockType, 2));
+            vertices[indexIndex+2] = chunkPackVertexData(0 + CHUNK_SIZE, 0 + CHUNK_SIZE, 0 + CHUNK_SIZE, 2, 0, 2, blocksTextureFace(blockType, 2));
+            vertices[indexIndex+3] = chunkPackVertexData(0    , 0 + CHUNK_SIZE, 0 + CHUNK_SIZE, 0, 0, 2, blocksTextureFace(blockType, 2));
+            
+            indices[indexCount  ] = 1 + indexIndex;
+            indices[indexCount+1] = 2 + indexIndex;
+            indices[indexCount+2] = 0 + indexIndex;
+            indices[indexCount+3] = 2 + indexIndex;
+            indices[indexCount+4] = 3 + indexIndex;
+            indices[indexCount+5] = 0 + indexIndex;
+            
+            indexIndex += 4;
+            indexCount += 6;
         }
 
         //LEFT RIGHT
@@ -147,29 +181,43 @@ CHUNK_MESH* chunkGenerateMesh(VECTORI* position, U8* blocks) {
         }}
 
         if (left) {
-            vertices[vertexIndex  ] = chunkPackVertexData(0    , 0 + CHUNK_SIZE, 0 + CHUNK_SIZE, 0, 0, 3, blocksTextureFace(blockType, 3));
-            vertices[vertexIndex+1] = chunkPackVertexData(0    , 0 + CHUNK_SIZE, 0    , 2, 0, 3, blocksTextureFace(blockType, 3));
-            vertices[vertexIndex+2] = chunkPackVertexData(0    , 0    , 0    , 2, 2, 3, blocksTextureFace(blockType, 3));
-
-            vertices[vertexIndex+3] = chunkPackVertexData(0    , 0    , 0    , 2, 2, 3, blocksTextureFace(blockType, 3));
-            vertices[vertexIndex+4] = chunkPackVertexData(0    , 0    , 0 + CHUNK_SIZE, 0, 2, 3, blocksTextureFace(blockType, 3));
-            vertices[vertexIndex+5] = chunkPackVertexData(0    , 0 + CHUNK_SIZE, 0 + CHUNK_SIZE, 0, 0, 3, blocksTextureFace(blockType, 3));
-            vertexIndex += 6;
+            vertices[indexIndex  ] = chunkPackVertexData(0    , 0    , 0    , 2, 2, 3, blocksTextureFace(blockType, 3));
+            vertices[indexIndex+1] = chunkPackVertexData(0    , 0 + CHUNK_SIZE, 0    , 2, 0, 3, blocksTextureFace(blockType, 3));
+            vertices[indexIndex+2] = chunkPackVertexData(0    , 0 + CHUNK_SIZE, 0 + CHUNK_SIZE, 0, 0, 3, blocksTextureFace(blockType, 3));
+            vertices[indexIndex+3] = chunkPackVertexData(0    , 0    , 0 + CHUNK_SIZE, 0, 2, 3, blocksTextureFace(blockType, 3));
+            
+            indices[indexCount  ] = 0 + indexIndex;
+            indices[indexCount+1] = 2 + indexIndex;
+            indices[indexCount+2] = 1 + indexIndex;
+            indices[indexCount+3] = 0 + indexIndex;
+            indices[indexCount+4] = 3 + indexIndex;
+            indices[indexCount+5] = 2 + indexIndex;
+            
+            indexIndex += 4;
+            indexCount += 6;
         }
 
         if (right) {
-            vertices[vertexIndex  ] = chunkPackVertexData(0 + CHUNK_SIZE, 0    , 0    , 0, 2, 4, blocksTextureFace(blockType, 4));
-            vertices[vertexIndex+1] = chunkPackVertexData(0 + CHUNK_SIZE, 0 + CHUNK_SIZE, 0    , 0, 0, 4, blocksTextureFace(blockType, 4));
-            vertices[vertexIndex+2] = chunkPackVertexData(0 + CHUNK_SIZE, 0 + CHUNK_SIZE, 0 + CHUNK_SIZE, 2, 0, 4, blocksTextureFace(blockType, 4));
-
-            vertices[vertexIndex+3] = chunkPackVertexData(0 + CHUNK_SIZE, 0 + CHUNK_SIZE, 0 + CHUNK_SIZE, 2, 0, 4, blocksTextureFace(blockType, 4));
-            vertices[vertexIndex+4] = chunkPackVertexData(0 + CHUNK_SIZE, 0    , 0 + CHUNK_SIZE, 2, 2, 4, blocksTextureFace(blockType, 4));
-            vertices[vertexIndex+5] = chunkPackVertexData(0 + CHUNK_SIZE, 0    , 0    , 0, 2, 4, blocksTextureFace(blockType, 4));
-            vertexIndex += 6;
+            vertices[indexIndex  ] = chunkPackVertexData(0 + CHUNK_SIZE, 0    , 0    , 0, 2, 4, blocksTextureFace(blockType, 4));
+            vertices[indexIndex+1] = chunkPackVertexData(0 + CHUNK_SIZE, 0 + CHUNK_SIZE, 0    , 0, 0, 4, blocksTextureFace(blockType, 4));
+            vertices[indexIndex+2] = chunkPackVertexData(0 + CHUNK_SIZE, 0 + CHUNK_SIZE, 0 + CHUNK_SIZE, 2, 0, 4, blocksTextureFace(blockType, 4));
+            vertices[indexIndex+3] = chunkPackVertexData(0 + CHUNK_SIZE, 0    , 0 + CHUNK_SIZE, 2, 2, 4, blocksTextureFace(blockType, 4));
+            
+            indices[indexCount  ] = 1 + indexIndex;
+            indices[indexCount+1] = 2 + indexIndex;
+            indices[indexCount+2] = 0 + indexIndex;
+            indices[indexCount+3] = 2 + indexIndex;
+            indices[indexCount+4] = 3 + indexIndex;
+            indices[indexCount+5] = 0 + indexIndex;
+            
+            indexIndex += 4;
+            indexCount += 6;
         }
 
         mesh->vertices = vertices;
-        mesh->vertexCount = vertexIndex;
+        mesh->indices = indices;
+        mesh->vertexCount = indexIndex;
+        mesh->indexCount = indexCount;
         return mesh;
     }
 
@@ -189,14 +237,20 @@ CHUNK_MESH* chunkGenerateMesh(VECTORI* position, U8* blocks) {
             (topIndex >= BLOCK_COUNT && blocksIsTransparent(worldGetBlock(position->x + blockPos->x, position->y + blockPos->y + 1, position->z + blockPos->z))) || 
             (topIndex < BLOCK_COUNT && blocksIsTransparent(blocks[topIndex]))
         ) {
-            vertices[vertexIndex  ] = chunkPackVertexData(blockPos->x + 1, blockPos->y + 1, blockPos->z    , 1, 0, 0, blocksTextureFace(blockType, 0));
-            vertices[vertexIndex+1] = chunkPackVertexData(blockPos->x    , blockPos->y + 1, blockPos->z    , 0, 0, 0, blocksTextureFace(blockType, 0));
-            vertices[vertexIndex+2] = chunkPackVertexData(blockPos->x + 1, blockPos->y + 1, blockPos->z + 1, 1, 1, 0, blocksTextureFace(blockType, 0));
-
-            vertices[vertexIndex+3] = chunkPackVertexData(blockPos->x + 1, blockPos->y + 1, blockPos->z + 1, 1, 1, 0, blocksTextureFace(blockType, 0));
-            vertices[vertexIndex+4] = chunkPackVertexData(blockPos->x    , blockPos->y + 1, blockPos->z    , 0, 0, 0, blocksTextureFace(blockType, 0));
-            vertices[vertexIndex+5] = chunkPackVertexData(blockPos->x    , blockPos->y + 1, blockPos->z + 1, 0, 1, 0, blocksTextureFace(blockType, 0));
-            vertexIndex += 6;
+            vertices[indexIndex  ] = chunkPackVertexData(blockPos->x    , blockPos->y + 1, blockPos->z    , 0, 0, 0, blocksTextureFace(blockType, 0));
+            vertices[indexIndex+1] = chunkPackVertexData(blockPos->x + 1, blockPos->y + 1, blockPos->z    , 1, 0, 0, blocksTextureFace(blockType, 0));
+            vertices[indexIndex+2] = chunkPackVertexData(blockPos->x + 1, blockPos->y + 1, blockPos->z + 1, 1, 1, 0, blocksTextureFace(blockType, 0));
+            vertices[indexIndex+3] = chunkPackVertexData(blockPos->x    , blockPos->y + 1, blockPos->z + 1, 0, 1, 0, blocksTextureFace(blockType, 0));
+            
+            indices[indexCount  ] = 0 + indexIndex;
+            indices[indexCount+1] = 2 + indexIndex;
+            indices[indexCount+2] = 1 + indexIndex;
+            indices[indexCount+3] = 0 + indexIndex;
+            indices[indexCount+4] = 3 + indexIndex;
+            indices[indexCount+5] = 2 + indexIndex;
+            
+            indexIndex += 4;
+            indexCount += 6;
         }
 
         // FRONT
@@ -205,14 +259,20 @@ CHUNK_MESH* chunkGenerateMesh(VECTORI* position, U8* blocks) {
             (frontIndex >= BLOCK_COUNT && blocksIsTransparent(worldGetBlock(position->x + blockPos->x, position->y + blockPos->y, position->z + blockPos->z - 1))) || 
             (frontIndex < BLOCK_COUNT && blocksIsTransparent(blocks[frontIndex]))
         ) {
-            vertices[vertexIndex  ] = chunkPackVertexData(blockPos->x + 1, blockPos->y    , blockPos->z    , 0, 1, 1, blocksTextureFace(blockType, 1));
-            vertices[vertexIndex+1] = chunkPackVertexData(blockPos->x    , blockPos->y    , blockPos->z    , 1, 1, 1, blocksTextureFace(blockType, 1));
-            vertices[vertexIndex+2] = chunkPackVertexData(blockPos->x + 1, blockPos->y + 1, blockPos->z    , 0, 0, 1, blocksTextureFace(blockType, 1));
-
-            vertices[vertexIndex+3] = chunkPackVertexData(blockPos->x + 1, blockPos->y + 1, blockPos->z    , 0, 0, 1, blocksTextureFace(blockType, 1));
-            vertices[vertexIndex+4] = chunkPackVertexData(blockPos->x    , blockPos->y    , blockPos->z    , 1, 1, 1, blocksTextureFace(blockType, 1));
-            vertices[vertexIndex+5] = chunkPackVertexData(blockPos->x    , blockPos->y + 1, blockPos->z    , 1, 0, 1, blocksTextureFace(blockType, 1));
-            vertexIndex += 6;
+            vertices[indexIndex  ] = chunkPackVertexData(blockPos->x    , blockPos->y    , blockPos->z    , 1, 1, 1, blocksTextureFace(blockType, 1));
+            vertices[indexIndex+1] = chunkPackVertexData(blockPos->x + 1, blockPos->y    , blockPos->z    , 0, 1, 1, blocksTextureFace(blockType, 1));
+            vertices[indexIndex+2] = chunkPackVertexData(blockPos->x + 1, blockPos->y + 1, blockPos->z    , 0, 0, 1, blocksTextureFace(blockType, 1));
+            vertices[indexIndex+3] = chunkPackVertexData(blockPos->x    , blockPos->y + 1, blockPos->z    , 1, 0, 1, blocksTextureFace(blockType, 1));
+            
+            indices[indexCount  ] = 0 + indexIndex;
+            indices[indexCount+1] = 2 + indexIndex;
+            indices[indexCount+2] = 1 + indexIndex;
+            indices[indexCount+3] = 0 + indexIndex;
+            indices[indexCount+4] = 3 + indexIndex;
+            indices[indexCount+5] = 2 + indexIndex;
+            
+            indexIndex += 4;
+            indexCount += 6;
         }
 
         // BACK
@@ -221,14 +281,20 @@ CHUNK_MESH* chunkGenerateMesh(VECTORI* position, U8* blocks) {
             (backIndex >= BLOCK_COUNT && blocksIsTransparent(worldGetBlock(position->x + blockPos->x, position->y + blockPos->y, position->z + blockPos->z + 1))) || 
             (backIndex < BLOCK_COUNT && blocksIsTransparent(blocks[backIndex]))
         ) {
-            vertices[vertexIndex  ] = chunkPackVertexData(blockPos->x    , blockPos->y    , blockPos->z + 1, 0, 1, 2, blocksTextureFace(blockType, 2));
-            vertices[vertexIndex+1] = chunkPackVertexData(blockPos->x + 1, blockPos->y    , blockPos->z + 1, 1, 1, 2, blocksTextureFace(blockType, 2));
-            vertices[vertexIndex+2] = chunkPackVertexData(blockPos->x + 1, blockPos->y + 1, blockPos->z + 1, 1, 0, 2, blocksTextureFace(blockType, 2));
-
-            vertices[vertexIndex+3] = chunkPackVertexData(blockPos->x + 1, blockPos->y + 1, blockPos->z + 1, 1, 0, 2, blocksTextureFace(blockType, 2));
-            vertices[vertexIndex+4] = chunkPackVertexData(blockPos->x    , blockPos->y + 1, blockPos->z + 1, 0, 0, 2, blocksTextureFace(blockType, 2));
-            vertices[vertexIndex+5] = chunkPackVertexData(blockPos->x    , blockPos->y    , blockPos->z + 1, 0, 1, 2, blocksTextureFace(blockType, 2));
-            vertexIndex += 6;
+            vertices[indexIndex  ] = chunkPackVertexData(blockPos->x    , blockPos->y    , blockPos->z + 1, 0, 1, 2, blocksTextureFace(blockType, 2));
+            vertices[indexIndex+1] = chunkPackVertexData(blockPos->x + 1, blockPos->y    , blockPos->z + 1, 1, 1, 2, blocksTextureFace(blockType, 2));
+            vertices[indexIndex+2] = chunkPackVertexData(blockPos->x + 1, blockPos->y + 1, blockPos->z + 1, 1, 0, 2, blocksTextureFace(blockType, 2));
+            vertices[indexIndex+3] = chunkPackVertexData(blockPos->x    , blockPos->y + 1, blockPos->z + 1, 0, 0, 2, blocksTextureFace(blockType, 2));
+            
+            indices[indexCount  ] = 1 + indexIndex;
+            indices[indexCount+1] = 2 + indexIndex;
+            indices[indexCount+2] = 0 + indexIndex;
+            indices[indexCount+3] = 2 + indexIndex;
+            indices[indexCount+4] = 3 + indexIndex;
+            indices[indexCount+5] = 0 + indexIndex;
+            
+            indexIndex += 4;
+            indexCount += 6;
         }
 
         // LEFT
@@ -237,14 +303,20 @@ CHUNK_MESH* chunkGenerateMesh(VECTORI* position, U8* blocks) {
             (leftIndex >= BLOCK_COUNT && blocksIsTransparent(worldGetBlock(position->x + blockPos->x - 1, position->y + blockPos->y, position->z + blockPos->z))) || 
             (leftIndex < BLOCK_COUNT && blocksIsTransparent(blocks[leftIndex]))
         ) {
-            vertices[vertexIndex  ] = chunkPackVertexData(blockPos->x    , blockPos->y + 1, blockPos->z + 1, 0, 0, 3, blocksTextureFace(blockType, 3));
-            vertices[vertexIndex+1] = chunkPackVertexData(blockPos->x    , blockPos->y + 1, blockPos->z    , 1, 0, 3, blocksTextureFace(blockType, 3));
-            vertices[vertexIndex+2] = chunkPackVertexData(blockPos->x    , blockPos->y    , blockPos->z    , 1, 1, 3, blocksTextureFace(blockType, 3));
-
-            vertices[vertexIndex+3] = chunkPackVertexData(blockPos->x    , blockPos->y    , blockPos->z    , 1, 1, 3, blocksTextureFace(blockType, 3));
-            vertices[vertexIndex+4] = chunkPackVertexData(blockPos->x    , blockPos->y    , blockPos->z + 1, 0, 1, 3, blocksTextureFace(blockType, 3));
-            vertices[vertexIndex+5] = chunkPackVertexData(blockPos->x    , blockPos->y + 1, blockPos->z + 1, 0, 0, 3, blocksTextureFace(blockType, 3));
-            vertexIndex += 6;
+            vertices[indexIndex  ] = chunkPackVertexData(blockPos->x    , blockPos->y    , blockPos->z    , 1, 1, 3, blocksTextureFace(blockType, 3));
+            vertices[indexIndex+1] = chunkPackVertexData(blockPos->x    , blockPos->y + 1, blockPos->z    , 1, 0, 3, blocksTextureFace(blockType, 3));
+            vertices[indexIndex+2] = chunkPackVertexData(blockPos->x    , blockPos->y + 1, blockPos->z + 1, 0, 0, 3, blocksTextureFace(blockType, 3));
+            vertices[indexIndex+3] = chunkPackVertexData(blockPos->x    , blockPos->y    , blockPos->z + 1, 0, 1, 3, blocksTextureFace(blockType, 3));
+            
+            indices[indexCount  ] = 0 + indexIndex;
+            indices[indexCount+1] = 2 + indexIndex;
+            indices[indexCount+2] = 1 + indexIndex;
+            indices[indexCount+3] = 0 + indexIndex;
+            indices[indexCount+4] = 3 + indexIndex;
+            indices[indexCount+5] = 2 + indexIndex;
+            
+            indexIndex += 4;
+            indexCount += 6;
         }
 
         // RIGHT
@@ -253,14 +325,20 @@ CHUNK_MESH* chunkGenerateMesh(VECTORI* position, U8* blocks) {
             (rightIndex >= BLOCK_COUNT && blocksIsTransparent(worldGetBlock(position->x + blockPos->x + 1, position->y + blockPos->y, position->z + blockPos->z))) || 
             (rightIndex < BLOCK_COUNT && blocksIsTransparent(blocks[rightIndex]))
         ) {
-            vertices[vertexIndex  ] = chunkPackVertexData(blockPos->x + 1, blockPos->y    , blockPos->z    , 0, 1, 4, blocksTextureFace(blockType, 4));
-            vertices[vertexIndex+1] = chunkPackVertexData(blockPos->x + 1, blockPos->y + 1, blockPos->z    , 0, 0, 4, blocksTextureFace(blockType, 4));
-            vertices[vertexIndex+2] = chunkPackVertexData(blockPos->x + 1, blockPos->y + 1, blockPos->z + 1, 1, 0, 4, blocksTextureFace(blockType, 4));
-
-            vertices[vertexIndex+3] = chunkPackVertexData(blockPos->x + 1, blockPos->y + 1, blockPos->z + 1, 1, 0, 4, blocksTextureFace(blockType, 4));
-            vertices[vertexIndex+4] = chunkPackVertexData(blockPos->x + 1, blockPos->y    , blockPos->z + 1, 1, 1, 4, blocksTextureFace(blockType, 4));
-            vertices[vertexIndex+5] = chunkPackVertexData(blockPos->x + 1, blockPos->y    , blockPos->z    , 0, 1, 4, blocksTextureFace(blockType, 4));
-            vertexIndex += 6;
+            vertices[indexIndex  ] = chunkPackVertexData(blockPos->x + 1, blockPos->y    , blockPos->z    , 0, 1, 4, blocksTextureFace(blockType, 4));
+            vertices[indexIndex+1] = chunkPackVertexData(blockPos->x + 1, blockPos->y + 1, blockPos->z    , 0, 0, 4, blocksTextureFace(blockType, 4));
+            vertices[indexIndex+2] = chunkPackVertexData(blockPos->x + 1, blockPos->y + 1, blockPos->z + 1, 1, 0, 4, blocksTextureFace(blockType, 4));
+            vertices[indexIndex+3] = chunkPackVertexData(blockPos->x + 1, blockPos->y    , blockPos->z + 1, 1, 1, 4, blocksTextureFace(blockType, 4));
+            
+            indices[indexCount  ] = 1 + indexIndex;
+            indices[indexCount+1] = 2 + indexIndex;
+            indices[indexCount+2] = 0 + indexIndex;
+            indices[indexCount+3] = 2 + indexIndex;
+            indices[indexCount+4] = 3 + indexIndex;
+            indices[indexCount+5] = 0 + indexIndex;
+            
+            indexIndex += 4;
+            indexCount += 6;
         }
 
         // BOTTOM
@@ -269,21 +347,29 @@ CHUNK_MESH* chunkGenerateMesh(VECTORI* position, U8* blocks) {
             (bottomIndex >= BLOCK_COUNT && blocksIsTransparent(worldGetBlock(position->x + blockPos->x, position->y + blockPos->y - 1, position->z + blockPos->z))) || 
             (bottomIndex < BLOCK_COUNT && blocksIsTransparent(blocks[bottomIndex]))
         ) {
-            vertices[vertexIndex  ] = chunkPackVertexData(blockPos->x    , blockPos->y    , blockPos->z    , 0, 1, 5, blocksTextureFace(blockType, 5));
-            vertices[vertexIndex+1] = chunkPackVertexData(blockPos->x + 1, blockPos->y    , blockPos->z    , 1, 1, 5, blocksTextureFace(blockType, 5));
-            vertices[vertexIndex+2] = chunkPackVertexData(blockPos->x + 1, blockPos->y    , blockPos->z + 1, 1, 0, 5, blocksTextureFace(blockType, 5));
-
-            vertices[vertexIndex+3] = chunkPackVertexData(blockPos->x + 1, blockPos->y    , blockPos->z + 1, 1, 0, 5, blocksTextureFace(blockType, 5));
-            vertices[vertexIndex+4] = chunkPackVertexData(blockPos->x    , blockPos->y    , blockPos->z + 1, 0, 0, 5, blocksTextureFace(blockType, 5));
-            vertices[vertexIndex+5] = chunkPackVertexData(blockPos->x    , blockPos->y    , blockPos->z    , 0, 1, 5, blocksTextureFace(blockType, 5));
-            vertexIndex += 6;
+            vertices[indexIndex  ] = chunkPackVertexData(blockPos->x    , blockPos->y    , blockPos->z    , 0, 1, 5, blocksTextureFace(blockType, 5));
+            vertices[indexIndex+1] = chunkPackVertexData(blockPos->x + 1, blockPos->y    , blockPos->z    , 1, 1, 5, blocksTextureFace(blockType, 5));
+            vertices[indexIndex+2] = chunkPackVertexData(blockPos->x + 1, blockPos->y    , blockPos->z + 1, 1, 0, 5, blocksTextureFace(blockType, 5));
+            vertices[indexIndex+3] = chunkPackVertexData(blockPos->x    , blockPos->y    , blockPos->z + 1, 0, 0, 5, blocksTextureFace(blockType, 5));
+            
+            indices[indexCount  ] = 1 + indexIndex;
+            indices[indexCount+1] = 2 + indexIndex;
+            indices[indexCount+2] = 0 + indexIndex;
+            indices[indexCount+3] = 2 + indexIndex;
+            indices[indexCount+4] = 3 + indexIndex;
+            indices[indexCount+5] = 0 + indexIndex;
+            
+            indexIndex += 4;
+            indexCount += 6;
         }
     }
 
     vectoriClean(blockPos);
 
     mesh->vertices = vertices;
-    mesh->vertexCount = vertexIndex;
+    mesh->indices = indices;
+    mesh->vertexCount = indexIndex;
+    mesh->indexCount = indexCount;
     return mesh;
 }
 
@@ -294,7 +380,7 @@ CHUNK* chunkCreate(VECTORI* position, U8* blocks) {
     glGenBuffers(1, &chunk->vboID);
     glGenBuffers(1, &chunk->eboID);
 
-    chunk->vertexCount = 0;
+    chunk->indexCount = 0;
     chunk->position = position;
     chunk->blocks = blocks;
 
@@ -303,10 +389,10 @@ CHUNK* chunkCreate(VECTORI* position, U8* blocks) {
 
 void chunkRender(CHUNK* chunk) {
     if (chunk == NULL) return;
-    if (!chunk->vertexCount) return;
+    if (!chunk->indexCount) return;
     
     glBindVertexArray(chunk->vaoID);
-    glDrawArrays(GL_TRIANGLES, 0, chunk->vertexCount);
+    glDrawElements(GL_TRIANGLES, chunk->indexCount, GL_UNSIGNED_INT, 0);
 }
 
 void chunkDrestroy(CHUNK* chunk) {

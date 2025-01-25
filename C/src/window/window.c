@@ -25,7 +25,7 @@ GLFWwindow* windowCreate() {
         glewInit();
     #endif
 
-    glfwSwapInterval(1);
+    glfwSwapInterval(0);
     
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 

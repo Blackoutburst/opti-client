@@ -58,15 +58,15 @@ void decodePacketSendChunk(U8* buffer) {
     U8* blocks = malloc(sizeof(U8) * CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE);
     for (I32 i = 0; i < CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE; i++) blocks[i] = getU8(bufferptr);
 
-    VECTORI* pa = vectoriInit();
-    vectoriSet(pa, position->x, position->y, position->z, 0);
-    U8* ba = malloc(sizeof(U8) * CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE);
-    memcpy(ba, blocks, CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE);
-
     CHUNK* exist = worldGetChunk(position->x, position->y, position->z);
     if (exist != NULL) {
         memcpy(exist->blocks, blocks, CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE);
     } else {
+        VECTORI* pa = vectoriInit();
+        vectoriSet(pa, position->x, position->y, position->z, 0);
+        U8* ba = malloc(sizeof(U8) * CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE);
+        memcpy(ba, blocks, CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE);
+    
         CHUNK* chunk = chunkCreate(pa, ba);
         worldAddChunk(chunk);
     }
@@ -101,15 +101,14 @@ void decodePacketSendMonotypeChunk(U8* buffer) {
     U8 blockType = getU8(bufferptr);
     for (I32 i = 0; i < CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE; i++) blocks[i] = blockType;
 
-    VECTORI* pa = vectoriInit();
-    vectoriSet(pa, position->x, position->y, position->z, 0);
-    U8* ba = malloc(sizeof(U8) * CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE);
-    memcpy(ba, blocks, CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE);
-
     CHUNK* exist = worldGetChunk(position->x, position->y, position->z);
     if (exist != NULL) {
         memcpy(exist->blocks, blocks, CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE);
     } else {
+        VECTORI* pa = vectoriInit();
+        vectoriSet(pa, position->x, position->y, position->z, 0);
+        U8* ba = malloc(sizeof(U8) * CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE);
+        memcpy(ba, blocks, CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE);
         CHUNK* chunk = chunkCreate(pa, ba);
         worldAddChunk(chunk);
     }

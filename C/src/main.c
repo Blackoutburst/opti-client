@@ -146,7 +146,7 @@ void update(GLFWwindow* window) {
     U8 selectedBlockType = 3;
 
     while (!glfwWindowShouldClose(window) && !glfwGetKey(window, GLFW_KEY_ESCAPE)) {
-        //calculateFPS();
+        FPS();
 
         worldRemoveChunkOutOfRenderDistance(20, camera->position->x, camera->position->y, camera->position->z);
         

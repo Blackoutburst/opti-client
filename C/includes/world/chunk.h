@@ -13,14 +13,16 @@ struct chunk {
     U32 vaoID;
     U32 vboID;
     U32 eboID;
-    U32 vertexCount;
+    U32 indexCount;
     VECTORI* position;
     U8* blocks;
 };
 
 struct chunkMesh {
     U32 vertexCount;
+    U32 indexCount;
     I32* vertices;
+    I32* indices;
 };
 
 void chunkPrint(CHUNK* chunk);

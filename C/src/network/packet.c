@@ -332,7 +332,16 @@ void packetSendUpdateBlock(U8 type, I32 x, I32 y, I32 z) {
 }
 
 void packetSendBlockBulkEdit(U32 blockCount, BLOCK_BULK_EDIT* blocks) {
-    // TODO
+    U32 size = sizeof(S02BLOCK_BULK_EDIT) + (sizeof(BLOCK_BULK_EDIT) * blockCount);
+    S02BLOCK_BULK_EDIT* packet = malloc(size);
+    packet->id = SERVER_PACKET_BLOCK_BULK_EDIT;
+    packet->blockCount = blockCount;
+    packet->blocks = blocks;
+    U8* buffer = encodePacketBlockBulkEdit(packet);
+    connectionSend(buffer, size);
+    
+    free(buffer);
+    free(packet);
 }
 
 void packetSendChat(const U8* message) {

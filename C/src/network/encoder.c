@@ -34,13 +34,24 @@ U8* encodePacketUpdateBlock(S01UPDATE_BLOCK* packet) {
     return buffer;
 }
 
+void putBlockBulkPacket(U16* index, BLOCK_BULK_EDIT* block, U8* buffer) {
+   putU8(index, block->type, buffer);
+   putI32(index, block->x, buffer);
+   putI32(index, block->y, buffer);
+   putI32(index, block->z, buffer);
+}
+
 U8* encodePacketBlockBulkEdit(S02BLOCK_BULK_EDIT* packet) {
-    U8* buffer = malloc(sizeof(S02BLOCK_BULK_EDIT));
-    for (U16 i = 0; i < sizeof(S02BLOCK_BULK_EDIT); i++) buffer[i] = 0;
+    U32 size = sizeof(S02BLOCK_BULK_EDIT) + (sizeof(BLOCK_BULK_EDIT) * packet->blockCount);
+    U8* buffer = malloc(size);
+    for (U16 i = 0; i < size; i++) buffer[i] = 0;
 
-    //U16 index = 0;
+    U16 index = 0;
 
-    //TODO
+    putU8(&index, packet->id, buffer);
+    putU32(&index, packet->blockCount, buffer);
+    for (U32 i = 0; i < packet->blockCount; i++)
+      putBlockBulkPacket(&index, &packet->blocks[i], buffer);
 
     return buffer;
 }
@@ -49,9 +60,11 @@ U8* encodePacketChat(S03CHAT* packet) {
     U8* buffer = malloc(sizeof(S03CHAT));
     for (U16 i = 0; i < sizeof(S03CHAT); i++) buffer[i] = 0;
 
-    //U16 index = 0;
-    
-    //TODO
+    U16 index = 0;
+
+    putU8(&index, packet->id, buffer);
+    for (U16 i = 0; packet->message[i]; i++)
+      putU8(&index, packet->message[i], buffer);
 
     return buffer;
 }
@@ -70,8 +83,8 @@ U8* encodePacketClientMetadata(S04CLIENT_METADATA* packet) {
 }
 
 U8* encodeString(const U8* str, U16 size) {
-    U8* string = malloc(size);
-    for (U8 i = 0; i < size; i++) string[i] = 0;
+    U8* string = malloc(sizeof(U8) * size);
+    for (U16 i = 0; i < size; i++) string[i] = 0;
     
     for (U16 i = 0; i < size && str[i]; i++) string[i] = str[i];
 

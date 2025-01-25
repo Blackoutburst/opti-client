@@ -10,14 +10,11 @@ static NET_QUEUE* networkQueue = NULL;
     static pthread_mutex_t mutex;
 #endif
 
-void networkQueueCleanElement(U16 index) {
+void _networkQueueCleanElement(U16 index) {
     if (networkQueue == NULL) return;
 
-    mutexLock(&mutex);
-    
     NET_QUEUE_ELEM* element = networkQueue->elements[index];
     if (element == NULL) {
-        mutexUnlock(&mutex);
         return;
     }
 
@@ -27,6 +24,15 @@ void networkQueueCleanElement(U16 index) {
     element->buffer = NULL;
     element->function = NULL;
     element->used = 0;
+}
+
+
+void networkQueueCleanElement(U16 index) {
+    if (networkQueue == NULL) return;
+
+    mutexLock(&mutex);
+
+    _networkQueueCleanElement(index);
 
     mutexUnlock(&mutex);
 }
@@ -37,7 +43,7 @@ void networkQueuePush(void (*function)(U8*), U8* buffer) {
     mutexLock(&mutex);
     
     if (networkQueue->elements[networkQueue->pushIndex]->used) {
-        networkQueueCleanElement(networkQueue->pushIndex);
+        _networkQueueCleanElement(networkQueue->pushIndex);
     }
     
     networkQueue->elements[networkQueue->pushIndex]->function = function;

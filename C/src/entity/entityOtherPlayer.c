@@ -3,6 +3,7 @@
 #include "utils/ioUtils.h"
 #include "utils/vectorf.h"
 #include "utils/matrix.h"
+#include "utils/math.h"
 #include "entity/entityOtherPlayer.h"
 #include "entity/entityManager.h"
 
@@ -75,9 +76,9 @@ void entityOtherPlayerUpdate(ENTITY* entity, CAMERA* camera, MATRIX* projection)
     if (entity == NULL) return;
 
     matrixSetIdentity(entity->model);
-    matrixRotate(entity->model, entity->pitch, -1, 0, 0);
-    matrixRotate(entity->model, entity->yaw, 0, 1, 0);
     matrixTranslate3d(entity->model, entity->position->x, entity->position->y, entity->position->z);
+    matrixRotate(entity->model, entity->yaw, 0, -1, 0);
+    matrixRotate(entity->model, entity->pitch, 1, 0, 0);
     
     
     entityOtherPlayerRender(entity, camera, projection);
@@ -92,6 +93,7 @@ void entityOtherPlayerClean(ENTITY* entity) {
     glDeleteBuffers(1, &entity->eboId);
 
     vectorfClean(entity->position);
+    free(entity->model);
     free(entity);
 }
 

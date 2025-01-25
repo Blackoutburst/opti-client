@@ -12,9 +12,7 @@ void entityManagerUpdateEntityPosition(U32 id, F32 x, F32 y, F32 z, F32 yaw, F32
     for (U32 i = 0; i < MAX_ENTITY_COUNT; i++) {
         if (!entityList[i].used) continue;
         if (entityList[i].entity->id == id) {
-            entityList[i].entity->position->x = x;
-            entityList[i].entity->position->y = y;
-            entityList[i].entity->position->z = z;
+            vectorfSet(entityList[i].entity->position, x, y, z, 0);
             entityList[i].entity->yaw = yaw;
             entityList[i].entity->pitch = pitch;
             break;
@@ -61,7 +59,10 @@ void entityManagerUpdateEntity(CAMERA* camera, MATRIX* projection) {
 
 void entityManagerClean() {
     if (entityList == NULL) return;
-    for (U32 i = 0; i < MAX_ENTITY_COUNT; i++) free(entityList[i].entity);
+    for (U32 i = 0; i < MAX_ENTITY_COUNT; i++) {
+        if (entityList[i].used)
+            entityList[i].entity->clean(entityList[i].entity);
+    }
     free(entityList);
 }
 
@@ -71,6 +72,6 @@ void entityManagerInit() {
     entityList = malloc(sizeof(ENTITY_LIST_ELEMENT) * MAX_ENTITY_COUNT);
     for (U32 i = 0; i < MAX_ENTITY_COUNT; i++) {
         entityList[i].used = 0;
-        entityList[i].entity = malloc(sizeof(ENTITY));
+        entityList[i].entity = NULL;
     }
 }

@@ -80,7 +80,6 @@ void entityOtherPlayerUpdate(ENTITY* entity, CAMERA* camera, MATRIX* projection)
     matrixRotate(entity->model, entity->yaw, 0, -1, 0);
     matrixRotate(entity->model, entity->pitch, 1, 0, 0);
     
-    
     entityOtherPlayerRender(entity, camera, projection);
 }
 

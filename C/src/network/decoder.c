@@ -63,8 +63,13 @@ void decodePacketSendChunk(U8* buffer) {
     U8* ba = malloc(sizeof(U8) * CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE);
     memcpy(ba, blocks, CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE);
 
-    CHUNK* chunk = chunkCreate(pa, ba);
-    worldAddChunk(chunk);
+    CHUNK* exist = worldGetChunk(position->x, position->y, position->z);
+    if (exist != NULL) {
+        memcpy(exist->blocks, blocks, CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE);
+    } else {
+        CHUNK* chunk = chunkCreate(pa, ba);
+        worldAddChunk(chunk);
+    }
 
     I32 chunkPoses[6][3] = {
         {position->x + CHUNK_SIZE, position->y, position->z},
@@ -101,8 +106,13 @@ void decodePacketSendMonotypeChunk(U8* buffer) {
     U8* ba = malloc(sizeof(U8) * CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE);
     memcpy(ba, blocks, CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE);
 
-    CHUNK* chunk = chunkCreate(pa, ba);
-    worldAddChunk(chunk);
+    CHUNK* exist = worldGetChunk(position->x, position->y, position->z);
+    if (exist != NULL) {
+        memcpy(exist->blocks, blocks, CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE);
+    } else {
+        CHUNK* chunk = chunkCreate(pa, ba);
+        worldAddChunk(chunk);
+    }
 
     I32 chunkPoses[6][3] = {
         {position->x + CHUNK_SIZE, position->y, position->z},

@@ -58,19 +58,34 @@ const I32 indices[] = {
     22, 23, 20
 };
 
-void entityOtherPlayerRender(ENTITY* entity) {
+void entityOtherPlayerRender(ENTITY* entity, CAMERA* camera, MATRIX* projection) {
+    if (entity == NULL) return;
+
     glUseProgram(entity->shaderProgram);
+
+    setUniformMat4(entity->shaderProgram, "model", entity->model);
+    setUniformMat4(entity->shaderProgram, "view", camera->matrix);
+    setUniformMat4(entity->shaderProgram, "projection", projection);
+    
     glBindVertexArray(entity->vaoId);
     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0); 
 }
 
-void entityOtherPlayerUpdate(ENTITY* entity) {
+void entityOtherPlayerUpdate(ENTITY* entity, CAMERA* camera, MATRIX* projection) {
+    if (entity == NULL) return;
+
+    matrixSetIdentity(entity->model);
+    matrixRotate(entity->model, entity->pitch, -1, 0, 0);
+    matrixRotate(entity->model, entity->yaw, 0, 1, 0);
+    matrixTranslate3d(entity->model, entity->position->x, entity->position->y, entity->position->z);
     
     
-    entityOtherPlayerRender(entity);
+    entityOtherPlayerRender(entity, camera, projection);
 }
 
 void entityOtherPlayerClean(ENTITY* entity) {
+    if (entity == NULL) return;
+    
     deleteShaderProgram(entity->shaderProgram);
     glDeleteVertexArrays(1, &entity->vaoId);
     glDeleteBuffers(1, &entity->vboId);
@@ -80,9 +95,12 @@ void entityOtherPlayerClean(ENTITY* entity) {
     free(entity);
 }
 
-ENTITY* entityOtherPlayerInit(F32 x, F32 y, F32 z, F32 yaw, F32 pitch) {
+ENTITY* entityOtherPlayerInit(U32 id, F32 x, F32 y, F32 z, F32 yaw, F32 pitch) {
     ENTITY* entity = malloc(sizeof(ENTITY));
+    entity->id = id;
 
+    entity->update = &entityOtherPlayerUpdate;
+    entity->clean = &entityOtherPlayerClean;
     
     VECTORF* position = vectorfInit();
     vectorfSet(position, x, y, z, 0);

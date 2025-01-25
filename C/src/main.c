@@ -108,8 +108,8 @@ void update(GLFWwindow* window) {
 
     CAMERA* camera = cameraInit(window);
 
-    I8* vertexShaderSource = readFile("./res/shaders/cube.vert");
-    I8* fragmentShaderSource = readFile("./res/shaders/cube.frag");
+    I8* vertexShaderSource = readFile("./res/shaders/chunk.vert");
+    I8* fragmentShaderSource = readFile("./res/shaders/chunk.frag");
 
     I32 vertexShader = compileShader(vertexShaderSource, GL_VERTEX_SHADER);
     I32 fragmentShader = compileShader(fragmentShaderSource, GL_FRAGMENT_SHADER);
@@ -199,7 +199,7 @@ void update(GLFWwindow* window) {
         setUniformMat4(shaderProgram, "view", camera->matrix);
         worldRender(shaderProgram);
 
-        entityManagerUpdateEntity();
+        entityManagerUpdateEntity(camera, projectionMatrix);
 
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

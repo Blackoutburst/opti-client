@@ -1,5 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
+#include "entity/entityManager.h"
+#include "entity/entityOtherPlayer.h"
 #include "utils/types.h"
 #include "utils/ioUtils.h"
 #include "utils/math.h"
@@ -14,15 +16,39 @@ void decodePacketIdentification(U8* buffer) {
 }
 
 void decodePacketAddEntity(U8* buffer) {
-    //println("Add Entity");
+    U8** bufferptr = &buffer;
+    
+    U32 entityId = getU32(bufferptr);
+    F32 x = getF32(bufferptr);
+    F32 y = getF32(bufferptr);
+    F32 z = getF32(bufferptr);
+    F32 yaw = getF32(bufferptr);
+    F32 pitch = getF32(bufferptr);
+    
+    for (U32 i = 0; i < 64; i++) getU8(bufferptr); // consume the name but don't do anything with it for now
+    
+    ENTITY* entity = entityOtherPlayerInit(entityId, x, y, z, yaw, pitch);
+    entityManagerAddEntity(entity);
 }
 
 void decodePacketRemoveEntity(U8* buffer) {
-    //println("Remove Entity");
+    U8** bufferptr = &buffer;
+    
+    U32 entityId = getU32(bufferptr);
+    entityManagerRemoveEntity(entityId);
 }
 
 void decodePacketUpdateEntity(U8* buffer) {
-    //println("Update Entity");
+    U8** bufferptr = &buffer;
+    
+    U32 entityId = getU32(bufferptr);
+    F32 x = getF32(bufferptr);
+    F32 y = getF32(bufferptr);
+    F32 z = getF32(bufferptr);
+    F32 yaw = getF32(bufferptr);
+    F32 pitch = getF32(bufferptr);
+
+    entityManagerUpdateEntityPosition(entityId, x, y, z, yaw, pitch);
 }
 
 void decodePacketSendChunk(U8* buffer) {

@@ -1,18 +1,30 @@
 #version 410
 
-layout(location = 0) in int data;
+layout(location = 0) in vec3 aPos;
+layout(location = 1) in vec2 aUv;
+layout(location = 2) in float aFace;
 
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
-uniform vec3 chunkPos;
-
 out vec3 FragPos;
 out vec2 uv;
 out vec3 norm;
-
+out vec3 tamer;
 flat out float layer;
+
+vec3 getColor(int index) {
+	const vec3 normals[6] = vec3[6](
+		vec3(1.0f, 0.0f, 0.0f), // RED
+		vec3(0.0f, 0.0f, 1.0f), // GREEN
+		vec3(0.0f, 0.0f, 1.0f), // BLUE
+		vec3(0.0f, 1.0f, 1.0f), // CYAN
+		vec3(1.0f, 1.0f, 0.0f), // YELLOW
+		vec3(1.0f, 0.0f, 1.0f) // MAGENTA
+	);
+	return normals[index];
+}
 
 vec3 getNormal(int index) {
 	const vec3 normals[6] = vec3[6](
@@ -27,22 +39,10 @@ vec3 getNormal(int index) {
 }
 
 void main() {
-	int X = data & 31;
-	int Y = (data >> 5) & 31;
-	int Z = (data >> 10) & 31;
-	int U = (data >> 15) & 3;
-	int V = (data >> 17) & 3;
-	int N = (data >> 19) & 7;
-	int T = (data >> 23) & 31;
-
-	if (U == 2) U = 16;
-	if (V == 2) V = 16;
-
-	FragPos = vec3(X, Y, Z) + chunkPos;
-	norm = getNormal(int(N));
-	uv = vec2(U, V);
-	layer = T;
+	FragPos = aPos - 0.5f;
+	norm = getNormal(int(aFace));
+	uv = aUv;
+	tamer = getColor(int(aFace));
 
 	gl_Position = projection * view * model * vec4(FragPos, 1.0);
 }
-

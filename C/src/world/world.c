@@ -24,7 +24,7 @@ CHUNK* _worldGetChunk(I32 x, I32 y, I32 z) {
     U32 start = index;
 
     while (1) {
-        if (!chunks[index].used) {
+        if (!chunks[index].used || chunks[index].position == NULL) {
             return NULL;
         }
         

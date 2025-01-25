@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include "utils/math.h"
 #include "network/encoder.h"
 #include "network/packet.h"
 
@@ -12,8 +13,8 @@ U8* encodePacketUpdateEntity(S00UPDATE_ENTITY* packet) {
     putF32(&index, packet->x, buffer);
     putF32(&index, packet->y, buffer);
     putF32(&index, packet->z, buffer);
-    putF32(&index, packet->yaw, buffer);
-    putF32(&index, packet->pitch, buffer);
+    putF32(&index, rad(packet->yaw), buffer);
+    putF32(&index, rad(packet->pitch), buffer);
 
     return buffer;
 }

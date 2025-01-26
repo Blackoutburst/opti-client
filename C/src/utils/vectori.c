@@ -13,12 +13,12 @@ void vectoriSet(VECTORI* vectori, I32 x, I32 y, I32 z, I32 w) {
 }
 
 void vectoriNormalize(VECTORI* vectori) {
-    I32 mag = sqrt(vectori->x * vectori->x + vectori->y * vectori->y + vectori->z * vectori->z + vectori->w * vectori->w);
+    F32 mag = sqrt(vectori->x * vectori->x + vectori->y * vectori->y + vectori->z * vectori->z + vectori->w * vectori->w);
     if (mag == 0.0) return;
 
     vectori->x /= mag;
-    vectori->x /= mag;
-    vectori->x /= mag;
+    vectori->y /= mag;
+    vectori->z /= mag;
     vectori->w /= mag;
 }
 

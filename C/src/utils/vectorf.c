@@ -17,8 +17,8 @@ void vectorfNormalize(VECTORF* vectorf) {
     if (mag == 0.0) return;
 
     vectorf->x /= mag;
-    vectorf->x /= mag;
-    vectorf->x /= mag;
+    vectorf->y /= mag;
+    vectorf->z /= mag;
     vectorf->w /= mag;
 }
 

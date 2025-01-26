@@ -170,11 +170,11 @@ void worldRemoveChunkOutOfRenderDistance(I32 renderDistance, I32 x, I32 y, I32 z
     mutexUnlock(&mutex);
 }
 
-void worldRender(I32 shaderProgram) {
+void worldRender(CAMERA* camera, I32 shaderProgram) {
     if (chunks == NULL) return;
     
     for (U32 i = 0; i < CHUNK_COUNT; i++) {
-        if (!chunks[i].used || chunks[i].chunk == NULL) continue;
+        if (!chunks[i].used || chunks[i].chunk == NULL) continue;// || !cameraIsInFrustrum(camera, chunks[i].chunk->position)) continue;
         setUniform3f(shaderProgram, "chunkPos", chunks[i].chunk->position->x, chunks[i].chunk->position->y, chunks[i].chunk->position->z);
         chunkRender(chunks[i].chunk);
     }

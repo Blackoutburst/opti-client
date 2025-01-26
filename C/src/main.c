@@ -196,8 +196,10 @@ void update(GLFWwindow* window) {
 
         glUseProgram(shaderProgram);
         cameraUpdate(camera);
+        cameraUpdatePlanes(camera, projectionMatrix);
+        
         setUniformMat4(shaderProgram, "view", camera->matrix);
-        worldRender(shaderProgram);
+        worldRender(camera, shaderProgram);
 
         entityManagerUpdateEntity(camera, projectionMatrix);
 

@@ -2,7 +2,9 @@
 
 #include "utils/types.h"
 #include "utils/vectori.h"
+#include "utils/matrix.h"
 #include "world/chunk.h"
+#include "core/camera.h"
 
 #define CHUNK_COUNT 64000
 
@@ -21,6 +23,6 @@ void worldAddChunk(CHUNK* chunk);
 void _worldRemoveChunk(I32 x, I32 y, I32 z);
 void worldRemoveChunk(I32 x, I32 y, I32 z);
 void worldRemoveChunkOutOfRenderDistance(I32 renderDistance, I32 x, I32 y, I32 z);
-void worldRender(I32 shaderProgram);
+void worldRender(CAMERA* camera, I32 shaderProgram);
 void worldClean();
 void worldInit();

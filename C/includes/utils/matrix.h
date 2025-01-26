@@ -50,6 +50,8 @@ struct matrix {
 F32* matrixGetValues(MATRIX* matrix);
 void matrixSetIdentity(MATRIX* matrix);
 MATRIX* identityMatrix();
+F32 matrixGet(MATRIX* matrix, U32 index);
+void matrixMultiply(MATRIX* result, MATRIX* left, MATRIX* right);
 void matrixCopy(MATRIX* src, MATRIX* dest);
 void matrixOrtho2D(MATRIX* matrix, F32 left, F32 right, F32 bottom, F32 top, F32 near, F32 far);
 void matrixProjection(MATRIX* matrix, F32 width, F32 height, F32 fov, F32 near, F32 far);

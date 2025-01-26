@@ -167,6 +167,7 @@ void cameraClean(CAMERA* camera) {
     free(camera->matrix);
     vectorfClean(camera->position);
     vectorfClean(camera->direction);
+    for (U8 i = 0; i < 6; i++) vectorfClean(camera->planes[i]);
     free(camera);
 }
 

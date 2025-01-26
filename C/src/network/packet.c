@@ -332,13 +332,14 @@ void packetSendUpdateBlock(U8 type, I32 x, I32 y, I32 z) {
 }
 
 void packetSendBlockBulkEdit(U32 blockCount, BLOCK_BULK_EDIT* blocks) {
-    U32 size = sizeof(S02BLOCK_BULK_EDIT) + (sizeof(BLOCK_BULK_EDIT) * blockCount);
-    S02BLOCK_BULK_EDIT* packet = malloc(size);
+    S02BLOCK_BULK_EDIT* packet = malloc(sizeof(S02BLOCK_BULK_EDIT));
     packet->id = SERVER_PACKET_BLOCK_BULK_EDIT;
     packet->blockCount = blockCount;
     packet->blocks = blocks;
+
     U8* buffer = encodePacketBlockBulkEdit(packet);
-    connectionSend(buffer, size);
+    U32 totalSize = sizeof(S02BLOCK_BULK_EDIT) + (sizeof(BLOCK_BULK_EDIT) * blockCount);
+    connectionSend(buffer, totalSize);
     
     free(buffer);
     free(packet);

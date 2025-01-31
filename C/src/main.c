@@ -235,7 +235,7 @@ void update(GLFWwindow* window) {
 I32 main(void) {
     worldInit();
     wgInitThreadPool();
-    openConnection("162.19.137.231", 15000);
+    openConnection("127.0.0.1", 15000);
     
     GLFWwindow* window = windowCreate();
 

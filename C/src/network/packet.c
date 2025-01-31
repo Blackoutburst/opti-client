@@ -11,7 +11,7 @@ void printBufferHex(const I8 *title, const U8 *buf, U32 buf_len) {
     printf("%s [ ", title);
     
     for (U32 i = 0 ; i < buf_len ; ++i) {
-        printf("%02X%s", buf[i], ( i + 1 ) % 16 == 0 ? "\r\n" : " " );
+        printf("%02X%s", buf[i], ( i + 1 ) % 32 == 0 ? "\r\n" : " " );
     }
     
     printf("]\n");
@@ -204,9 +204,9 @@ void putF32(U16* index, F32 value, U8* buffer) {
         F32 f;
         U32 u;
     } u;
-    
+
     u.f = value;
-    
+
     buffer[*index  ] = (u.u >> 24) & 0xFF;
     buffer[*index+1] = (u.u >> 16) & 0xFF;
     buffer[*index+2] = (u.u >> 8 ) & 0xFF;
@@ -298,51 +298,48 @@ U16 getServerPacketSize(I8 packetID) {
     }
 }
 
-void packetSendUpdateEntity(I32 x, I32 y, I32 z, F32 yaw, F32 pitch) {
-    S00UPDATE_ENTITY* packet = malloc(sizeof(S00UPDATE_ENTITY));
-    packet->id = SERVER_PACKET_UPDATE_ENTITY;
-    packet->x = x;
-    packet->y = y;
-    packet->z = z;
-    packet->yaw = yaw;
-    packet->pitch = pitch;
+void packetSendUpdateEntity(F32 x, F32 y, F32 z, F32 yaw, F32 pitch) {
+    S00UPDATE_ENTITY packet;
+    packet.id = SERVER_PACKET_UPDATE_ENTITY;
+    packet.x = x;
+    packet.y = y;
+    packet.z = z;
+    packet.yaw = yaw;
+    packet.pitch = pitch;
 
-    U8* buffer = encodePacketUpdateEntity(packet);
+    U8* buffer = encodePacketUpdateEntity(&packet);
 
     connectionSend(buffer, sizeof(S00UPDATE_ENTITY));
     
     free(buffer);
-    free(packet);
 }
 
 void packetSendUpdateBlock(U8 type, I32 x, I32 y, I32 z) {
-    S01UPDATE_BLOCK* packet = malloc(sizeof(S01UPDATE_BLOCK));
-    packet->id = SERVER_PACKET_UPDATE_BLOCK;
-    packet->type = type;
-    packet->x = x;
-    packet->y = y;
-    packet->z = z;
+    S01UPDATE_BLOCK packet;
+    packet.id = SERVER_PACKET_UPDATE_BLOCK;
+    packet.type = type;
+    packet.x = x;
+    packet.y = y;
+    packet.z = z;
 
-    U8* buffer = encodePacketUpdateBlock(packet);
+    U8* buffer = encodePacketUpdateBlock(&packet);
 
     connectionSend(buffer, sizeof(S01UPDATE_BLOCK));
     
     free(buffer);
-    free(packet);
 }
 
 void packetSendBlockBulkEdit(U32 blockCount, BLOCK_BULK_EDIT* blocks) {
-    S02BLOCK_BULK_EDIT* packet = malloc(sizeof(S02BLOCK_BULK_EDIT));
-    packet->id = SERVER_PACKET_BLOCK_BULK_EDIT;
-    packet->blockCount = blockCount;
-    packet->blocks = blocks;
+    S02BLOCK_BULK_EDIT packet;
+    packet.id = SERVER_PACKET_BLOCK_BULK_EDIT;
+    packet.blockCount = blockCount;
+    packet.blocks = blocks;
 
-    U8* buffer = encodePacketBlockBulkEdit(packet);
+    U8* buffer = encodePacketBlockBulkEdit(&packet);
     U32 totalSize = sizeof(S02BLOCK_BULK_EDIT) + (sizeof(BLOCK_BULK_EDIT) * blockCount);
     connectionSend(buffer, totalSize);
     
     free(buffer);
-    free(packet);
 }
 
 void packetSendChat(const U8* message) {

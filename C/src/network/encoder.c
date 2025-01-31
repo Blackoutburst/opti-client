@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include "utils/math.h"
 #include "network/encoder.h"
 #include "network/packet.h"

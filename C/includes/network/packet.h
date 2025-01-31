@@ -126,11 +126,11 @@ enum ClientPackets {
 };
 
 enum ServerPackets {
-    SERVER_PACKET_UPDATE_ENTITY,
-    SERVER_PACKET_UPDATE_BLOCK,
-    SERVER_PACKET_BLOCK_BULK_EDIT,
-    SERVER_PACKET_CHAT,
-    SERVER_PACKET_CLIENT_METADATA,
+    SERVER_PACKET_UPDATE_ENTITY = 0,
+    SERVER_PACKET_UPDATE_BLOCK = 1,
+    SERVER_PACKET_BLOCK_BULK_EDIT = 2,
+    SERVER_PACKET_CHAT = 3,
+    SERVER_PACKET_CLIENT_METADATA = 4,
 };
 
 void printBufferHex(const I8 *title, const U8 *buf, U32 buf_len);
@@ -161,7 +161,7 @@ void* getClientPacketfunction(I8 packetID);
 U16 getClientPacketSize(I8 packetID);
 U16 getServerPacketSize(I8 packetID);
 
-void packetSendUpdateEntity(I32 x, I32 y, I32 z, F32 yaw, F32 pitch);
+void packetSendUpdateEntity(F32 x, F32 y, F32 z, F32 yaw, F32 pitch);
 void packetSendUpdateBlock(U8 type, I32 x, I32 y, I32 z);
 void packetSendBlockBulkEdit(U32 blockCount, BLOCK_BULK_EDIT* blocks);
 void packetSendChat(const U8* message);

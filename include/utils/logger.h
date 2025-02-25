@@ -23,7 +23,7 @@ enum _logLevel {
 #include <stdio.h>
 #include <stdarg.h>
 
-#define COLOR_RESET "\033[37m"
+#define COLOR_RESET "\033[0m"
 
 #if defined(_WIN32) || defined(_WIN64)
 #include <windows.h>

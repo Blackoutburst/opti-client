@@ -4,25 +4,24 @@
 #include <stdio.h>
 
 #include "utils/logger.h"
+#include "utils/types.h"
 #include "renderer/rendererInstance.h"
+#include "window/window.h"
 
-int main(void) {
-    glfwInit();
-
-    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-    GLFWwindow* window = glfwCreateWindow(800, 600, "VKMC", NULL, NULL);
+I32 main(void) {
+    windowInit();
 
     rendererInstanceInit();
 
-    while(!glfwWindowShouldClose(window)) {
-        glfwPollEvents();
+    while(!glfwWindowShouldClose(windowGetHandle())) {
+        windowUpdate();
+
+        windowClear();
     }
 
     rendererInstanceClean();
 
-    glfwDestroyWindow(window);
-
-    glfwTerminate();
+    windowClean();
 
     return 0;
 }

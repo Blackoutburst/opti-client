@@ -4,20 +4,21 @@
 #include <stdio.h>
 
 #include "utils/logger.h"
+#include "renderer/rendererInstance.h"
 
 int main(void) {
     glfwInit();
 
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-    GLFWwindow* window = glfwCreateWindow(800, 600, "Vulkan window", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(800, 600, "VKMC", NULL, NULL);
 
-    unsigned int extensionCount = 0;
-    vkEnumerateInstanceExtensionProperties(NULL, &extensionCount, NULL);
-    logI("Ext: %d", extensionCount);
+    rendererInstanceInit();
 
     while(!glfwWindowShouldClose(window)) {
         glfwPollEvents();
     }
+
+    rendererInstanceClean();
 
     glfwDestroyWindow(window);
 

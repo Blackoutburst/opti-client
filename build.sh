@@ -1,6 +1,6 @@
 #!/bin/bash
 readonly NAME="game"
-readonly SRC="src/main.c"
+readonly SRC="src/*.c src/renderer/*.c"
 readonly INCLUDE="-Iinclude"
 
 readonly I_GLFW="$HOME/glfw/include/"

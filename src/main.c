@@ -27,7 +27,10 @@ I32 main(I32 argc, I8** argv) {
         windowClear();
     }
 
-    logCallBackClean(rendererInstanceGetInstance());
+    if (argsGetValidationLayers()) {
+        logCallBackClean(rendererInstanceGetInstance());
+    }
+    
     rendererInstanceClean();
 
     windowClean();

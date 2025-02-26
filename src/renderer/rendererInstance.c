@@ -61,11 +61,8 @@ void rendererInstanceInit(void) {
 
     VkResult result = vkCreateInstance(&createInfo, NULL, &instance);
     if (result != VK_SUCCESS) {
-        logE("VK instance creation failed code: %s", vkError(result));
         exit(1);
     }
-
-    logI("VK Instance created successfully");
 
     if (argsGetValidationLayers()) {
         logI("Enabled %i validation layers", validationLayersCount());

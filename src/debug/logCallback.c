@@ -21,9 +21,6 @@ void logCallBackClean(VkInstance instance) {
     
     if (func) {
         func(instance, logger, NULL);
-        logI("Logger deleted successfully");
-    } else {
-        logW("Logger deletion failed");
     }
 
     free(createInfo);
@@ -44,9 +41,6 @@ void logCallBackSet(VkInstance instance) {
     
     if (func) {
         func(instance, createInfo, NULL, &logger);
-        logI("Logger set successfully");
-    } else {
-        logW("Logger creation failed");
     }
 }
 

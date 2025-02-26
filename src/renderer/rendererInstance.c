@@ -5,6 +5,7 @@
 
 #include "utils/args.h"
 #include "debug/validationLayers.h"
+#include "debug/logCallback.h"
 #include "renderer/rendererInstance.h"
 #include "utils/logger.h"
 #include "utils/vkerror.h"
@@ -34,21 +35,23 @@ void rendererInstanceInit(void) {
 
     glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
 
-    const I8** requiredExtensions = malloc((glfwExtensionCount + 1) * sizeof(char*));
+    const I8** requiredExtensions = malloc((glfwExtensionCount + 2) * sizeof(char*));
     memcpy(requiredExtensions, glfwExtensions, glfwExtensionCount * sizeof(char*));
-    requiredExtensions[glfwExtensionCount] = VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME;
-    glfwExtensionCount++;
+    requiredExtensions[glfwExtensionCount++] = VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME;
+    requiredExtensions[glfwExtensionCount++] = VK_EXT_DEBUG_UTILS_EXTENSION_NAME;
 
     VkInstanceCreateInfo createInfo;
     createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-    createInfo.pNext = NULL;
     createInfo.flags |= VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
     createInfo.pApplicationInfo = &appInfo;
 
     if (argsGetValidationLayers()) {
+        logCallBackInit();
+        createInfo.pNext = logCallBackGetInfo();
         createInfo.enabledLayerCount = validationLayersCount();
         createInfo.ppEnabledLayerNames = validationLayersGet();
     } else {
+        createInfo.pNext = NULL;
         createInfo.enabledLayerCount = 0;
         createInfo.ppEnabledLayerNames = NULL;
     }
@@ -68,3 +71,4 @@ void rendererInstanceInit(void) {
         logI("Enabled %i validation layers", validationLayersCount());
     }
 }
+

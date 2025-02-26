@@ -8,6 +8,7 @@
 #include "utils/types.h"
 #include "utils/args.h"
 #include "renderer/rendererInstance.h"
+#include "debug/logCallback.h"
 #include "window/window.h"
 
 I32 main(I32 argc, I8** argv) {
@@ -15,6 +16,10 @@ I32 main(I32 argc, I8** argv) {
     windowInit();
 
     rendererInstanceInit();
+    
+    if (argsGetValidationLayers()) {
+        logCallBackSet(rendererInstanceGetInstance());
+    }
 
     while(!glfwWindowShouldClose(windowGetHandle())) {
         windowUpdate();
@@ -22,6 +27,7 @@ I32 main(I32 argc, I8** argv) {
         windowClear();
     }
 
+    logCallBackClean(rendererInstanceGetInstance());
     rendererInstanceClean();
 
     windowClean();

@@ -6,3 +6,6 @@ game
 ### MACOS ###
 .DS_Store
 *.dSYM
+
+### GFX ###
+*.gfxr

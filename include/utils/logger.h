@@ -6,6 +6,7 @@ extern void logD(const char* fmt, ...);
 extern void logI(const char* fmt, ...);
 extern void logW(const char* fmt, ...);
 extern void logE(const char* fmt, ...);
+extern void logMsg(const char* fmt, ...);
 #ifdef __cplusplus
 }
 #endif
@@ -132,6 +133,19 @@ void logE(const char* fmt, ...) {
     va_list args;
     va_start(args, fmt);
     _log(LOG_ERROR, fmt, args);
+    va_end(args);
+}
+
+void logMsg(const char* fmt, ...) {
+    va_list args;
+    va_start(args, fmt);
+    
+    if (fmt == NULL || *fmt == '\0') {
+        printf("%s\n", fmt);
+    } else {
+        vprintf(fmt, args);
+        printf("\n");
+    }
     va_end(args);
 }
 

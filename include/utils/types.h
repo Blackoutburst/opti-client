@@ -14,3 +14,5 @@ typedef char I8;
 typedef float F32;
 typedef double F64;
 typedef long double F128;
+
+#define UNUSED_VAR(expr) do { (void)(expr); } while (0)

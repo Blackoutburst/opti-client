@@ -1,11 +1,11 @@
 #include "debug/validationLayers.h"
 
-#define LAYERS_COUNT 9
+#define LAYERS_COUNT 8
 
 const static I8* layers[LAYERS_COUNT] = {
     "VK_LAYER_LUNARG_api_dump",
     "VK_LAYER_LUNARG_crash_diagnostic",
-    "VK_LAYER_LUNARG_gfxreconstruct",
+    //"VK_LAYER_LUNARG_gfxreconstruct",
     "VK_LAYER_KHRONOS_profiles",
     "VK_LAYER_KHRONOS_shader_object",
     "VK_LAYER_KHRONOS_synchronization2",

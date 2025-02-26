@@ -6,10 +6,12 @@
 
 #include "utils/logger.h"
 #include "utils/types.h"
+#include "utils/args.h"
 #include "renderer/rendererInstance.h"
 #include "window/window.h"
 
-I32 main(void) {
+I32 main(I32 argc, I8** argv) {
+    argsParse(argc, argv);
     windowInit();
 
     rendererInstanceInit();

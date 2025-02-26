@@ -1,6 +1,6 @@
 #!/bin/bash
 readonly NAME="game"
-readonly SRC="src/*.c src/renderer/*.c src/window/*.c"
+readonly SRC="src/*.c src/renderer/*.c src/window/*.c src\utils\*.c"
 readonly INCLUDE="-Iinclude"
 
 readonly I_VK="$HOME/vulkan/1.4.304.1/macOS/include"

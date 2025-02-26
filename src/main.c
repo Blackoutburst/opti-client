@@ -16,8 +16,6 @@ I32 main(I32 argc, I8** argv) {
 
     rendererInstanceInit();
 
-    logD("test %i ss %s", 4, "test");
-
     while(!glfwWindowShouldClose(windowGetHandle())) {
         windowUpdate();
 

@@ -1,6 +1,6 @@
 @echo off
 set NAME=game
-set SRC=src\*.c src\renderer\*.c src\window\*.c src\utils\*.c
+set SRC=src\*.c src\renderer\*.c src\window\*.c src\utils\*.c src\debug\*.c
 set INCLUDE=-Iinclude
 
 set I_VK=%USERPROFILE%\vulkan\1.4.304.1\Include

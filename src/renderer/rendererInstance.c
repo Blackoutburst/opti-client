@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "utils/args.h"
+#include "debug/validationLayers.h"
 #include "renderer/rendererInstance.h"
 #include "utils/logger.h"
 #include "utils/vkerror.h"
@@ -42,8 +44,15 @@ void rendererInstanceInit(void) {
     createInfo.pNext = NULL;
     createInfo.flags |= VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
     createInfo.pApplicationInfo = &appInfo;
-    createInfo.enabledLayerCount = 0;
-    createInfo.ppEnabledLayerNames = NULL;
+
+    if (argsGetValidationLayers()) {
+        createInfo.enabledLayerCount = validationLayersCount();
+        createInfo.ppEnabledLayerNames = validationLayersGet();
+    } else {
+        createInfo.enabledLayerCount = 0;
+        createInfo.ppEnabledLayerNames = NULL;
+    }
+
     createInfo.enabledExtensionCount = glfwExtensionCount;
     createInfo.ppEnabledExtensionNames = requiredExtensions;
 
@@ -54,4 +63,8 @@ void rendererInstanceInit(void) {
     }
 
     logI("VK Instance created successfully");
+
+    if (argsGetValidationLayers()) {
+        logI("Enabled %i validation layers", validationLayersCount());
+    }
 }

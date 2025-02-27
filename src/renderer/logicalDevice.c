@@ -24,6 +24,13 @@ void logicalDeviceClean(void) {
     }
 }
 
+VkQueue logicalDeviceGetQueue(VkPhysicalDevice physicalDevice, VkDevice logicalDevice, VkQueueFlagBits queueType) {
+    VkQueue graphicsQueue;
+    vkGetDeviceQueue(logicalDevice, queueFamiliesGetType(physicalDevice, queueType), 0, &graphicsQueue);
+
+    return graphicsQueue;
+}
+
 void logicalDeviceCreate(VkPhysicalDevice physicalDevice, VkDevice* logicalDevice) {
     const F32 queuePriority = 1.0;
 

@@ -1,6 +1,6 @@
-#include "renderer/logicalDevice.h"
-#include "renderer/queueFamilies.h"
-#include "renderer/physicalDevice.h"
+#include "devices/logicalDevice.h"
+#include "devices/queueFamilies.h"
+#include "devices/physicalDevice.h"
 #include "utils/logger.h"
 
 static VkDevice primaryDevice = VK_NULL_HANDLE;

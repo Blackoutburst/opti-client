@@ -1,8 +1,8 @@
 #include <stdlib.h>
 
 #include "utils/logger.h"
-#include "renderer/physicalDevice.h"
-#include "renderer/queueFamilies.h"
+#include "devices/physicalDevice.h"
+#include "devices/queueFamilies.h"
 
 #define PHYSICAL_DEVICE_TYPE_COUNT 5
 

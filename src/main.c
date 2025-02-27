@@ -8,8 +8,8 @@
 #include "utils/types.h"
 #include "utils/args.h"
 #include "renderer/rendererInstance.h"
-#include "renderer/physicalDevice.h"
-#include "renderer/logicalDevice.h"
+#include "devices/physicalDevice.h"
+#include "devices/logicalDevice.h"
 #include "debug/logCallback.h"
 #include "window/window.h"
 

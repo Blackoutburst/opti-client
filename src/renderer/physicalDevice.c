@@ -82,7 +82,7 @@ void physicalDeviceList(VkInstance instance) {
     for (U32 i = 0; i < deviceCount; i++) {
         VkPhysicalDeviceProperties deviceProperties;
         vkGetPhysicalDeviceProperties(devices[i], &deviceProperties);
-        logI("Device: %s | Type: %s | Id: %u", deviceProperties.deviceName, physicalDeviceTypeName(deviceProperties.deviceType), deviceProperties.deviceID);
+        logI("Device: %s | Type: %s", deviceProperties.deviceName, physicalDeviceTypeName(deviceProperties.deviceType));
     }
 
     free(devices);

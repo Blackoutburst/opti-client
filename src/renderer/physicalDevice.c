@@ -101,7 +101,7 @@ VkPhysicalDevice physicalDeviceGetDevice(VkInstance instance, U8 desiredType, U3
         vkGetPhysicalDeviceProperties(devices[i], &deviceProperties);
 
         if (deviceProperties.deviceID == primaryId) continue;
-        if (!queueFamiliesFindType(devices[i], VK_QUEUE_GRAPHICS_BIT)) continue;
+        if (!queueFamiliesHasType(devices[i], VK_QUEUE_GRAPHICS_BIT)) continue;
 
         if (deviceProperties.deviceType == desiredType) return devices[i];
     }

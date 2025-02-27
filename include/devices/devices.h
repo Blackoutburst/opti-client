@@ -11,3 +11,9 @@ struct device {
     VkPhysicalDeviceProperties properties;
     VkQueue graphicsQueue;
 };
+
+DEVICE* devicePrimary(void);
+DEVICE* deviceSecondary(void);
+void deviceClean(void);
+void deviceInit(void);
+

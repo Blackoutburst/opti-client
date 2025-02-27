@@ -8,8 +8,7 @@
 #include "utils/types.h"
 #include "utils/args.h"
 #include "renderer/rendererInstance.h"
-#include "devices/physicalDevice.h"
-#include "devices/logicalDevice.h"
+#include "devices/devices.h"
 #include "debug/logCallback.h"
 #include "window/window.h"
 
@@ -19,8 +18,7 @@ I32 main(I32 argc, I8** argv) {
 
     rendererInstanceInit();
 
-    physicalDeviceInit(rendererInstanceGetInstance());
-    logicalDeviceInit();
+    devicesInit();
 
     if (argsGetValidationLayers()) {
         logCallBackSet(rendererInstanceGetInstance());
@@ -36,7 +34,7 @@ I32 main(I32 argc, I8** argv) {
         logCallBackClean(rendererInstanceGetInstance());
     }
 
-    logicalDeviceClean();
+    devicesClean();
     rendererInstanceClean();
 
     windowClean();

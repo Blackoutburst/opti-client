@@ -4,10 +4,12 @@
 #include "renderer/physicalDevice.h"
 #include "renderer/queueFamilies.h"
 
+#define PHYSICAL_DEVICE_TYPE_COUNT 5
+
 static VkPhysicalDevice primaryDevice = VK_NULL_HANDLE;
 static VkPhysicalDevice secondaryDevice = VK_NULL_HANDLE;
 
-static const VkPhysicalDeviceType devicePriorityList[5] = {
+static const VkPhysicalDeviceType devicePriorityList[PHYSICAL_DEVICE_TYPE_COUNT] = {
     VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU,
     VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU,
     VK_PHYSICAL_DEVICE_TYPE_VIRTUAL_GPU,
@@ -31,7 +33,7 @@ void physicalDeviceInit(VkInstance instance) {
     VkPhysicalDeviceProperties secondaryDeviceProperties;
 
     U32 i = 0;
-    while (primaryDevice == VK_NULL_HANDLE && i < 5) {
+    while (primaryDevice == VK_NULL_HANDLE && i < PHYSICAL_DEVICE_TYPE_COUNT) {
         primaryDevice = physicalDeviceGetDevice(instance, devicePriorityList[i++], 0);
     }
     vkGetPhysicalDeviceProperties(primaryDevice, &primaryDeviceProperties);
@@ -39,7 +41,7 @@ void physicalDeviceInit(VkInstance instance) {
 
     if (deviceCount > 1) {
         i = 0;
-        while (secondaryDevice == VK_NULL_HANDLE && i < 5) {
+        while (secondaryDevice == VK_NULL_HANDLE && i < PHYSICAL_DEVICE_TYPE_COUNT) {
             secondaryDevice = physicalDeviceGetDevice(instance, devicePriorityList[i++], primaryDeviceProperties.deviceID);
         }
         vkGetPhysicalDeviceProperties(secondaryDevice, &secondaryDeviceProperties);

@@ -7,22 +7,14 @@
 #include "utils/logger.h"
 #include "utils/types.h"
 #include "utils/args.h"
-#include "renderer/rendererInstance.h"
-#include "devices/devices.h"
-#include "debug/logCallback.h"
+#include "renderer/vk.h"
 #include "window/window.h"
 
 I32 main(I32 argc, I8** argv) {
     argsParse(argc, argv);
     windowInit();
 
-    rendererInstanceInit();
-
-    devicesInit();
-
-    if (argsGetValidationLayers()) {
-        logCallBackSet(rendererInstanceGetInstance());
-    }
+    vkInit();
 
     while(!glfwWindowShouldClose(windowGetHandle())) {
         windowUpdate();
@@ -30,12 +22,7 @@ I32 main(I32 argc, I8** argv) {
         windowClear();
     }
 
-    if (argsGetValidationLayers()) {
-        logCallBackClean(rendererInstanceGetInstance());
-    }
-
-    devicesClean();
-    rendererInstanceClean();
+    vkClean();
 
     windowClean();
 

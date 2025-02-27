@@ -25,6 +25,13 @@ VkPhysicalDevice physicalDeviceGetSecondary(void) {
     return secondaryDevice;
 }
 
+VkPhysicalDeviceProperties physicalDeviceGetProperties(VkPhysicalDevice device) {
+    VkPhysicalDeviceProperties properties;
+    vkGetPhysicalDeviceProperties(device, &properties);
+
+    return properties;
+}
+
 void physicalDeviceInit(VkInstance instance) {
     physicalDeviceList(instance);
 

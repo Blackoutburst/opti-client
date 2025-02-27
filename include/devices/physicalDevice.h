@@ -6,6 +6,7 @@
 
 VkPhysicalDevice physicalDeviceGetPrimary(void);
 VkPhysicalDevice physicalDeviceGetSecondary(void);
+VkPhysicalDeviceProperties physicalDeviceGetProperties(VkPhysicalDevice device);
 void physicalDeviceInit(VkInstance instance);
 const I8* physicalDeviceTypeName(VkPhysicalDeviceType type);
 U32 physicalDeviceCount(VkInstance instance);

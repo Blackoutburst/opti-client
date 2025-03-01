@@ -1,5 +1,3 @@
-#include <GLFW/glfw3.h>
-
 #include "window/window.h"
 
 static GLFWwindow* window;

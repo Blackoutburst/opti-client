@@ -9,7 +9,8 @@ struct device {
     VkDevice logical;
     VkPhysicalDevice physical;
     VkPhysicalDeviceProperties properties;
-    VkQueue graphicsQueue;
+    VkQueue graphicQueue;
+    VkQueue presentQueue;
 };
 
 DEVICE* devicesGetPrimary(void);

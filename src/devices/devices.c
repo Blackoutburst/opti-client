@@ -41,7 +41,8 @@ void devicesCreate(DEVICE* device, U8 primary) {
     device->logical = primary ? logicalDeviceGetPrimary() : logicalDeviceGetSecondary();
     device->physical = primary ? physicalDeviceGetPrimary() : physicalDeviceGetSecondary();
     device->properties = physicalDeviceGetProperties(device->physical);
-    device->graphicsQueue = logicalDeviceGetQueue(device->physical, device->logical, VK_QUEUE_GRAPHICS_BIT);
+    device->graphicQueue = logicalDeviceGetQueue(device->physical, device->logical, VK_QUEUE_GRAPHICS_BIT);
+    device->presentQueue = logicalDeviceGetPresentationQueue(device->physical, device->logical);
 }
 
 void devicesInit(void) {

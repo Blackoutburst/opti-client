@@ -3,6 +3,7 @@
 #include "utils/logger.h"
 #include "devices/physicalDevice.h"
 #include "devices/queueFamilies.h"
+#include "renderer/windowSurface.h"
 
 #define PHYSICAL_DEVICE_TYPE_COUNT 5
 
@@ -109,6 +110,9 @@ VkPhysicalDevice physicalDeviceGetDevice(VkInstance instance, U8 desiredType, U3
 
         if (deviceProperties.deviceID == primaryId) continue;
         if (!queueFamiliesHasType(devices[i], VK_QUEUE_GRAPHICS_BIT)) continue;
+        VkBool32 presentSupport = VK_FALSE;
+        vkGetPhysicalDeviceSurfaceSupportKHR(devices[i], i, windowSurfaceGet(), &presentSupport);
+        if (!presentSupport) continue;
 
         if (deviceProperties.deviceType == desiredType) return devices[i];
     }

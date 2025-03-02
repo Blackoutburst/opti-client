@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 
 #include "utils/logger.h"
 #include "devices/physicalDevice.h"
@@ -7,8 +8,12 @@
 
 #define PHYSICAL_DEVICE_TYPE_COUNT 5
 
-static VkPhysicalDevice primaryDevice = VK_NULL_HANDLE;
-static VkPhysicalDevice secondaryDevice = VK_NULL_HANDLE;
+static VkPhysicalDevice device = VK_NULL_HANDLE;
+
+#define REQUIRED_EXTENSIONS_COUNT 1
+static const I8* requiredExtensions[REQUIRED_EXTENSIONS_COUNT] = {
+    VK_KHR_SWAPCHAIN_EXTENSION_NAME
+};
 
 static const VkPhysicalDeviceType devicePriorityList[PHYSICAL_DEVICE_TYPE_COUNT] = {
     VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU,
@@ -18,12 +23,8 @@ static const VkPhysicalDeviceType devicePriorityList[PHYSICAL_DEVICE_TYPE_COUNT]
     VK_PHYSICAL_DEVICE_TYPE_OTHER
 };
 
-VkPhysicalDevice physicalDeviceGetPrimary(void) {
-    return primaryDevice;
-}
-
-VkPhysicalDevice physicalDeviceGetSecondary(void) {
-    return secondaryDevice;
+VkPhysicalDevice physicalDeviceGet(void) {
+    return device;
 }
 
 VkPhysicalDeviceProperties physicalDeviceGetProperties(VkPhysicalDevice device) {
@@ -36,30 +37,15 @@ VkPhysicalDeviceProperties physicalDeviceGetProperties(VkPhysicalDevice device) 
 void physicalDeviceInit(VkInstance instance) {
     physicalDeviceList(instance);
 
-    U32 deviceCount = physicalDeviceCount(instance);
-    VkPhysicalDeviceProperties primaryDeviceProperties;
-    VkPhysicalDeviceProperties secondaryDeviceProperties;
+    VkPhysicalDeviceProperties deviceProperties;
 
     U32 i = 0;
-    while (primaryDevice == VK_NULL_HANDLE && i < PHYSICAL_DEVICE_TYPE_COUNT) {
-        primaryDevice = physicalDeviceGetDevice(instance, devicePriorityList[i++], 0);
+    while (device == VK_NULL_HANDLE && i < PHYSICAL_DEVICE_TYPE_COUNT) {
+        device = physicalDeviceGetDevice(instance, devicePriorityList[i++], 0);
     }
-    vkGetPhysicalDeviceProperties(primaryDevice, &primaryDeviceProperties);
+    vkGetPhysicalDeviceProperties(device, &deviceProperties);
 
-
-    if (deviceCount > 1) {
-        i = 0;
-        while (secondaryDevice == VK_NULL_HANDLE && i < PHYSICAL_DEVICE_TYPE_COUNT) {
-            secondaryDevice = physicalDeviceGetDevice(instance, devicePriorityList[i++], primaryDeviceProperties.deviceID);
-        }
-        vkGetPhysicalDeviceProperties(secondaryDevice, &secondaryDeviceProperties);
-    }
-
-    if (secondaryDevice != VK_NULL_HANDLE) {
-        logI("GPU's selected | Primary: %s (%s) | Secondary %s (%s)", primaryDeviceProperties.deviceName, physicalDeviceTypeName(primaryDeviceProperties.deviceType), secondaryDeviceProperties.deviceName, physicalDeviceTypeName(secondaryDeviceProperties.deviceType));
-    } else {
-        logI("GPU's selected | Primary: %s (%s) | Secondary: NONE", primaryDeviceProperties.deviceName, physicalDeviceTypeName(primaryDeviceProperties.deviceType));
-    }
+    logI("GPU's selected: %s (%s)", deviceProperties.deviceName, physicalDeviceTypeName(deviceProperties.deviceType));
 }
 
 const I8* physicalDeviceTypeName(VkPhysicalDeviceType type) {
@@ -98,6 +84,22 @@ void physicalDeviceList(VkInstance instance) {
     free(devices);
 }
 
+U8 physicalDeviceHasExtensions(VkPhysicalDevice device) {
+    U32 extensionsCount = 0;
+    vkEnumerateDeviceExtensionProperties(device, NULL, &extensionsCount, NULL);
+    VkExtensionProperties* extensions = malloc(sizeof(VkExtensionProperties) * extensionsCount);
+    vkEnumerateDeviceExtensionProperties(device, NULL, &extensionsCount, extensions);
+
+    U32 extensionsPresent = 0;
+    for (U32 i = 0; i < REQUIRED_EXTENSIONS_COUNT; i++) {
+    for (U32 j = 0; j < extensionsCount; j++) {
+        if (!strcmp(requiredExtensions[i], extensions[j].extensionName))
+            extensionsPresent++;
+    }}
+
+    return extensionsPresent == REQUIRED_EXTENSIONS_COUNT;
+}
+
 VkPhysicalDevice physicalDeviceGetDevice(VkInstance instance, U8 desiredType, U32 primaryId) {
     U32 deviceCount = physicalDeviceCount(instance);
     VkPhysicalDevice* devices = malloc(sizeof(VkPhysicalDevice) * deviceCount);
@@ -113,6 +115,7 @@ VkPhysicalDevice physicalDeviceGetDevice(VkInstance instance, U8 desiredType, U3
         VkBool32 presentSupport = VK_FALSE;
         vkGetPhysicalDeviceSurfaceSupportKHR(devices[i], i, windowSurfaceGet(), &presentSupport);
         if (!presentSupport) continue;
+        if (!physicalDeviceHasExtensions(devices[i])) continue;
 
         if (deviceProperties.deviceType == desiredType) return devices[i];
     }

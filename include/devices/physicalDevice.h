@@ -4,8 +4,7 @@
 
 #include "utils/types.h"
 
-VkPhysicalDevice physicalDeviceGetPrimary(void);
-VkPhysicalDevice physicalDeviceGetSecondary(void);
+VkPhysicalDevice physicalDeviceGet(void);
 VkPhysicalDeviceProperties physicalDeviceGetProperties(VkPhysicalDevice device);
 void physicalDeviceInit(VkInstance instance);
 const I8* physicalDeviceTypeName(VkPhysicalDeviceType type);

@@ -6,24 +6,20 @@
 #include "renderer/windowSurface.h"
 #include "utils/logger.h"
 
-static VkDevice primaryDevice = VK_NULL_HANDLE;
-static VkDevice secondaryDevice = VK_NULL_HANDLE;
+static VkDevice device = VK_NULL_HANDLE;
 
-VkDevice logicalDeviceGetPrimary(void) {
-    return primaryDevice;
-}
+#define REQUIRED_EXTENSIONS_COUNT 1
+static const I8* requiredExtensions[REQUIRED_EXTENSIONS_COUNT] = {
+    VK_KHR_SWAPCHAIN_EXTENSION_NAME
+};
 
-VkDevice logicalDeviceGetSecondary(void) {
-    return secondaryDevice;
+VkDevice logicalDeviceGet(void) {
+    return device;
 }
 
 void logicalDeviceClean(void) {
-    if (primaryDevice != VK_NULL_HANDLE) {
-        vkDestroyDevice(primaryDevice, NULL);
-    }
-
-    if (secondaryDevice != VK_NULL_HANDLE) {
-        vkDestroyDevice(secondaryDevice, NULL);
+    if (device != VK_NULL_HANDLE) {
+        vkDestroyDevice(device, NULL);
     }
 }
 
@@ -90,22 +86,17 @@ void logicalDeviceCreate(VkPhysicalDevice physicalDevice, VkDevice* logicalDevic
     createInfo.pQueueCreateInfos = sameQueue ? &graphicsQueueCreateInfo : queues;
     createInfo.enabledLayerCount = 0;
     createInfo.ppEnabledLayerNames = NULL;
-    createInfo.enabledExtensionCount = 0;
-    createInfo.ppEnabledExtensionNames = NULL;
+    createInfo.enabledExtensionCount = REQUIRED_EXTENSIONS_COUNT;
+    createInfo.ppEnabledExtensionNames = requiredExtensions;
     createInfo.pEnabledFeatures = &deviceFeatures;
 
     vkCreateDevice(physicalDevice, &createInfo, NULL, logicalDevice);
 }
 
 void logicalDeviceInit(void) {
-    VkPhysicalDevice primaryPhysicalDevice = physicalDeviceGetPrimary();
-    VkPhysicalDevice secondaryPhysicalDevice = physicalDeviceGetSecondary();
+    VkPhysicalDevice physicalDevice = physicalDeviceGet();
 
-    if (primaryPhysicalDevice != VK_NULL_HANDLE) {
-        logicalDeviceCreate(primaryPhysicalDevice, &primaryDevice);
-    }
-
-    if (secondaryPhysicalDevice != VK_NULL_HANDLE) {
-        logicalDeviceCreate(secondaryPhysicalDevice, &secondaryDevice);
+    if (physicalDevice != VK_NULL_HANDLE) {
+        logicalDeviceCreate(physicalDevice, &device);
     }
 }

@@ -6,15 +6,10 @@
 #include "devices/physicalDevice.h"
 #include "renderer/rendererInstance.h"
 
-static DEVICE* primaryDevice = NULL;
-static DEVICE* secondaryDevice = NULL;
+static DEVICE* device = NULL;
 
-DEVICE* devicesGetPrimary(void) {
-    return primaryDevice;
-}
-
-DEVICE* devicesGetSecondary(void) {
-    return secondaryDevice;
+DEVICE* devicesGet(void) {
+    return device;
 }
 
 void devicesPrint(DEVICE* device) {
@@ -28,18 +23,14 @@ void devicesPrint(DEVICE* device) {
 void devicesClean(void) {
     logicalDeviceClean();
 
-    if (primaryDevice != NULL) {
-        free(primaryDevice);
-    }
-
-    if (secondaryDevice != NULL) {
-        free(secondaryDevice);
+    if (device != NULL) {
+        free(device);
     }
 }
 
-void devicesCreate(DEVICE* device, U8 primary) {
-    device->logical = primary ? logicalDeviceGetPrimary() : logicalDeviceGetSecondary();
-    device->physical = primary ? physicalDeviceGetPrimary() : physicalDeviceGetSecondary();
+void devicesCreate(DEVICE* device) {
+    device->logical = logicalDeviceGet();
+    device->physical = physicalDeviceGet();
     device->properties = physicalDeviceGetProperties(device->physical);
     device->graphicQueue = logicalDeviceGetQueue(device->physical, device->logical, VK_QUEUE_GRAPHICS_BIT);
     device->presentQueue = logicalDeviceGetPresentationQueue(device->physical, device->logical);
@@ -49,14 +40,9 @@ void devicesInit(void) {
     physicalDeviceInit(rendererInstanceGetInstance());
     logicalDeviceInit();
 
-    if (logicalDeviceGetPrimary() != VK_NULL_HANDLE) {
-        primaryDevice = malloc(sizeof(DEVICE));
-        devicesCreate(primaryDevice, 1);
-    }
-
-    if (logicalDeviceGetSecondary() != VK_NULL_HANDLE) {
-        secondaryDevice = malloc(sizeof(DEVICE));
-        devicesCreate(secondaryDevice, 0);
+    if (logicalDeviceGet() != VK_NULL_HANDLE) {
+        device = malloc(sizeof(DEVICE));
+        devicesCreate(device);
     }
 }
 

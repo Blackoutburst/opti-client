@@ -5,6 +5,7 @@
 #include "renderer/rendererInstance.h"
 #include "renderer/windowSurface.h"
 #include "utils/args.h"
+#include "renderer/swapChain.h"
 
 void vkInit(void) {
     rendererInstanceInit();
@@ -15,6 +16,8 @@ void vkInit(void) {
     
 
     devicesInit();
+    swapChainInit();
+    
 
     if (argsGetValidationLayers()) {
         logCallBackSet(instance);
@@ -28,6 +31,7 @@ void vkClean(void) {
         logCallBackClean(instance);
     }
 
+    swapChainClean();
     devicesClean();
     windowSurfaceClean(instance);
     rendererInstanceClean();

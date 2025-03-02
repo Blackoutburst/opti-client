@@ -13,9 +13,8 @@ struct device {
     VkQueue presentQueue;
 };
 
-DEVICE* devicesGetPrimary(void);
-DEVICE* devicesGetSecondary(void);
-void devicesCreate(DEVICE* device, U8 primary);
+DEVICE* devicesGet(void);
+void devicesCreate(DEVICE* device);
 void devicesPrint(DEVICE* device);
 void devicesClean(void);
 void devicesInit(void);

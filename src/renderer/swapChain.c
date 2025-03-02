@@ -15,9 +15,9 @@ VkSwapchainKHR swapChainGet(void) {
 
 VkSurfaceFormatKHR swapChainFormat(void) {
     U32 count = 0;
-    VkSurfaceFormatKHR* data = malloc(sizeof(VkSurfaceFormatKHR) * count);
-    
     vkGetPhysicalDeviceSurfaceFormatsKHR(physicalDeviceGet(), windowSurfaceGet(), &count, NULL);
+
+    VkSurfaceFormatKHR* data = malloc(sizeof(VkSurfaceFormatKHR) * count);
     vkGetPhysicalDeviceSurfaceFormatsKHR(physicalDeviceGet(), windowSurfaceGet(), &count, data);
 
     for (U32 i = 0; i < count; i++) {
@@ -31,9 +31,9 @@ VkSurfaceFormatKHR swapChainFormat(void) {
 
 VkPresentModeKHR swapChainPresentMode(void) {
     U32 count = 0;
-    VkPresentModeKHR* data = malloc(sizeof(VkSurfaceFormatKHR) * count);
-    
     vkGetPhysicalDeviceSurfacePresentModesKHR(physicalDeviceGet(), windowSurfaceGet(), &count, NULL);
+
+    VkPresentModeKHR* data = malloc(sizeof(VkSurfaceFormatKHR) * count);
     vkGetPhysicalDeviceSurfacePresentModesKHR(physicalDeviceGet(), windowSurfaceGet(), &count, data);
 
     for (U32 i = 0; i < count; i++) {
@@ -93,7 +93,7 @@ void swapChainInit(void) {
     createInfo.imageExtent = extent;
     createInfo.imageArrayLayers = 1;
     createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-    
+
     U32 queues[2] = { queueFamiliesGetType(physicalDeviceGet(), VK_QUEUE_GRAPHICS_BIT), logicalDeviceGetSurfaceSupport(physicalDeviceGet()) };
     U8 sameQueue = queues[0] == queues[1];
 
@@ -106,7 +106,7 @@ void swapChainInit(void) {
         createInfo.queueFamilyIndexCount = 2;
         createInfo.pQueueFamilyIndices = queues;
     }
-    
+
     createInfo.preTransform = capabilities.currentTransform;
     createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
     createInfo.presentMode = presentMode;

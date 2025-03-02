@@ -12,7 +12,7 @@ readonly L_GLFW="$HOME/glfw/lib-arm64"
 readonly GLFW="-I$I_GLFW -L$L_GLFW -lglfw3"
 
 readonly F_ERROR="-Wall -Wextra -Wpedantic"
-readonly F_DEBUG="-g3 -fsanitize=address"
+readonly F_DEBUG="-g3 -fno-omit-frame-pointer -fsanitize=address -fsanitize-address-use-after-return=always"
 readonly F_DISABLED=""
 readonly FRAMEWORKS="-framework Cocoa -framework IOKit"
 

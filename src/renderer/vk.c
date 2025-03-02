@@ -5,6 +5,7 @@
 #include "renderer/rendererInstance.h"
 #include "renderer/windowSurface.h"
 #include "utils/args.h"
+#include "utils/logger.h"
 #include "renderer/swapChain.h"
 
 void vkInit(void) {
@@ -13,7 +14,6 @@ void vkInit(void) {
     VkInstance instance = rendererInstanceGetInstance();
     
     windowSurfaceInit(instance, windowGetHandle());
-    
 
     devicesInit();
     swapChainInit();

@@ -10,21 +10,22 @@
 #include "renderer/vk.h"
 #include "window/window.h"
 
+#include <sanitizer/lsan_interface.h>
+
 I32 main(I32 argc, I8** argv) {
     argsParse(argc, argv);
     windowInit();
 
     vkInit();
-
     while(!glfwWindowShouldClose(windowGetHandle())) {
         windowUpdate();
-
         windowClear();
     }
 
     vkClean();
 
     windowClean();
+
 
     return 0;
 }

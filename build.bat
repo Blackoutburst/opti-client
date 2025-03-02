@@ -13,7 +13,7 @@ set GLFW=-I"%I_GLFW%" -L"%L_GLFW%" -lglfw3dll
 
 
 set F_ERROR=-Wall -Wextra -Wpedantic
-set F_DEBUG=-g3 -fsanitize=address
+set F_DEBUG=-g3 -fno-omit-frame-pointer -fsanitize=address -fsanitize-address-use-after-return=always
 set F_DISABLED=
 
 rem GCC

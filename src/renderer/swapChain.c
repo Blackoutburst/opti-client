@@ -9,6 +9,16 @@
 
 static VkSwapchainKHR swapChain;
 
+VkImage* swapChainGetImages(void) {
+    U32 count = 0;
+    vkGetSwapchainImagesKHR(logicalDeviceGet(), swapChain, &count, NULL);
+
+    VkImage* data = malloc(sizeof(VkSurfaceFormatKHR) * count);
+    vkGetSwapchainImagesKHR(logicalDeviceGet(), swapChain, &count, data);
+
+    return data;
+}
+
 VkSwapchainKHR swapChainGet(void) {
     return swapChain;
 }

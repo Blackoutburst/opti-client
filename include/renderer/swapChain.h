@@ -3,6 +3,7 @@
 #include <vulkan/vulkan.h>
 #include "utils/types.h"
 
+VkImage* swapChainGetImages(void);
 VkSwapchainKHR swapChainGet(void);
 VkSurfaceFormatKHR swapChainFormat(void);
 VkPresentModeKHR swapChainPresentMode(void);

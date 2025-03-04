@@ -4,6 +4,7 @@
 #include "utils/types.h"
 
 VkImage* swapChainGetImages(void);
+U32 swapChainGetImagesCount(void);
 VkSwapchainKHR swapChainGet(void);
 VkSurfaceFormatKHR swapChainFormat(void);
 VkPresentModeKHR swapChainPresentMode(void);

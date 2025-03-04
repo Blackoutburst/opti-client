@@ -7,32 +7,36 @@
 #include "utils/args.h"
 #include "utils/logger.h"
 #include "renderer/swapChain.h"
+#include "renderer/imageView.h"
 
 void vkInit(void) {
     rendererInstanceInit();
     
     VkInstance instance = rendererInstanceGetInstance();
+
+    if (argsGetValidationLayers()) {
+        logCallBackSet(instance);
+    }
     
     windowSurfaceInit(instance, windowGetHandle());
 
     devicesInit();
     swapChainInit();
+    imageViewInit();
     
-
-    if (argsGetValidationLayers()) {
-        logCallBackSet(instance);
-    }
 }
 
 void vkClean(void) {
     VkInstance instance = rendererInstanceGetInstance();
 
-    if (argsGetValidationLayers()) {
-        logCallBackClean(instance);
-    }
-
+    imageViewClean();
     swapChainClean();
     devicesClean();
     windowSurfaceClean(instance);
+    
+    if (argsGetValidationLayers()) {
+        logCallBackClean(instance);
+    }
+    
     rendererInstanceClean();
 }

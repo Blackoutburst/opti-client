@@ -8,6 +8,8 @@
 #include "utils/logger.h"
 #include "renderer/swapChain.h"
 #include "renderer/imageView.h"
+#include "renderer/shader.h"
+#include "renderer/pipeline.h"
 
 void vkInit(void) {
     rendererInstanceInit();
@@ -23,7 +25,11 @@ void vkInit(void) {
     devicesInit();
     swapChainInit();
     imageViewInit();
-    
+
+    VkShaderModule vertexShader = shaderInit("./shader/triangleVert.spv");
+    VkShaderModule fragmentShader = shaderInit("./shader/triangleFrag.spv");
+
+    pipelineInit(vertexShader, fragmentShader);
 }
 
 void vkClean(void) {

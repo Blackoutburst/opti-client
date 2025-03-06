@@ -179,14 +179,53 @@ VkPipelineLayout pipelineCreateLayout(void) {
     return pipelineLayout;
 }
 
-void pipelineClean(void) {
-
+void pipelineLayoutClean(VkPipelineLayout pipelineLayout) {
+    vkDestroyPipelineLayout(logicalDeviceGet(), pipelineLayout, NULL);
 }
 
-void pipelineInit(VkShaderModule vertexShader, VkShaderModule fragmentShader) {
+void pipelineClean(VkPipeline graphicsPipeline) {
+    vkDestroyPipeline(logicalDeviceGet(), graphicsPipeline, NULL);
+}
+
+VkPipeline pipelineInit(VkPipelineLayout layout, VkShaderModule vertexShader, VkShaderModule fragmentShader, VkRenderPass renderPass) {
+    UNUSED_VAR(layout);
+    
     VkPipelineShaderStageCreateInfo vertexInfo = pipelineCreateShader(VK_SHADER_STAGE_VERTEX_BIT, vertexShader);
     VkPipelineShaderStageCreateInfo fragmentInfo = pipelineCreateShader(VK_SHADER_STAGE_FRAGMENT_BIT, fragmentShader);
     VkPipelineShaderStageCreateInfo shaderInfo[2] = {vertexInfo, fragmentInfo};
 
-    UNUSED_VAR(shaderInfo);
+    VkPipelineVertexInputStateCreateInfo vertexInput = pipelineCreateVertexInput();
+    VkPipelineInputAssemblyStateCreateInfo inputAssembly = pipelineCreateInputAssembly();
+    VkPipelineViewportStateCreateInfo viewport = pipelineCreateViewportState(pipelineCreateViewport(), pipelineCreateScissor());
+    VkPipelineRasterizationStateCreateInfo rasterizer = pipelineCreateRasterizerState();
+    VkPipelineMultisampleStateCreateInfo multiSampling = pipelineCreateMultisamplingState();
+    VkPipelineColorBlendStateCreateInfo colorBlend =  pipelineCreateColorBlendState(pipelineCreateColorBlendAttachmentState());
+    VkPipelineDynamicStateCreateInfo dynamicState = pipelineCreateDynamicState();
+
+    VkGraphicsPipelineCreateInfo createInfo;
+    createInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+    createInfo.flags = 0;
+    createInfo.pNext = NULL;
+    createInfo.stageCount = 2;
+    createInfo.pStages = shaderInfo;
+    createInfo.pVertexInputState = &vertexInput;
+    createInfo.pInputAssemblyState = &inputAssembly;
+    createInfo.pTessellationState = NULL;
+    createInfo.pViewportState = &viewport;
+    createInfo.pRasterizationState = &rasterizer;
+    createInfo.pMultisampleState = &multiSampling;
+    createInfo.pDepthStencilState = NULL;
+    createInfo.pColorBlendState = &colorBlend;
+    createInfo.pDynamicState = &dynamicState;
+    createInfo.layout = layout;
+    createInfo.renderPass = renderPass;
+    createInfo.subpass = 0;
+    createInfo.basePipelineHandle = VK_NULL_HANDLE;
+    createInfo.basePipelineIndex = -1;
+
+    VkPipeline graphicsPipeline;
+    vkCreateGraphicsPipelines(logicalDeviceGet(), VK_NULL_HANDLE, 1, &createInfo, NULL, &graphicsPipeline);
+
+    return graphicsPipeline;
+
 }

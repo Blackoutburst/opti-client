@@ -1,19 +1,25 @@
 #include <stdlib.h>
 
 #include "renderer/imageView.h"
-#include "renderer/swapChain.h"
-#include "devices/logicalDevice.h"
+#include "renderer/swapchain.h"
+#include "devices/devices.h"
 
-static VkImageView* imageView = NULL;
+void imageViewClean(VkImageView* imageView, VkSwapchainKHR swapchain) {
+    VkDevice device = devices()->logical;
+    U32 swapChainImagesCount = swapChainGetImagesCount(swapchain);
 
-VkImageView* imageViewGet(void) {
-    return imageView;
+    for (U32 i = 0; i < swapChainImagesCount; i++) {
+        vkDestroyImageView(device, imageView[i], NULL);
+    }
+
+    free(imageView);
 }
 
-void imageViewInit(void) {
-    VkDevice device = logicalDeviceGet();
-    U32 swapChainImagesCount = swapChainGetImagesCount();
-    VkImage* swapChainImages = swapChainGetImages();
+VkImageView* imageViewInit(VkSwapchainKHR swapchain) {
+    VkImageView* imageView;
+    VkDevice device = devices()->logical;
+    U32 swapChainImagesCount = swapChainGetImagesCount(swapchain);
+    VkImage* swapChainImages = swapChainGetImages(swapchain);
     VkSurfaceFormatKHR surfaceFormat = swapChainFormat();
     VkFormat format = surfaceFormat.format;
 
@@ -38,16 +44,7 @@ void imageViewInit(void) {
         createInfo.subresourceRange.layerCount = 1;
         vkCreateImageView(device, &createInfo, NULL, &imageView[i]);
     }
-}
 
-void imageViewClean(void) {
-    VkDevice device = logicalDeviceGet();
-    U32 swapChainImagesCount = swapChainGetImagesCount();
-
-    for (U32 i = 0; i < swapChainImagesCount; i++) {
-        vkDestroyImageView(device, imageView[i], NULL);
-    }
-
-    free(imageView);
+    return imageView;
 }
 

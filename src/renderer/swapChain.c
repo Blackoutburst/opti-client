@@ -1,39 +1,33 @@
 #include <stdlib.h>
-#include "renderer/swapChain.h"
+#include "renderer/swapchain.h"
 #include "renderer/windowSurface.h"
-#include "devices/physicalDevice.h"
-#include "devices/queueFamilies.h"
+#include "devices/devices.h"
 #include "devices/logicalDevice.h"
+#include "devices/queueFamilies.h"
 #include "window/window.h"
 #include "utils/math.h"
 
-static VkSwapchainKHR swapChain;
-
-VkImage* swapChainGetImages(void) {
-    U32 count = swapChainGetImagesCount();
+VkImage* swapChainGetImages(VkSwapchainKHR swapchain) {
+    U32 count = swapChainGetImagesCount(swapchain);
     VkImage* data = malloc(sizeof(VkSurfaceFormatKHR) * count);
-    vkGetSwapchainImagesKHR(logicalDeviceGet(), swapChain, &count, data);
+    vkGetSwapchainImagesKHR(devices()->logical, swapchain, &count, data);
 
     return data;
 }
 
-U32 swapChainGetImagesCount(void) {
+U32 swapChainGetImagesCount(VkSwapchainKHR swapchain) {
     U32 count = 0;
-    vkGetSwapchainImagesKHR(logicalDeviceGet(), swapChain, &count, NULL);
+    vkGetSwapchainImagesKHR(devices()->logical, swapchain, &count, NULL);
 
     return count;
 }
 
-VkSwapchainKHR swapChainGet(void) {
-    return swapChain;
-}
-
 VkSurfaceFormatKHR swapChainFormat(void) {
     U32 count = 0;
-    vkGetPhysicalDeviceSurfaceFormatsKHR(physicalDeviceGet(), windowSurfaceGet(), &count, NULL);
+    vkGetPhysicalDeviceSurfaceFormatsKHR(devices()->physical, windowSurfaceGet(), &count, NULL);
 
     VkSurfaceFormatKHR* data = malloc(sizeof(VkSurfaceFormatKHR) * count);
-    vkGetPhysicalDeviceSurfaceFormatsKHR(physicalDeviceGet(), windowSurfaceGet(), &count, data);
+    vkGetPhysicalDeviceSurfaceFormatsKHR(devices()->physical, windowSurfaceGet(), &count, data);
 
     for (U32 i = 0; i < count; i++) {
         if (data[i].format == VK_FORMAT_B8G8R8A8_SRGB && data[i].colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
@@ -46,10 +40,10 @@ VkSurfaceFormatKHR swapChainFormat(void) {
 
 VkPresentModeKHR swapChainPresentMode(void) {
     U32 count = 0;
-    vkGetPhysicalDeviceSurfacePresentModesKHR(physicalDeviceGet(), windowSurfaceGet(), &count, NULL);
+    vkGetPhysicalDeviceSurfacePresentModesKHR(devices()->physical, windowSurfaceGet(), &count, NULL);
 
     VkPresentModeKHR* data = malloc(sizeof(VkSurfaceFormatKHR) * count);
-    vkGetPhysicalDeviceSurfacePresentModesKHR(physicalDeviceGet(), windowSurfaceGet(), &count, data);
+    vkGetPhysicalDeviceSurfacePresentModesKHR(devices()->physical, windowSurfaceGet(), &count, data);
 
     for (U32 i = 0; i < count; i++) {
         if (data[i] == VK_PRESENT_MODE_MAILBOX_KHR) {
@@ -62,7 +56,7 @@ VkPresentModeKHR swapChainPresentMode(void) {
 
 VkSurfaceCapabilitiesKHR swapChainCapabilities(void) {
     VkSurfaceCapabilitiesKHR capabilities;
-    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physicalDeviceGet(), windowSurfaceGet(), &capabilities);
+    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(devices()->physical, windowSurfaceGet(), &capabilities);
 
     return capabilities;
 }
@@ -83,11 +77,12 @@ VkExtent2D swapChainExtend(void) {
     };
 }
 
-void swapChainClean(void) {
-    vkDestroySwapchainKHR(logicalDeviceGet(), swapChain, NULL);
+void swapChainClean(VkSwapchainKHR swapchain) {
+    vkDestroySwapchainKHR(devices()->logical, swapchain, NULL);
 }
 
-void swapChainInit(void) {
+VkSwapchainKHR swapChainInit(void) {
+    VkSwapchainKHR swapchain;
     VkSurfaceCapabilitiesKHR capabilities = swapChainCapabilities();
     VkSurfaceFormatKHR surfaceFormat = swapChainFormat();
     VkPresentModeKHR presentMode = swapChainPresentMode();
@@ -109,7 +104,7 @@ void swapChainInit(void) {
     createInfo.imageArrayLayers = 1;
     createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
-    U32 queues[2] = { queueFamiliesGetType(physicalDeviceGet(), VK_QUEUE_GRAPHICS_BIT), logicalDeviceGetSurfaceSupport(physicalDeviceGet()) };
+    U32 queues[2] = { queueFamiliesGetType(devices()->physical, VK_QUEUE_GRAPHICS_BIT), logicalDeviceGetSurfaceSupport(devices()->physical) };
     U8 sameQueue = queues[0] == queues[1];
 
     if (sameQueue) {
@@ -128,5 +123,7 @@ void swapChainInit(void) {
     createInfo.clipped = VK_TRUE;
     createInfo.oldSwapchain = VK_NULL_HANDLE;
 
-    vkCreateSwapchainKHR(logicalDeviceGet(), &createInfo, NULL, &swapChain);
+    vkCreateSwapchainKHR(devices()->logical, &createInfo, NULL, &swapchain);
+
+    return swapchain;
 }

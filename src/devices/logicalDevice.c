@@ -6,18 +6,12 @@
 #include "renderer/windowSurface.h"
 #include "utils/logger.h"
 
-static VkDevice device = VK_NULL_HANDLE;
-
 #define REQUIRED_EXTENSIONS_COUNT 1
 static const I8* requiredExtensions[REQUIRED_EXTENSIONS_COUNT] = {
     VK_KHR_SWAPCHAIN_EXTENSION_NAME
 };
 
-VkDevice logicalDeviceGet(void) {
-    return device;
-}
-
-void logicalDeviceClean(void) {
+void logicalDeviceClean(VkDevice device) {
     if (device != VK_NULL_HANDLE) {
         vkDestroyDevice(device, NULL);
     }
@@ -53,8 +47,9 @@ U32 logicalDeviceGetSurfaceSupport(VkPhysicalDevice device) {
     return 0;
 }
 
-void logicalDeviceCreate(VkPhysicalDevice physicalDevice, VkDevice* logicalDevice) {
+VkDevice logicalDeviceCreate(VkPhysicalDevice physicalDevice) {
     const F32 queuePriority = 1.0;
+    VkDevice logicalDevice = VK_NULL_HANDLE;
 
     VkDeviceQueueCreateInfo graphicsQueueCreateInfo;
     graphicsQueueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
@@ -90,13 +85,17 @@ void logicalDeviceCreate(VkPhysicalDevice physicalDevice, VkDevice* logicalDevic
     createInfo.ppEnabledExtensionNames = requiredExtensions;
     createInfo.pEnabledFeatures = &deviceFeatures;
 
-    vkCreateDevice(physicalDevice, &createInfo, NULL, logicalDevice);
+    vkCreateDevice(physicalDevice, &createInfo, NULL, &logicalDevice);
+
+    return logicalDevice;
 }
 
-void logicalDeviceInit(void) {
-    VkPhysicalDevice physicalDevice = physicalDeviceGet();
-
+VkDevice logicalDeviceInit(VkPhysicalDevice physicalDevice) {
+    VkDevice logicalDevice = VK_NULL_HANDLE;
+    
     if (physicalDevice != VK_NULL_HANDLE) {
-        logicalDeviceCreate(physicalDevice, &device);
+        logicalDevice = logicalDeviceCreate(physicalDevice);
     }
+
+    return logicalDevice;
 }

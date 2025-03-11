@@ -4,6 +4,6 @@
 
 #include "utils/types.h"
 
-VkImageView* imageViewGet(void);
-void imageViewInit(void);
-void imageViewClean(void);
+void imageViewClean(VkImageView* imageView, VkSwapchainKHR swapchain);
+VkImageView* imageViewInit(VkSwapchainKHR swapchain);
+

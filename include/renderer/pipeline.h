@@ -3,10 +3,6 @@
 #include <vulkan/vulkan.h>
 #include "utils/types.h"
 
-#include "renderer/pipeline.h"
-#include "renderer/swapChain.h"
-#include "devices/logicalDevice.h"
-
 VkPipelineShaderStageCreateInfo pipelineCreateShader(VkShaderStageFlagBits stage, VkShaderModule shader);
 VkPipelineDynamicStateCreateInfo pipelineCreateDynamicState(void);
 VkPipelineVertexInputStateCreateInfo pipelineCreateVertexInput(void);

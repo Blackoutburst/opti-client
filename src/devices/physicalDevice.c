@@ -5,10 +5,9 @@
 #include "devices/physicalDevice.h"
 #include "devices/queueFamilies.h"
 #include "renderer/windowSurface.h"
+#include "renderer/rendererInstance.h"
 
 #define PHYSICAL_DEVICE_TYPE_COUNT 5
-
-static VkPhysicalDevice device = VK_NULL_HANDLE;
 
 #define REQUIRED_EXTENSIONS_COUNT 1
 static const I8* requiredExtensions[REQUIRED_EXTENSIONS_COUNT] = {
@@ -23,29 +22,11 @@ static const VkPhysicalDeviceType devicePriorityList[PHYSICAL_DEVICE_TYPE_COUNT]
     VK_PHYSICAL_DEVICE_TYPE_OTHER
 };
 
-VkPhysicalDevice physicalDeviceGet(void) {
-    return device;
-}
-
 VkPhysicalDeviceProperties physicalDeviceGetProperties(VkPhysicalDevice device) {
     VkPhysicalDeviceProperties properties;
     vkGetPhysicalDeviceProperties(device, &properties);
 
     return properties;
-}
-
-void physicalDeviceInit(VkInstance instance) {
-    physicalDeviceList(instance);
-
-    VkPhysicalDeviceProperties deviceProperties;
-
-    U32 i = 0;
-    while (device == VK_NULL_HANDLE && i < PHYSICAL_DEVICE_TYPE_COUNT) {
-        device = physicalDeviceGetDevice(instance, devicePriorityList[i++], 0);
-    }
-    vkGetPhysicalDeviceProperties(device, &deviceProperties);
-
-    logI("GPU's selected: %s (%s)", deviceProperties.deviceName, physicalDeviceTypeName(deviceProperties.deviceType));
 }
 
 const I8* physicalDeviceTypeName(VkPhysicalDeviceType type) {
@@ -59,19 +40,19 @@ const I8* physicalDeviceTypeName(VkPhysicalDeviceType type) {
     }
 }
 
-U32 physicalDeviceCount(VkInstance instance) {
+U32 physicalDeviceCount(void) {
     U32 count = 0;
 
-    vkEnumeratePhysicalDevices(instance, &count, NULL);
+    vkEnumeratePhysicalDevices(renderer(), &count, NULL);
 
     return count;
 }
 
-void physicalDeviceList(VkInstance instance) {
-    U32 deviceCount = physicalDeviceCount(instance);
+void physicalDeviceList(void) {
+    U32 deviceCount = physicalDeviceCount();
     VkPhysicalDevice* devices = malloc(sizeof(VkPhysicalDevice) * deviceCount);
 
-    vkEnumeratePhysicalDevices(instance, &deviceCount, devices);
+    vkEnumeratePhysicalDevices(renderer(), &deviceCount, devices);
 
     logI("Physical devices found: %i", deviceCount);
 
@@ -100,17 +81,16 @@ U8 physicalDeviceHasExtensions(VkPhysicalDevice device) {
     return extensionsPresent == REQUIRED_EXTENSIONS_COUNT;
 }
 
-VkPhysicalDevice physicalDeviceGetDevice(VkInstance instance, U8 desiredType, U32 primaryId) {
-    U32 deviceCount = physicalDeviceCount(instance);
+VkPhysicalDevice physicalDeviceGetDevice(U8 desiredType) {
+    U32 deviceCount = physicalDeviceCount();
     VkPhysicalDevice* devices = malloc(sizeof(VkPhysicalDevice) * deviceCount);
 
-    vkEnumeratePhysicalDevices(instance, &deviceCount, devices);
+    vkEnumeratePhysicalDevices(renderer(), &deviceCount, devices);
 
     for (U32 i = 0; i < deviceCount; i++) {
         VkPhysicalDeviceProperties deviceProperties;
         vkGetPhysicalDeviceProperties(devices[i], &deviceProperties);
 
-        if (deviceProperties.deviceID == primaryId) continue;
         if (!queueFamiliesHasType(devices[i], VK_QUEUE_GRAPHICS_BIT)) continue;
         VkBool32 presentSupport = VK_FALSE;
         vkGetPhysicalDeviceSurfaceSupportKHR(devices[i], i, windowSurfaceGet(), &presentSupport);
@@ -121,4 +101,20 @@ VkPhysicalDevice physicalDeviceGetDevice(VkInstance instance, U8 desiredType, U3
     }
 
     return VK_NULL_HANDLE;
+}
+
+VkPhysicalDevice physicalDeviceInit(void) {
+    VkPhysicalDevice device = VK_NULL_HANDLE;
+    physicalDeviceList();
+
+    VkPhysicalDeviceProperties deviceProperties;
+
+    U32 i = 0;
+    while (device == VK_NULL_HANDLE && i < PHYSICAL_DEVICE_TYPE_COUNT) {
+        device = physicalDeviceGetDevice(devicePriorityList[i++]);
+    }
+    vkGetPhysicalDeviceProperties(device, &deviceProperties);
+
+    logI("GPU's selected: %s (%s)", deviceProperties.deviceName, physicalDeviceTypeName(deviceProperties.deviceType));
+    return device;
 }

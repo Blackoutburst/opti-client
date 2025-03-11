@@ -1,9 +1,9 @@
 #include "renderer/shader.h"
 #include "utils/io.h"
-#include "devices/logicalDevice.h"
+#include "devices/devices.h"
 
 void shaderClean(VkShaderModule shader) {
-    vkDestroyShaderModule(logicalDeviceGet(), shader, NULL);
+    vkDestroyShaderModule(devices()->logical, shader, NULL);
 }
 
 VkShaderModule shaderInit(const I8* filePath) {
@@ -19,7 +19,7 @@ VkShaderModule shaderInit(const I8* filePath) {
     createInfo.pCode = code;
 
     VkShaderModule shaderModule;
-    vkCreateShaderModule(logicalDeviceGet(), &createInfo, NULL, &shaderModule);
+    vkCreateShaderModule(devices()->logical, &createInfo, NULL, &shaderModule);
 
     return shaderModule;
 }

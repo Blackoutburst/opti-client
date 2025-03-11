@@ -13,9 +13,9 @@ struct device {
     VkQueue presentQueue;
 };
 
-DEVICE* devicesGet(void);
-void devicesCreate(DEVICE* device);
-void devicesPrint(DEVICE* device);
+DEVICE* devices(void);
+void devicesCreate(VkPhysicalDevice physical, VkDevice logical);
+void devicesPrint(void);
 void devicesClean(void);
-void devicesInit(void);
+void devicesInit(VkPhysicalDevice physical, VkDevice logical);
 

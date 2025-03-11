@@ -1,7 +1,6 @@
 #include "renderer/pipeline.h"
-#include "renderer/swapChain.h"
-#include "devices/logicalDevice.h"
-
+#include "renderer/swapchain.h"
+#include "devices/devices.h"
 
 VkPipelineShaderStageCreateInfo pipelineCreateShader(VkShaderStageFlagBits stage, VkShaderModule shader) {
     VkPipelineShaderStageCreateInfo createInfo;
@@ -159,7 +158,7 @@ VkPipelineColorBlendStateCreateInfo pipelineCreateColorBlendState(VkPipelineColo
 }
 
 void pipelineDeleteLayout(VkPipelineLayout layout) {
-    vkDestroyPipelineLayout(logicalDeviceGet(), layout, NULL);
+    vkDestroyPipelineLayout(devices()->logical, layout, NULL);
 }
 
 VkPipelineLayout pipelineCreateLayout(void) {
@@ -174,17 +173,17 @@ VkPipelineLayout pipelineCreateLayout(void) {
     createInfo.pushConstantRangeCount = 0;
     createInfo.pPushConstantRanges = NULL;
     
-    vkCreatePipelineLayout(logicalDeviceGet(), &createInfo, NULL, &pipelineLayout);
+    vkCreatePipelineLayout(devices()->logical, &createInfo, NULL, &pipelineLayout);
 
     return pipelineLayout;
 }
 
 void pipelineLayoutClean(VkPipelineLayout pipelineLayout) {
-    vkDestroyPipelineLayout(logicalDeviceGet(), pipelineLayout, NULL);
+    vkDestroyPipelineLayout(devices()->logical, pipelineLayout, NULL);
 }
 
 void pipelineClean(VkPipeline graphicsPipeline) {
-    vkDestroyPipeline(logicalDeviceGet(), graphicsPipeline, NULL);
+    vkDestroyPipeline(devices()->logical, graphicsPipeline, NULL);
 }
 
 VkPipeline pipelineInit(VkPipelineLayout layout, VkShaderModule vertexShader, VkShaderModule fragmentShader, VkRenderPass renderPass) {
@@ -224,7 +223,7 @@ VkPipeline pipelineInit(VkPipelineLayout layout, VkShaderModule vertexShader, Vk
     createInfo.basePipelineIndex = -1;
 
     VkPipeline graphicsPipeline;
-    vkCreateGraphicsPipelines(logicalDeviceGet(), VK_NULL_HANDLE, 1, &createInfo, NULL, &graphicsPipeline);
+    vkCreateGraphicsPipelines(devices()->logical, VK_NULL_HANDLE, 1, &createInfo, NULL, &graphicsPipeline);
 
     return graphicsPipeline;
 

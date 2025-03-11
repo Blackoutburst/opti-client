@@ -8,11 +8,11 @@
 
 static DEVICE* device = NULL;
 
-DEVICE* devicesGet(void) {
+DEVICE* devices(void) {
     return device;
 }
 
-void devicesPrint(DEVICE* device) {
+void devicesPrint(void) {
     if (device == NULL) {
         logI("Device: NULL");
     } else {
@@ -21,28 +21,25 @@ void devicesPrint(DEVICE* device) {
 }
 
 void devicesClean(void) {
-    logicalDeviceClean();
+    logicalDeviceClean(device->logical);
 
     if (device != NULL) {
         free(device);
     }
 }
 
-void devicesCreate(DEVICE* device) {
-    device->logical = logicalDeviceGet();
-    device->physical = physicalDeviceGet();
+void devicesCreate(VkPhysicalDevice physical, VkDevice logical) {
+    device->physical = physical;
+    device->logical = logical;
     device->properties = physicalDeviceGetProperties(device->physical);
     device->graphicQueue = logicalDeviceGetQueue(device->physical, device->logical, VK_QUEUE_GRAPHICS_BIT);
     device->presentQueue = logicalDeviceGetPresentationQueue(device->physical, device->logical);
 }
 
-void devicesInit(void) {
-    physicalDeviceInit(rendererInstanceGetInstance());
-    logicalDeviceInit();
-
-    if (logicalDeviceGet() != VK_NULL_HANDLE) {
+void devicesInit(VkPhysicalDevice physical, VkDevice logical) {
+    if (physical != VK_NULL_HANDLE && logical != VK_NULL_HANDLE) {
         device = malloc(sizeof(DEVICE));
-        devicesCreate(device);
+        devicesCreate(physical, logical);
     }
 }
 

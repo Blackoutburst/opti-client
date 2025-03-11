@@ -12,7 +12,7 @@
 
 static VkInstance instance;
 
-VkInstance rendererInstanceGetInstance(void) {
+VkInstance renderer(void) {
     return instance;
 }
 

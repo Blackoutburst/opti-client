@@ -2,6 +2,6 @@
 
 #include "utils/types.h"
 
-VkInstance rendererInstanceGetInstance(void);
+VkInstance renderer(void);
 void rendererInstanceClean(void);
 void rendererInstanceInit(void);

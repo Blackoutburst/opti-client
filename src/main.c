@@ -19,7 +19,8 @@ I32 main(I32 argc, I8** argv) {
     vkInit();
     while(!glfwWindowShouldClose(windowGetHandle())) {
         windowUpdate();
-        windowClear();
+
+        vkDrawTriangle();
     }
 
     vkClean();

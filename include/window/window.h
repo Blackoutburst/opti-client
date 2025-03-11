@@ -5,6 +5,5 @@
 
 GLFWwindow* windowGetHandle(void);
 void windowUpdate(void);
-void windowClear(void);
 void windowClean(void);
 void windowInit(void);

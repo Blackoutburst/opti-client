@@ -10,10 +10,6 @@ void windowUpdate(void) {
     glfwPollEvents();
 }
 
-void windowClear(void) {
-
-}
-
 void windowClean(void) {
     glfwDestroyWindow(window);
 
